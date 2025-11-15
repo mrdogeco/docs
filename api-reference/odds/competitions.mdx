@@ -1,5 +1,5 @@
 ---
-title: "List Competitions"
+title: "Competitions"
 api: "GET https://api.mrdoge.co/odds/competitions"
 description: "Get all available competitions (leagues/tournaments) with event counts"
 ---
@@ -18,30 +18,44 @@ Use this endpoint to:
 
 ## Query Parameters
 
+<ParamField query="locale" type="string" default="en">
+  Language for competition and region names. Supported: `en`, `es`, `pt`
+</ParamField>
+
 <ParamField query="regionId" type="string">
   Filter competitions by region ID
 
-  Example: `1` for England
+  Example: `6` for England
 </ParamField>
 
 <ParamField query="date" type="string">
   Filter competitions with events on specific date (YYYY-MM-DD)
 
   Example: `2025-11-08`
+
+  <Warning>
+    Cannot be used together with `startDate` or `endDate`. Choose either `date` for single-day filtering or `startDate`/`endDate` for range filtering.
+  </Warning>
 </ParamField>
 
 <ParamField query="startDate" type="string">
   Filter competitions with events starting from this date
+
+  <Warning>
+    Cannot be used together with `date` parameter.
+  </Warning>
 </ParamField>
 
 <ParamField query="endDate" type="string">
   Filter competitions with events ending on this date
+
+  <Warning>
+    Cannot be used together with `date` parameter.
+  </Warning>
 </ParamField>
 
-<ParamField query="includeCompleted" type="string" default="false">
-  Include completed events in count
-
-  Values: `true` or `false`
+<ParamField query="status" type="string" default="upcoming,live">
+  Filter by event status. Pass multiple values with commas or repeat the parameter (e.g., `status=completed`). Defaults to upcoming + live events.
 </ParamField>
 
 <ParamField query="timezone" type="string">
@@ -59,7 +73,7 @@ Use this endpoint to:
     </ResponseField>
 
     <ResponseField name="caption" type="string">
-      Competition name
+      Competition name (localized using the `locale` parameter)
 
       Example: `Premier League`, `Champions League`
     </ResponseField>
@@ -69,7 +83,7 @@ Use this endpoint to:
     </ResponseField>
 
     <ResponseField name="region" type="object">
-      Region object with `id` and `caption`
+      Region object with `id` and localized `caption`
     </ResponseField>
 
     <ResponseField name="_count" type="object">
@@ -85,7 +99,7 @@ Use this endpoint to:
 ## Example Request
 
 ```bash
-curl https://api.mrdoge.co/odds/competitions?regionId=1&date=2025-11-08
+curl "https://api.mrdoge.co/odds/competitions?regionId=1&date=2025-11-08&locale=en"
 ```
 
 ## Example Response

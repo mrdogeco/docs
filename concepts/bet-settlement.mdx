@@ -467,7 +467,7 @@ recommendations.forEach(rec => {
   <Accordion title="Can I see settlement before it happens?" icon="eye">
     **No.** Settlement only occurs after events complete. You can:
     - View unsettled recommendations: `?settled=false`
-    - Track live events: `GET /odds/live-events`
+    - Track live events: `GET /odds/events?status=live`
     - Monitor event status: `GET /odds/events/:id/status`
 
     But you won't see settlement results until the event is marked `completed` and settlement runs.

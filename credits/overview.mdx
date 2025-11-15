@@ -57,8 +57,7 @@ Credits are the currency of the Mr. Doge API. Instead of monthly subscriptions o
 
 Most endpoints cost **1 credit** per request:
 
-- `/odds/events` - Get upcoming events with odds
-- `/odds/live-events` - Real-time live events
+- `/odds/events` - Get events with odds (supports `status=live` for live events)
 - `/odds/events/:eventId` - Single event details
 - `/odds/teams` - Search teams
 - `/ai/betting-recommendations` - AI recommendations (filtered)
@@ -101,7 +100,7 @@ X-Auto-Recharge: false
 
 **Example in code:**
 ```javascript
-const response = await fetch('https://api.mrdoge.co/odds/events', {
+const response = await fetch('https://api.mrdoge.co/odds/events?locale=en', {
   headers: { 'Authorization': 'Bearer sk_live_...' }
 });
 
@@ -182,7 +181,7 @@ Save credits with these best practices:
 ```javascript ❌ Inefficient (100 credits)
 // Fetching 100 events individually
 for (let i = 0; i < 100; i++) {
-  await fetch(`https://api.mrdoge.co/odds/events/${eventIds[i]}`, {
+  await fetch(`https://api.mrdoge.co/odds/events/${eventIds[i]}?locale=en`, {
     headers: { 'Authorization': 'Bearer sk_live_...' }
   }); // 100 requests = 100 credits
 }
@@ -191,7 +190,7 @@ for (let i = 0; i < 100; i++) {
 ```javascript ✅ Efficient (1 credit)
 // Fetch all events in one request with filters
 const response = await fetch(
-  'https://api.mrdoge.co/odds/events?competitionId=premier-league&limit=100',
+  'https://api.mrdoge.co/odds/events?competitionId=premier-league&limit=100&locale=en',
   { headers: { 'Authorization': 'Bearer sk_live_...' } }
 ); // 1 request = 1 credit!
 ```

@@ -1,5 +1,5 @@
 ---
-title: "List Events"
+title: "Events"
 api: "GET https://api.mrdoge.co/odds/events"
 auth: "bearer"
 description: "Get sporting events with filtering by competition, region, date, and status"
@@ -11,7 +11,18 @@ description: "Get sporting events with filtering by competition, region, date, a
 
 Returns a list of sporting events with basic information. Use filters to find specific events by competition, region, date, or status.
 
-This is the main endpoint for browsing events. For full event details including markets and odds, use the [Get Event Details](/api-reference/odds/event-details) endpoint.
+This is the main endpoint for **browsing event lists and schedules**. It supports **all event statuses** including:
+- `upcoming` - Events that haven't started yet (no stats)
+- `live` - Currently ongoing events (**list only, no real-time data**)
+- `completed` - Finished events (includes final scores and stats)
+
+<Warning>
+**For real-time live data**: Use the [Get Live Events](/api-reference/odds/live-events) endpoint (2 credits) instead of `status=live` on this endpoint. The `/live-events` endpoint provides real-time scores, odds, and statistics with sub-second response times.
+
+This endpoint (`/events`) is designed for **static event lists and schedules**. Live events returned here will NOT include real-time stats or odds.
+</Warning>
+
+For full event details including markets and odds, use the [Get Event Details](/api-reference/odds/event-details) endpoint.
 
 <Note>
   **Pagination**: This endpoint returns a maximum of 100 events per request. To retrieve more events, use date ranges (`startDate`/`endDate`) or filter by specific competitions/regions and make multiple requests.
@@ -25,60 +36,126 @@ This is the main endpoint for browsing events. For full event details including 
 
 ## Query Parameters
 
+<ParamField query="locale" type="string" default="en">
+  Language for team, competition, and region names. Supported: `en`, `es`, `pt`
+</ParamField>
+
 <ParamField query="competitionId" type="string">
   Filter by competition ID
 
-  Example: `1` for Premier League
+  Example: `847` for Premier League
 </ParamField>
 
 <ParamField query="regionId" type="string">
   Filter by region ID
 
-  Example: `1` for England
+  Example: `6` for England
 </ParamField>
 
-<ParamField query="status" type="string">
-  Filter by event status
+<ParamField query="sportName" type="string">
+  Filter by sport name
+
+  Options: `soccer`, `basketball`, `tennis`, `baseball`, `volleyball`, `american-football`, `ice-hockey`, `handball`
+
+  Example: `soccer`
+</ParamField>
+
+<ParamField query="status" type="string" default="upcoming,live">
+  Filter by one or more event statuses.
 
   Options:
-  - `upcoming` - Events that haven't started
-  - `live` - Currently ongoing events
-  - `completed` - Finished events
+  - `upcoming` - Events that haven't started (no stats field)
+  - `live` - Currently ongoing events (**no stats/odds** - use `/live-events` for real-time data)
+  - `completed` - Finished events (includes `stats` field with final scores)
+
+  Pass multiple statuses with a comma (`status=upcoming,completed`) or by repeating the parameter (`status=upcoming&status=completed`).
+
+  Default: Returns both `upcoming` and `live` events
+
+  <Warning>
+    **Using `status=live`?** This returns a static list of live events without real-time data. For live scores, odds, and statistics, use the dedicated [/live-events](/api-reference/odds/live-events) endpoint instead.
+  </Warning>
 </ParamField>
 
 <ParamField query="date" type="string">
   Filter events on specific date (YYYY-MM-DD)
 
   Example: `2025-11-08`
+
+  <Note>
+    When no date parameters are provided, the API returns events based on the default `status` filter (upcoming and live events).
+  </Note>
+
+  <Warning>
+    Cannot be used together with `startDate` or `endDate`. Choose either `date` for single-day filtering or `startDate`/`endDate` for range filtering.
+  </Warning>
 </ParamField>
 
 <ParamField query="startDate" type="string">
-  Filter events starting from this date
+  Filter events starting on or after this date (YYYY-MM-DD). Pair with `endDate` to fetch a multi-day window (e.g., a full week) in one request and paginate through the calendar efficiently.
+
+  <Warning>
+    Cannot be used together with `date` parameter.
+  </Warning>
 </ParamField>
 
 <ParamField query="endDate" type="string">
-  Filter events ending on this date
+  Filter events ending on or before this date (YYYY-MM-DD). Used with `startDate` for range-based queries.
+
+  <Warning>
+    Cannot be used together with `date` parameter.
+  </Warning>
 </ParamField>
 
 <ParamField query="limit" type="string" default="100">
   Maximum number of events to return
 
-  Default: `100`, Max: `100`
+  Default: `100`, Maximum: `100`
 
-  Results are paginated - use filters to narrow down results or make multiple requests with different date ranges.
+  Use with `afterDate` for cursor-based pagination to fetch additional results.
 </ParamField>
 
-<ParamField query="includeCompleted" type="string" default="false">
-  Include completed events
+<ParamField query="afterDate" type="string">
+  **Pagination cursor**: Fetch events starting after this datetime (ISO 8601 format)
 
-  Values: `true` or `false`
+  Example: `2025-11-14T15:30:00Z`
+
+  <Note>
+    **How pagination works**:
+    1. First request: `GET /events?limit=100` → Returns 100 events
+    2. Get the last event's `startDateTime` from response
+    3. Next request: `GET /events?limit=100&afterDate=2025-11-14T15:30:00Z` → Returns next 100 events after that time
+    4. Repeat until no more results
+
+    This is **cursor-based pagination** - more efficient than offset-based pagination for time-series data.
+  </Note>
 </ParamField>
 
 <ParamField query="timezone" type="string">
-  Timezone for date filtering
+  Timezone for date filtering. Uses IANA timezone identifiers.
 
-  Example: `America/New_York`, `Europe/London`
+  Example: `America/New_York`, `Europe/London`, `America/Sao_Paulo`
+
+  <Note>
+    Recommended to always include timezone for accurate date filtering based on user location.
+  </Note>
 </ParamField>
+
+<Info>
+  Always include the `locale` parameter (`en`, `es`, or `pt`) to control translations. Requests without it default to English.
+</Info>
+
+<Tip>
+  **Getting Live Events with Real-Time Data**: Use the dedicated `/live-events` endpoint for real-time scores, odds, and statistics:
+
+  ```bash
+  GET /odds/live-events?sport=soccer&locale=en
+  ```
+
+  This provides sub-second response times and includes live stats, odds movements, and real-time scores.
+
+  **Don't use** `/events?status=live` for real-time data - it only returns a static list without stats.
+</Tip>
 
 ## Response
 
@@ -124,6 +201,47 @@ This is the main endpoint for browsing events. For full event details including 
   Number of times this event has been viewed
 </ResponseField>
 
+<ResponseField name="stats" type="array">
+  **Conditional field** - Only present for `completed` events. Contains final match statistics including scores and sport-specific data.
+
+  <Note>
+    **Important**: This endpoint does NOT return `stats` for `upcoming` or `live` events:
+    - `upcoming` events: No stats (event hasn't started)
+    - `live` events: No stats (**use `/live-events` for real-time data**)
+    - `completed` events: Includes final stats (static data)
+  </Note>
+
+  <Expandable title="Stats Object Structure (Completed Events Only)">
+    <ResponseField name="stats.homeGoals" type="integer">
+      Final home team score/goals
+    </ResponseField>
+
+    <ResponseField name="stats.awayGoals" type="integer">
+      Final away team score/goals
+    </ResponseField>
+
+    <ResponseField name="stats.homeCorners" type="integer">
+      Final home team corners (soccer)
+    </ResponseField>
+
+    <ResponseField name="stats.awayCorners" type="integer">
+      Final away team corners (soccer)
+    </ResponseField>
+
+    <ResponseField name="stats.homeYellowCards" type="integer">
+      Final home team yellow cards (soccer)
+    </ResponseField>
+
+    <ResponseField name="stats.awayYellowCards" type="integer">
+      Final away team yellow cards (soccer)
+    </ResponseField>
+
+    <ResponseField name="stats.phase" type="string">
+      Final match phase (e.g., "FULL_TIME", "AFTER_EXTRA_TIME")
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
 <ResponseField name="metadata" type="object">
   Sport-specific event data including team names, markets, and odds
 
@@ -133,11 +251,11 @@ This is the main endpoint for browsing events. For full event details including 
     </ResponseField>
 
     <ResponseField name="homeTeamName" type="string">
-      Home team name
+      Home team name (localized via `locale`)
     </ResponseField>
 
     <ResponseField name="awayTeamName" type="string">
-      Away team name
+      Away team name (localized via `locale`)
     </ResponseField>
 
     <ResponseField name="markets" type="array">
@@ -151,11 +269,11 @@ This is the main endpoint for browsing events. For full event details including 
 <CodeGroup>
 ```bash cURL
 curl -H "Authorization: Bearer sk_live_..." \
-  "https://api.mrdoge.co/odds/events?competitionId=1&date=2025-11-08&limit=10"
+  "https://api.mrdoge.co/odds/events?competitionId=1&date=2025-11-08&limit=10&status=upcoming&status=live&status=completed&locale=en"
 ```
 
 ```javascript JavaScript
-const response = await fetch('https://api.mrdoge.co/odds/events?competitionId=1&date=2025-11-08&limit=10', {
+const response = await fetch('https://api.mrdoge.co/odds/events?competitionId=1&date=2025-11-08&limit=10&status=upcoming&status=live&status=completed&locale=en', {
   headers: {
     'Authorization': 'Bearer sk_live_...'
   }
@@ -178,7 +296,9 @@ response = requests.get(
     params={
         'competitionId': '1',
         'date': '2025-11-08',
-        'limit': '10'
+        'status': ['upcoming', 'live', 'completed'],
+        'limit': '10',
+        'locale': 'en'
     }
 )
 
@@ -252,11 +372,11 @@ Since the endpoint returns a maximum of 100 events per request, use these strate
 ```bash
 # Week 1: Nov 1-7
 curl -H "Authorization: Bearer sk_live_..." \
-  "https://api.mrdoge.co/odds/events?startDate=2025-11-01&endDate=2025-11-07&limit=100"
+  "https://api.mrdoge.co/odds/events?startDate=2025-11-01&endDate=2025-11-07&limit=100&locale=en"
 
 # Week 2: Nov 8-14
 curl -H "Authorization: Bearer sk_live_..." \
-  "https://api.mrdoge.co/odds/events?startDate=2025-11-08&endDate=2025-11-14&limit=100"
+  "https://api.mrdoge.co/odds/events?startDate=2025-11-08&endDate=2025-11-14&limit=100&locale=en"
 ```
 
 ### By Competition
@@ -264,11 +384,11 @@ curl -H "Authorization: Bearer sk_live_..." \
 ```bash
 # Get Premier League events
 curl -H "Authorization: Bearer sk_live_..." \
-  "https://api.mrdoge.co/odds/events?competitionId=847&limit=100"
+  "https://api.mrdoge.co/odds/events?competitionId=847&limit=100&locale=en"
 
 # Get La Liga events
 curl -H "Authorization: Bearer sk_live_..." \
-  "https://api.mrdoge.co/odds/events?competitionId=29&limit=100"
+  "https://api.mrdoge.co/odds/events?competitionId=29&limit=100&locale=en"
 ```
 
 ### By Region
@@ -276,11 +396,11 @@ curl -H "Authorization: Bearer sk_live_..." \
 ```bash
 # Get English events
 curl -H "Authorization: Bearer sk_live_..." \
-  "https://api.mrdoge.co/odds/events?regionId=6&limit=100"
+  "https://api.mrdoge.co/odds/events?regionId=6&limit=100&locale=en"
 
 # Get Spanish events
 curl -H "Authorization: Bearer sk_live_..." \
-  "https://api.mrdoge.co/odds/events?regionId=5&limit=100"
+  "https://api.mrdoge.co/odds/events?regionId=5&limit=100&locale=en"
 ```
 
 ## Common Filters
@@ -288,26 +408,27 @@ curl -H "Authorization: Bearer sk_live_..." \
 <CardGroup cols={2}>
   <Card title="Today's Events" icon="calendar-day">
     ```bash
-    ?date=2025-11-08&timezone=America/New_York
+    ?date=2025-11-08&timezone=America/New_York&locale=en
     ```
   </Card>
 
-  <Card title="Live Events" icon="circle-play">
+  <Card title="Live Event List" icon="list">
     ```bash
-    ?status=live
+    ?status=live&locale=en
     ```
+    **Note**: Returns list only, no live data. Use `/live-events` for real-time stats.
+  </Card>
+
+  <Card title="Completed Events" icon="check-circle">
+    ```bash
+    ?status=completed&date=2025-11-08&locale=en
+    ```
+    Includes final scores and stats
   </Card>
 
   <Card title="Premier League" icon="futbol">
     ```bash
-    ?competitionId=847
-    ```
-  </Card>
-
-  <Card title="English Events" icon="flag">
-    ```bash
-    ?regionId=6
+    ?competitionId=847&locale=en
     ```
   </Card>
 </CardGroup>
-

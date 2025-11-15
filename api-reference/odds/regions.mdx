@@ -1,5 +1,5 @@
 ---
-title: "List Regions"
+title: "Regions"
 api: "GET https://api.mrdoge.co/odds/regions"
 description: "Get all available regions (countries) with sports coverage, competition counts, and localized names"
 ---
@@ -9,32 +9,48 @@ description: "Get all available regions (countries) with sports coverage, compet
 </Info>
 
 This endpoint returns all regions where Mr. Doge has sports coverage, including:
-- Localized region names (supports multiple languages)
+- Localized region names (supports `en`, `es`, `pt`)
 - Number of competitions per region
-- Number of upcoming events
+- Number of events (filtered by query parameters)
 - Available sports in each region
-- List of competitions
+- List of competitions with sport references
 
 Perfect for building region selectors or filtering events by location.
 
 ## Query Parameters
 
 <ParamField query="locale" type="string" default="en">
-  Language code for localized region names. Supported: `en`, `es`, `pt`, `fr`, `de`, `it`
+  Language code for localized region names. Supported: `en`, `es`, `pt`
 </ParamField>
 
 <ParamField query="date" type="string">
   Filter regions with events on specific date (YYYY-MM-DD format)
 
   Example: `2025-11-08`
+
+  <Warning>
+    Cannot be used together with `startDate` or `endDate`. Choose either `date` for single-day filtering or `startDate`/`endDate` for range filtering.
+  </Warning>
 </ParamField>
 
 <ParamField query="startDate" type="string">
   Filter regions with events starting from this date
+
+  <Warning>
+    Cannot be used together with `date` parameter.
+  </Warning>
 </ParamField>
 
 <ParamField query="endDate" type="string">
   Filter regions with events ending on this date
+
+  <Warning>
+    Cannot be used together with `date` parameter.
+  </Warning>
+</ParamField>
+
+<ParamField query="status" type="string" default="upcoming,live">
+  Filter by event status (repeat or comma-separate values). Use `status=completed` to inspect historical dates.
 </ParamField>
 
 <ParamField query="timezone" type="string">
@@ -64,19 +80,41 @@ Returns an object with a `data` array containing region objects.
         </ResponseField>
 
         <ResponseField name="events" type="integer">
-          Number of upcoming events in this region
+          Number of events in this region (based on applied filters)
         </ResponseField>
       </Expandable>
     </ResponseField>
 
     <ResponseField name="availableSports" type="array">
-      Array of sport names available in this region
+      Array of sport objects with `id` and `name`
 
-      Example: `["soccer", "basketball", "tennis"]`
+      <Expandable title="Sport Object">
+        <ResponseField name="id" type="integer">
+          Sport ID for filtering and referencing
+        </ResponseField>
+
+        <ResponseField name="name" type="string">
+          Sport name (e.g., "soccer", "basketball", "tennis")
+        </ResponseField>
+      </Expandable>
     </ResponseField>
 
     <ResponseField name="competitions" type="array">
-      Array of competition objects with `id` and `caption`
+      Array of competition objects with `id`, `caption`, and `sportId`
+
+      <Expandable title="Competition Object">
+        <ResponseField name="id" type="integer">
+          Competition ID
+        </ResponseField>
+
+        <ResponseField name="caption" type="string">
+          Competition name
+        </ResponseField>
+
+        <ResponseField name="sportId" type="integer">
+          Reference to sport ID from availableSports array
+        </ResponseField>
+      </Expandable>
     </ResponseField>
   </Expandable>
 </ResponseField>
@@ -94,36 +132,23 @@ curl https://api.mrdoge.co/odds/regions?locale=en&date=2025-11-08
   "data": [
     {
       "id": 1,
-      "caption": "England",
+      "caption": "World",
       "_count": {
-        "competitions": 5,
-        "events": 120
+        "competitions": 1,
+        "events": 10
       },
-      "availableSports": ["soccer", "tennis"],
-      "competitions": [
+      "availableSports": [
         {
           "id": 1,
-          "caption": "Premier League"
+          "name": "soccer"
         },
-        {
-          "id": 2,
-          "caption": "Championship"
-        }
-      ]
-    },
-    {
-      "id": 2,
-      "caption": "Spain",
-      "_count": {
-        "competitions": 3,
-        "events": 85
-      },
-      "availableSports": ["soccer", "basketball"],
+      ],
       "competitions": [
         {
-          "id": 10,
-          "caption": "La Liga"
-        }
+          "id": 39,
+          "caption": "World Cup",
+          "sportId": 1
+        },
       ]
     }
   ]

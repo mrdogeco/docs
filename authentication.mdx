@@ -37,12 +37,12 @@ Include your API key in the `Authorization` header with the `Bearer` scheme:
 
 <CodeGroup>
 ```bash cURL
-curl -X GET "https://api.mrdoge.co/odds/events" \
+curl -X GET "https://api.mrdoge.co/odds/events?locale=en" \
   -H "Authorization: Bearer sk_live_your_api_key_here"
 ```
 
 ```javascript JavaScript
-const response = await fetch("https://api.mrdoge.co/odds/events", {
+const response = await fetch("https://api.mrdoge.co/odds/events?locale=en", {
   headers: {
     Authorization: "Bearer sk_live_your_api_key_here",
   },
@@ -53,12 +53,12 @@ const response = await fetch("https://api.mrdoge.co/odds/events", {
 import requests
 
 headers = {'Authorization': 'Bearer sk_live_your_api_key_here'}
-response = requests.get('https://api.mrdoge.co/odds/events', headers=headers)
+response = requests.get('https://api.mrdoge.co/odds/events?locale=en', headers=headers)
 ```
 
 ```php PHP
 <?php
-$ch = curl_init('https://api.mrdoge.co/odds/events');
+$ch = curl_init('https://api.mrdoge.co/odds/events?locale=en');
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
     'Authorization: Bearer sk_live_your_api_key_here'
 ]);
@@ -67,6 +67,10 @@ $response = curl_exec($ch);
 ```
 
 </CodeGroup>
+
+<Note>
+  Replace `locale=en` with `es` or `pt` to receive translated team and competition names.
+</Note>
 
 <Info>
   Every API response includes headers showing your credit balance, consumption, and auto-recharge status. See [Monitoring Your Credits](/credits/overview#monitoring-your-credits) for details on tracking usage.
@@ -162,7 +166,7 @@ Most endpoints cost **1 credit** per request. Some specialized endpoints cost mo
 | Endpoint Category                                              | Cost per Request     |
 | -------------------------------------------------------------- | -------------------- |
 | No-cost endpoints (regions, competitions, health)              | **0 credits** (free) |
-| Standard events endpoints (`/odds/events`, `/odds/live-events`)| **1 credit**         |
+| Standard events endpoint (`/odds/events`)                      | **1 credit**         |
 | Trending events endpoint (`/odds/trending-events`)             | **2 credits**        |
 | Specific event endpoint (`/odds/events/:eventId`)              | **1 credit**         |
 | AI recommendations (`/ai/betting-recommendations`)             | **2 credits**        |
@@ -189,7 +193,7 @@ require("dotenv").config();
 
 const apiKey = process.env.MRDOGE_API_KEY;
 
-fetch("https://api.mrdoge.co/odds/events", {
+fetch("https://api.mrdoge.co/odds/events?locale=en", {
   headers: { Authorization: `Bearer ${apiKey}` },
 });
 ```

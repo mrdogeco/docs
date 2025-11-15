@@ -1,17 +1,45 @@
 ---
-title: "List Live Events"
+title: "Live Events"
 api: "GET https://api.mrdoge.co/odds/live-events"
 auth: "bearer"
-description: "Get all currently live events with real-time scores and odds"
+description: "Get currently live events with real-time stats and odds (optimized for sub-second response)"
 ---
 
 <Warning>
-  **Requires Authentication**: This endpoint requires an API key and costs **1 credit** per request.
+  **Requires Authentication**: This endpoint requires an API key and costs **2 credits** per request.
 </Warning>
 
-Returns all events that are currently in progress across all sports. Updated every **10 seconds** with real-time scores, match statistics, and live odds.
+Returns all currently live sporting events with real-time statistics and odds. This endpoint is optimized for speed, providing sub-second response times even under heavy load.
 
-Perfect for building live scores dashboards or real-time betting applications.
+**Why use this endpoint instead of `/events?status=live`?**
+- ⚡ **10-100x faster** - Optimized for real-time performance
+- 📊 **Real-time data included** - Live scores, odds, phase, elapsed time
+- 🔄 **Always fresh** - Updated every 30 seconds as events progress
+- 💰 **Worth the cost** - 2 credits for real-time data vs 1 credit for static list
+- 🎯 **Live-only** - No mixed results, guaranteed live events
+
+**Key Difference**: `/events?status=live` returns a static list without stats/odds. This endpoint returns **real-time live data** with scores and odds updated every 30 seconds.
+
+<Info>
+  **Freshness Guarantee**: Events are updated in real-time as matches progress. Maximum staleness is 30 seconds.
+</Info>
+
+<Note>
+  **Migration from `/events?status=live`**:
+
+  If you're currently using `/events?status=live`, you're only getting a **static list** of event IDs and names without real-time data. That endpoint:
+  - ❌ Does NOT include live scores, odds, or statistics
+  - ❌ Static data (not updated in real-time)
+  - ✅ Costs only 1 credit
+  - ✅ Good for "Live Now" badges or event lists
+
+  This endpoint (`/live-events`):
+  - ✅ Includes live scores, odds movements, and real-time stats
+  - ✅ Updated every 30 seconds (fresh data)
+  - ✅ 10-100x faster response times
+  - ✅ Costs 2 credits (worth it for real-time data)
+  - ✅ Built for live dashboards and real-time applications
+</Note>
 
 ## Authorization
 
@@ -19,149 +47,475 @@ Perfect for building live scores dashboards or real-time betting applications.
   Your API key for authentication
 </ParamField>
 
-
 ## Query Parameters
 
-<ParamField query="limit" type="string" default="20">
-  Maximum number of live events to return
+<ParamField query="sport" type="string">
+  Filter by sport name
 
-  Max: `100`
+  Options: `soccer`, `basketball`, `tennis`, `baseball`, `volleyball`, `american-football`, `ice-hockey`, `handball`
+
+  Example: `soccer`
+
+  <Tip>
+    When filtering by sport, the endpoint is optimized for even faster response times.
+  </Tip>
 </ParamField>
 
-<ParamField query="prioritize" type="string">
-  Smart sorting - prioritize popular leagues first
-
-  Values: `true` or `false`
-
-  When enabled, events from major leagues (Premier League, NBA, Champions League, etc.) appear first.
+<ParamField query="locale" type="string" default="en">
+  Language for team, competition, and region names. Supported: `en`, `es`, `pt`
 </ParamField>
 
 ## Response
 
-Returns an object with a `data` array containing live events with real-time information.
-
 <ResponseField name="data" type="array">
-  Array of live event objects (same structure as [Get Event Details](/api-reference/odds/event-details) but filtered to live events only)
+  Array of live event objects
 </ResponseField>
 
-### Live Event Includes
+<ResponseField name="count" type="integer">
+  Total number of live events returned
+</ResponseField>
 
-Each live event includes:
-- Current scores
-- Match phase (1st half, 2nd half, quarter, etc.)
-- Match statistics (corners, cards, fouls, etc.)
-- Live odds for all markets
-- Time elapsed
+### Event Object
+
+The response format is identical to the `/events` endpoint, with the following fields:
+
+<ResponseField name="id" type="string">
+  Unique event ID
+
+  Example: `43357554`
+</ResponseField>
+
+<ResponseField name="competitionId" type="integer">
+  Parent competition ID
+</ResponseField>
+
+<ResponseField name="regionId" type="integer">
+  Parent region ID
+</ResponseField>
+
+<ResponseField name="sportId" type="integer">
+  Sport ID (1=Soccer, 2=Basketball, etc.)
+</ResponseField>
+
+<ResponseField name="startDateTime" type="string">
+  Event start time in ISO 8601 format
+
+  Example: `2025-11-14T20:00:00.000Z`
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Always `live` for this endpoint
+</ResponseField>
+
+<ResponseField name="stats" type="object">
+  **Always present for live events**. Contains real-time match statistics including scores, elapsed time, and sport-specific data. All properties are flattened directly on the stats object for optimal performance.
+
+  <Expandable title="Stats Object Structure">
+    <ResponseField name="stats.homeGoals" type="integer">
+      Home team score/goals (updated in real-time)
+    </ResponseField>
+
+    <ResponseField name="stats.awayGoals" type="integer">
+      Away team score/goals (updated in real-time)
+    </ResponseField>
+
+    <ResponseField name="stats.homeCorners" type="integer">
+      Home team corners (soccer only)
+    </ResponseField>
+
+    <ResponseField name="stats.awayCorners" type="integer">
+      Away team corners (soccer only)
+    </ResponseField>
+
+    <ResponseField name="stats.homeYellowCards" type="integer">
+      Home team yellow cards (soccer only)
+    </ResponseField>
+
+    <ResponseField name="stats.awayYellowCards" type="integer">
+      Away team yellow cards (soccer only)
+    </ResponseField>
+
+    <ResponseField name="stats.homeRedCards" type="integer">
+      Home team red cards (soccer only)
+    </ResponseField>
+
+    <ResponseField name="stats.awayRedCards" type="integer">
+      Away team red cards (soccer only)
+    </ResponseField>
+
+    <ResponseField name="stats.elapsedSeconds" type="integer">
+      Time elapsed in seconds since match start
+    </ResponseField>
+
+    <ResponseField name="stats.phase" type="string">
+      Current match phase
+
+      Soccer: `1ST_HALF`, `HALF_TIME`, `2ND_HALF`, `EXTRA_TIME`, etc.
+    </ResponseField>
+
+    <ResponseField name="stats.phaseCaption" type="string">
+      Human-readable time display
+
+      Example: `45:00`, `67:32`
+    </ResponseField>
+
+    <ResponseField name="stats.isLive" type="boolean">
+      Whether the event is currently in play
+    </ResponseField>
+
+    <ResponseField name="stats.isInPlay" type="boolean">
+      Whether betting is available (false during stoppages)
+    </ResponseField>
+
+    <ResponseField name="liveBetItems" type="array">
+      Live betting odds for this event with price tracking
+
+      <Expandable title="Live Bet Item Structure">
+        <ResponseField name="betItemId" type="string">
+          Unique bet item identifier
+        </ResponseField>
+
+        <ResponseField name="marketSysname" type="string">
+          Market type (e.g., `SOCCER_MATCH_RESULT`, `SOCCER_UNDER_OVER`)
+        </ResponseField>
+
+        <ResponseField name="marketCaption" type="string">
+          Human-readable market name
+        </ResponseField>
+
+        <ResponseField name="code" type="string">
+          Bet code (`1`, `X`, `2`, `O`, `U`, etc.)
+        </ResponseField>
+
+        <ResponseField name="caption" type="string">
+          Bet description
+        </ResponseField>
+
+        <ResponseField name="price" type="number">
+          Current odds
+        </ResponseField>
+
+        <ResponseField name="priceChange" type="number">
+          Change from previous update (null if first update)
+        </ResponseField>
+
+        <ResponseField name="isAvailable" type="boolean">
+          Whether betting is currently available
+        </ResponseField>
+
+        <ResponseField name="timestamp" type="string">
+          When this price was captured
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="homeTeam" type="object">
+  Home team details (localized)
+</ResponseField>
+
+<ResponseField name="awayTeam" type="object">
+  Away team details (localized)
+</ResponseField>
+
+<ResponseField name="competition" type="object">
+  Competition details (localized)
+</ResponseField>
+
+<ResponseField name="region" type="object">
+  Region details (localized)
+</ResponseField>
+
+<ResponseField name="markets" type="array">
+  Available betting markets with odds
+</ResponseField>
 
 ## Example Request
 
-```bash
+<CodeGroup>
+```bash cURL
 curl -H "Authorization: Bearer sk_live_..." \
-  "https://api.mrdoge.co/odds/live-events?prioritize=true&limit=10"
+  "https://api.mrdoge.co/odds/live-events?locale=en"
 ```
 
-## Example Response
+```bash cURL - Filter by Sport
+curl -H "Authorization: Bearer sk_live_..." \
+  "https://api.mrdoge.co/odds/live-events?sport=soccer&locale=en"
+```
 
-```json
+```javascript JavaScript
+const response = await fetch('https://api.mrdoge.co/odds/live-events?locale=en', {
+  headers: {
+    'Authorization': 'Bearer sk_live_...'
+  }
+});
+
+const data = await response.json();
+console.log(`${data.count} live events found`);
+```
+
+```python Python
+import requests
+
+headers = {
+    'Authorization': 'Bearer sk_live_...'
+}
+
+response = requests.get(
+    'https://api.mrdoge.co/odds/live-events',
+    headers=headers,
+    params={'locale': 'en', 'sport': 'soccer'}
+)
+
+data = response.json()
+print(f"{data['count']} live soccer events")
+```
+</CodeGroup>
+
+## Response
+
+<ResponseExample>
+
+```json Response
 {
   "data": [
     {
-      "id": "43102832",
-      "competitionId": 35302,
-      "startDateTime": "2025-10-28T10:41:00.048Z",
+      "id": "43357554",
+      "startDateTime": "2025-11-14T20:00:00.000Z",
       "status": "live",
+      "competitionId": 847,
+      "sportId": 1,
+      "regionId": 6,
+      "views": 234,
       "sport": {
-        "name": "tennis"
+        "id": 1,
+        "name": "soccer"
       },
       "homeTeam": {
-        "id": 193974,
-        "name": "Jeremy Schifris"
+        "id": 95450,
+        "name": "Arsenal"
       },
       "awayTeam": {
-        "id": 118617,
-        "name": "Lorenzo Bocchi"
+        "id": 11045,
+        "name": "Liverpool"
       },
       "competition": {
-        "id": 35302,
-        "caption": "Itália - Selva Gardena"
+        "id": 847,
+        "caption": "Premier League"
       },
       "region": {
-        "id": 1187,
-        "caption": "ITF "
+        "id": 6,
+        "caption": "England"
       },
-      "liveEventData": [
+      "stats": {
+        "id": "stats_123",
+        "homeGoals": 2,
+        "awayGoals": 1,
+        "homeCorners": 5,
+        "awayCorners": 3,
+        "homeYellowCards": 2,
+        "awayYellowCards": 1,
+        "homeRedCards": 0,
+        "awayRedCards": 0,
+        "elapsedSeconds": 2820,
+        "phaseCaptionLong": "2T",
+        "phaseCaption": "47:00",
+        "referenceTime": "2025-11-14T20:47:00.000Z",
+        "isLive": true,
+        "isInPlay": true,
+        "liveBetItems": [
+            {
+              "betItemId": "6234567890",
+              "marketSysname": "SOCCER_MATCH_RESULT",
+              "marketCaption": "Match Result",
+              "code": "1",
+              "caption": "Arsenal",
+              "price": 1.45,
+              "priceChange": -0.05,
+              "isAvailable": true,
+              "timestamp": "1731612847000"
+            },
+            {
+              "betItemId": "6234567891",
+              "marketSysname": "SOCCER_MATCH_RESULT",
+              "marketCaption": "Match Result",
+              "code": "X",
+              "caption": "Draw",
+              "price": 4.2,
+              "priceChange": 0.1,
+              "isAvailable": true,
+              "timestamp": "1731612847000"
+            },
+            {
+              "betItemId": "6234567892",
+              "marketSysname": "SOCCER_MATCH_RESULT",
+              "marketCaption": "Match Result",
+              "code": "2",
+              "caption": "Liverpool",
+              "price": 6.5,
+              "priceChange": 0.3,
+              "isAvailable": true,
+              "timestamp": "1731612847000"
+            }
+          ]
+      },
+      "markets": [
         {
-          "homeGoals": 0,
-          "awayGoals": 0,
-          "phaseCaption": "2º set finalizado",
-          "phaseCaptionLong": "Unknown",
-          "phaseSysname": "TENNIS_MATCH_SECOND_SET",
-          "isLive": true,
-          "isInPlay": false,
-          "liveDataJson": {
-            "setScores": [
-              {
-                "inPlay": false,
-                "caption": "1º Set",
-                "player1Score": 3,
-                "player2Score": 6,
-                "player1Winner": false,
-                "player2Winner": true
-              },
-              {
-                "inPlay": false,
-                "caption": "2º set",
-                "player1Score": 2,
-                "player2Score": 6,
-                "player1Winner": false,
-                "player2Winner": true
-              }
-            ],
-            "player1Sets": 0,
-            "player2Sets": 2
-          },
-          "lastUpdated": "2025-10-29T08:14:20.982Z"
+          "id": "1488408114",
+          "eventId": "43357554",
+          "betTypeSysname": "SOCCER_MATCH_RESULT",
+          "betItems": [
+            {
+              "id": "6234567890",
+              "code": "1",
+              "caption": "Arsenal",
+              "price": 1.45,
+              "oddsText": "1.45",
+              "isAvailable": true
+            }
+          ]
         }
       ]
     }
   ],
-  "count": 2,
-  "timestamp": "2025-11-09T11:43:29.777Z"
+  "count": 1
 }
 ```
 
-## Update Frequency
+</ResponseExample>
 
-<Info>
-  Live events data is updated every **10 seconds**. For the most up-to-date information, poll this endpoint at that interval or use WebSocket streaming for push updates.
-</Info>
+## Performance Characteristics
 
-## Sports Coverage
+This endpoint is optimized for high-frequency polling and real-time applications:
 
-Live data is available for:
-- ⚽ Soccer (scores, corners, cards, substitutions)
-- 🏀 Basketball (scores per quarter, fouls)
-- ⚾ Baseball (innings, runs, hits, errors)
-- 🎾 Tennis (sets, games, points)
-- 🏈 American Football (quarters, yards, downs)
-- 🏒 Ice Hockey (periods, shots, power plays)
+<CardGroup cols={2}>
+  <Card title="Response Time" icon="gauge-high">
+    **Sub-second**
+
+    Fast response times even with dozens of live events
+  </Card>
+
+  <Card title="Update Frequency" icon="arrows-rotate">
+    **Every 30 seconds**
+
+    Live data refreshed continuously as matches progress
+  </Card>
+
+  <Card title="Reliability" icon="shield-check">
+    **Highly available**
+
+    Handles halftime breaks, delays, and interruptions gracefully
+  </Card>
+
+  <Card title="Scalability" icon="chart-line">
+    **High throughput**
+
+    Supports unlimited concurrent requests
+  </Card>
+</CardGroup>
 
 ## Use Cases
 
 <CardGroup cols={2}>
-  <Card title="Live Dashboard" icon="tv">
-    Display all currently live events with scores
+  <Card title="Live Scores Widget" icon="tv">
+    Display real-time scores and stats on your site
   </Card>
 
-  <Card title="In-Play Betting" icon="chart-line">
-    Show live odds for events in progress
+  <Card title="Live Betting Interface" icon="chart-mixed">
+    Show live odds with price movement tracking
   </Card>
 
-  <Card title="Score Alerts" icon="bell">
-    Monitor events for goal/score notifications
+  <Card title="Event Monitoring" icon="eye">
+    Track multiple live events simultaneously
   </Card>
 
-  <Card title="Statistics Feed" icon="chart-simple">
-    Track live match statistics
+  <Card title="Push Notifications" icon="bell">
+    Trigger alerts on score changes or odds movements
   </Card>
 </CardGroup>
+
+## Migration Guide
+
+If you're currently using `/events?status=live`, here's how to migrate:
+
+### Before (General Events Endpoint)
+```javascript
+// Static list, no live data
+const response = await fetch(
+  'https://api.mrdoge.co/odds/events?status=live&locale=en',
+  { headers: { 'Authorization': 'Bearer sk_live_...' } }
+);
+// Cost: 1 credit
+// Returns: Event IDs and names only (no stats/odds)
+// Use case: "Live Now" badge, event list
+```
+
+### After (Dedicated Live Events Endpoint)
+```javascript
+// Real-time data with scores and odds
+const response = await fetch(
+  'https://api.mrdoge.co/odds/live-events?locale=en',
+  { headers: { 'Authorization': 'Bearer sk_live_...' } }
+);
+// Cost: 2 credits
+// Returns: Live scores, odds, stats, phase, elapsed time (updated every 30s)
+// Use case: Live dashboard, real-time scores
+```
+
+### When to Use Each Endpoint
+
+| Scenario | Use `/live-events` | Use `/events?status=live` |
+|----------|-------------------|---------------------------|
+| Real-time live scores dashboard | ✅ Yes | ❌ No |
+| Live odds and price tracking | ✅ Yes | ❌ No |
+| Polling every 30-60 seconds | ✅ Yes | ❌ No |
+| Static "Live Now" list (no scores) | ❌ No | ✅ Yes |
+| Mixed upcoming + live + completed | ❌ No | ✅ Yes |
+| Budget-conscious single fetch | ❌ No | ✅ Yes |
+| High-frequency updates | ✅ Yes | ❌ No |
+| Need final scores for completed events | ❌ No | ✅ Yes (use `status=completed`) |
+
+## Error Responses
+
+<ResponseField name="error" type="object">
+  Error details if request fails
+
+  <Expandable title="Common Errors">
+    **401 Unauthorized**
+    ```json
+    {
+      "statusCode": 401,
+      "message": "Invalid API key"
+    }
+    ```
+
+    **403 Forbidden**
+    ```json
+    {
+      "statusCode": 403,
+      "message": "Insufficient permissions. Requires: read:live-events"
+    }
+    ```
+
+    **429 Too Many Requests**
+    ```json
+    {
+      "statusCode": 429,
+      "message": "Rate limit exceeded. PRO tier allows 1000 requests/minute."
+    }
+    ```
+  </Expandable>
+</ResponseField>
+
+## Permissions
+
+This endpoint requires the `read:live-events` permission, which is included in:
+
+- ✅ **PRO tier** - Included
+- ✅ **ENTERPRISE tier** - Included
+- ❌ **FREE tier** - Not available
+
+<Tip>
+  Upgrade to PRO tier to access this endpoint and unlock real-time live event tracking.
+</Tip>

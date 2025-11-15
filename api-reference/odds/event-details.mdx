@@ -1,5 +1,5 @@
 ---
-title: "Get Event Details"
+title: "Event Details"
 api: "GET https://api.mrdoge.co/odds/events/{eventId}"
 auth: "bearer"
 description: "Get complete event information including teams, markets, odds, live data, and AI recommendations"
@@ -36,6 +36,12 @@ Perfect for building detailed event pages in your application.
   The unique event ID
 
   Example: `evt_abc123`
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="locale" type="string" default="en">
+  Language for team, competition, and region names. Supported: `en`, `es`, `pt`
 </ParamField>
 
 ## Response
@@ -75,19 +81,19 @@ Returns a complete event object with all related data.
 ### Relationships
 
 <ResponseField name="homeTeam" type="object">
-  Home team object with `id`, `caption`, and `regionId`
+  Home team object with `id`, localized `name`, and `regionId`
 </ResponseField>
 
 <ResponseField name="awayTeam" type="object">
-  Away team object
+  Away team object with localized `name`
 </ResponseField>
 
 <ResponseField name="competition" type="object">
-  Competition object with `id`, `caption`, `regionId`, and nested `region`
+  Competition object with `id`, localized `caption`, `regionId`, and nested `region`
 </ResponseField>
 
 <ResponseField name="region" type="object">
-  Region object
+  Region object with localized `caption`
 </ResponseField>
 
 ### Markets and Odds
@@ -192,11 +198,11 @@ Returns a complete event object with all related data.
 
 <CodeGroup>
 ```bash cURL
-curl https://api.mrdoge.co/odds/events/evt_abc123
+curl "https://api.mrdoge.co/odds/events/evt_abc123?locale=en"
 ```
 
 ```javascript JavaScript
-const response = await fetch('https://api.mrdoge.co/odds/events/evt_abc123');
+const response = await fetch('https://api.mrdoge.co/odds/events/evt_abc123?locale=en');
 const event = await response.json();
 console.log(event);
 ```
@@ -204,7 +210,7 @@ console.log(event);
 ```python Python
 import requests
 
-response = requests.get('https://api.mrdoge.co/odds/events/evt_abc123')
+response = requests.get('https://api.mrdoge.co/odds/events/evt_abc123?locale=en')
 event = response.json()
 print(event)
 ```

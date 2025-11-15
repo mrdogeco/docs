@@ -35,10 +35,8 @@ Returns processed AI insights for events including market efficiency scores and 
   Timezone for date filtering
 </ParamField>
 
-<ParamField query="includeCompleted" type="string">
-  Include completed events
-
-  Values: `true` or `false`
+<ParamField query="status" type="string">
+  Filter insights by event status (repeat the parameter or use comma-separated values). Options: `upcoming`, `live`, `completed`. Defaults to upcoming + live.
 </ParamField>
 
 ## Response

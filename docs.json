@@ -1,6 +1,6 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "aspen",
+  "theme": "willow",
   "name": "Mr. Doge API",
   "colors": {
     "primary": "#F59E0B",
@@ -35,14 +35,14 @@
         "tab": "API Reference",
         "groups": [
           {
-            "group": "Odds Endpoints",
+            "group": "Sports Endpoints",
             "pages": [
               "api-reference/odds/health",
               "api-reference/odds/regions",
               "api-reference/odds/competitions",
               "api-reference/odds/events",
-              "api-reference/odds/event-details",
               "api-reference/odds/live-events",
+              "api-reference/odds/event-details",
               "api-reference/odds/trending-events",
               "api-reference/odds/teams",
               "api-reference/odds/stats"
@@ -103,7 +103,10 @@
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mrdogeapp"
+      "x": "https://x.com/mrdogeapp",
+      "instagram": "https://www.instagram.com/mrdoge.ai",
+      "linkedin": "https://www.linkedin.com/company/mrdoge",
+      "reddit": "https://www.reddit.com/r/mrdoge/"
     }
   },
   "api": {

@@ -1,5 +1,5 @@
 ---
-title: "Get Trending Events"
+title: "Trending Events"
 api: "GET https://api.mrdoge.co/odds/trending-events"
 auth: "bearer"
 description: "Get today's most-viewed events with AI picks and recommendations"
@@ -12,6 +12,10 @@ description: "Get today's most-viewed events with AI picks and recommendations"
 Returns the top 5 most-viewed events for today, including AI recommendations and Mr. Doge picks. Perfect for discovering popular betting opportunities and showing users what everyone else is looking at.
 
 Events are ranked by view count and include full AI analysis.
+
+<Info>
+  Include the `locale` query parameter (`en`, `es`, or `pt`) to localize team, competition, and region names.
+</Info>
 
 ## Authorization
 
@@ -28,6 +32,10 @@ Events are ranked by view count and include full AI analysis.
   Example: `America/New_York`, `Europe/London`
 
   Default: UTC
+</ParamField>
+
+<ParamField query="locale" type="string" default="en">
+  Language for team, competition, and region names. Supported: `en`, `es`, `pt`
 </ParamField>
 
 <ParamField query="sport" type="string">
@@ -50,7 +58,7 @@ Each event includes:
 
 ```bash
 curl -H "Authorization: Bearer sk_live_..." \
-  "https://api.mrdoge.co/odds/trending-events?timezone=America/New_York&sport=soccer"
+  "https://api.mrdoge.co/odds/trending-events?timezone=America/New_York&sport=soccer&locale=en"
 ```
 
 ## Example Response

@@ -102,6 +102,20 @@
             }
           },
           {
+            "name": "status",
+            "in": "query",
+            "description": "Filter regions by event status (repeat or comma-separate values). Defaults to upcoming and live events.",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["upcoming", "live", "completed"]
+              }
+            }
+          },
+          {
             "name": "timezone",
             "in": "query",
             "description": "Timezone for date filtering",
@@ -178,13 +192,17 @@
             }
           },
           {
-            "name": "includeCompleted",
+            "name": "status",
             "in": "query",
-            "description": "Include completed events in count",
+            "description": "Filter competitions by event status (repeat or comma-separate values). Defaults to upcoming and live events.",
+            "style": "form",
+            "explode": true,
             "schema": {
-              "type": "string",
-              "enum": ["true", "false"],
-              "default": "false"
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["upcoming", "live", "completed"]
+              }
             }
           },
           {
@@ -246,10 +264,15 @@
           {
             "name": "status",
             "in": "query",
-            "description": "Filter by event status",
+            "description": "Filter by one or more event statuses. Repeat the parameter or send a comma-separated value (e.g., status=upcoming&status=completed).",
+            "style": "form",
+            "explode": true,
             "schema": {
-              "type": "string",
-              "enum": ["upcoming", "live", "completed"]
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["upcoming", "live", "completed"]
+              }
             }
           },
           {
@@ -265,7 +288,7 @@
           {
             "name": "startDate",
             "in": "query",
-            "description": "Filter events starting from this date",
+            "description": "Filter events starting on or after this date (YYYY-MM-DD). Combine with endDate to request a multi-day window (e.g., a full week).",
             "schema": {
               "type": "string",
               "format": "date"
@@ -274,10 +297,24 @@
           {
             "name": "endDate",
             "in": "query",
-            "description": "Filter events ending on this date",
+            "description": "Filter events ending on or before this date (YYYY-MM-DD). Use with startDate for range-based pagination.",
             "schema": {
               "type": "string",
               "format": "date"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filter by one or more event statuses. Repeat the parameter or send a comma-separated value (e.g., status=upcoming&status=completed).",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["upcoming", "live", "completed"]
+              }
             }
           },
           {
@@ -287,16 +324,6 @@
             "schema": {
               "type": "string",
               "example": "50"
-            }
-          },
-          {
-            "name": "includeCompleted",
-            "in": "query",
-            "description": "Include completed events",
-            "schema": {
-              "type": "string",
-              "enum": ["true", "false"],
-              "default": "false"
             }
           },
           {
