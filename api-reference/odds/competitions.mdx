@@ -99,7 +99,7 @@ Use this endpoint to:
 ## Example Request
 
 ```bash
-curl "https://api.mrdoge.co/odds/competitions?regionId=1&date=2025-11-08&locale=en"
+curl "https://api.mrdoge.co/odds/competitions?regionId=6&date=2025-11-15&locale=en"
 ```
 
 ## Example Response
@@ -108,60 +108,53 @@ curl "https://api.mrdoge.co/odds/competitions?regionId=1&date=2025-11-08&locale=
 {
   "data": [
     {
-      "id": 1,
+      "id": 847,
       "caption": "Premier League",
-      "regionId": 1,
+      "regionId": 6,
       "region": {
-        "id": 1,
+        "id": 6,
         "caption": "England"
       },
       "_count": {
-        "events": 10
+        "events": 4
       }
     },
     {
-      "id": 2,
-      "caption": "Championship",
-      "regionId": 1,
+      "id": 29,
+      "caption": "LaLiga",
+      "regionId": 5,
       "region": {
-        "id": 1,
-        "caption": "England"
+        "id": 5,
+        "caption": "Spain"
       },
       "_count": {
-        "events": 12
+        "events": 4
       }
     }
   ]
 }
 ```
 
-## Popular Competitions by Sport
+## Use Cases
 
-<AccordionGroup>
-  <Accordion title="Soccer" icon="futbol">
-    - Premier League (England)
-    - La Liga (Spain)
-    - Serie A (Italy)
-    - Bundesliga (Germany)
-    - Ligue 1 (France)
-    - Champions League
-    - Europa League
-  </Accordion>
+<CardGroup cols={2}>
+  <Card title="Competition Selector" icon="list">
+    Build dropdowns to let users filter events by league or tournament
+  </Card>
 
-  <Accordion title="Basketball" icon="basketball">
-    - NBA (USA)
-    - EuroLeague
-    - NCAA Basketball
-  </Accordion>
+  <Card title="League Overview" icon="trophy">
+    Show all competitions in a specific region with upcoming match counts
+  </Card>
 
-  <Accordion title="Baseball" icon="baseball">
-    - MLB (USA)
-    - NPB (Japan)
-    - KBO (Korea)
-  </Accordion>
+  <Card title="Multi-Sport Coverage" icon="globe">
+    Display which competitions are active across different sports
+  </Card>
 
-  <Accordion title="American Football" icon="football">
-    - NFL (USA)
-    - NCAA Football
-  </Accordion>
-</AccordionGroup>
+  <Card title="Schedule Widgets" icon="calendar">
+    Create widgets showing leagues with the most events on specific dates
+  </Card>
+</CardGroup>
+
+<Note>
+  Competition data is optimized for fast responses. Combine with the [Events endpoint](/api-reference/odds/events) to build complete league schedules.
+</Note>
