@@ -318,46 +318,83 @@ print(data)
       "id": "42099047",
       "startDateTime": "2025-09-13T11:30:00.000Z",
       "status": "upcoming",
-      "competitionId": 847,
-      "sport": {
-        "name": "soccer"
-      },
+      "homeTeamId": 95450,
       "homeTeam": {
         "id": 95450,
         "name": "Arsenal"
       },
+      "awayTeamId": 11045,
       "awayTeam": {
         "id": 11045,
         "name": "Nottingham Forest"
       },
+      "sportId": 1,
+      "sport": {
+        "id": 1,
+        "name": "soccer"
+      },
+      "competitionId": 847,
       "competition": {
         "id": 847,
         "caption": "Premier League"
       },
+      "regionId": 6,
+      "region": {
+        "id": 6,
+        "caption": "England"
+      },
       "markets": [
         {
           "id": "1432181681",
-          "eventId": "42099047",
           "betTypeSysname": "SOCCER_MATCH_RESULT",
           "betItems": [
             {
-              "id": "5940732426",
+              "id": "<string>",
+              "code": "1",
+              "caption": "1",
+              "price": 1.4,
+              "isAvailable": true
+            },
+            {
+              "id": "<string>",
               "code": "X",
               "caption": "X",
               "price": 4.7,
-              "oddsText": "4.70",
+              "isAvailable": true
+            },
+            {
+              "id": "<string>",
+              "code": "2",
+              "caption": "2",
+              "price": 8.1,
+              "isAvailable": true
+            }
+          ]
+        },
+        {
+          "id": "<string>",
+          "betTypeSysname": "SOCCER_UNDER_OVER",
+          "betItems": [
+            {
+              "id": "<string>",
+              "code": "O",
+              "caption": "Over 2.5",
+              "price": 1.72,
+              "isAvailable": true
+            },
+            {
+              "id": "<string>",
+              "code": "U",
+              "caption": "Under 2.5",
+              "price": 2.1,
               "isAvailable": true
             }
           ]
         }
-      ],
-      "region": {
-        "id": 6,
-        "caption": "Inglaterra"
-      }
+      ]
     }
   ],
-  "count": 2
+  "count": 1
 }
 ```
 
@@ -405,30 +442,46 @@ curl -H "Authorization: Bearer sk_live_..." \
 
 ## Common Filters
 
-<CardGroup cols={2}>
-  <Card title="Today's Events" icon="calendar-day">
+<AccordionGroup>
+  <Accordion title="Today's Events" icon="calendar-day">
+    Get all events happening today in a specific timezone:
+
     ```bash
     ?date=2025-11-08&timezone=America/New_York&locale=en
     ```
-  </Card>
 
-  <Card title="Live Event List" icon="list">
+    Perfect for building daily event schedules or "today's matches" widgets.
+  </Accordion>
+
+  <Accordion title="Live Event List" icon="list">
+    Get a static list of currently live events:
+
     ```bash
     ?status=live&locale=en
     ```
-    **Note**: Returns list only, no live data. Use `/live-events` for real-time stats.
-  </Card>
 
-  <Card title="Completed Events" icon="check-circle">
+    <Warning>
+      **Important**: This returns a **static list only** without real-time data. For live scores, odds, and statistics, use the [/live-events](/api-reference/odds/live-events) endpoint instead.
+    </Warning>
+  </Accordion>
+
+  <Accordion title="Completed Events" icon="check-circle">
+    Get finished events with final scores and statistics:
+
     ```bash
     ?status=completed&date=2025-11-08&locale=en
     ```
-    Includes final scores and stats
-  </Card>
 
-  <Card title="Premier League" icon="futbol">
+    Includes the `stats` field with complete match data, timeline, and final scores.
+  </Accordion>
+
+  <Accordion title="Premier League Events" icon="futbol">
+    Get all events for a specific competition:
+
     ```bash
     ?competitionId=847&locale=en
     ```
-  </Card>
-</CardGroup>
+
+    Use this pattern for any league/tournament - just change the `competitionId`.
+  </Accordion>
+</AccordionGroup>
