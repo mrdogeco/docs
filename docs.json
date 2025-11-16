@@ -43,9 +43,7 @@
               "api-reference/odds/events",
               "api-reference/odds/live-events",
               "api-reference/odds/event-details",
-              "api-reference/odds/trending-events",
-              "api-reference/odds/teams",
-              "api-reference/odds/stats"
+              "api-reference/odds/trending-events"
             ]
           },
           {

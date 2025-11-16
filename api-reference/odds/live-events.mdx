@@ -12,11 +12,11 @@ description: "Get currently live events with real-time stats and odds (optimized
 Returns all currently live sporting events with real-time statistics and odds. This endpoint is optimized for speed, providing sub-second response times even under heavy load.
 
 **Why use this endpoint instead of `/events?status=live`?**
-- ⚡ **10-100x faster** - Optimized for real-time performance
-- 📊 **Real-time data included** - Live scores, odds, phase, elapsed time
-- 🔄 **Always fresh** - Updated every 30 seconds as events progress
-- 💰 **Worth the cost** - 2 credits for real-time data vs 1 credit for static list
-- 🎯 **Live-only** - No mixed results, guaranteed live events
+- **10-100x faster** - Optimized for real-time performance
+- **Real-time data included** - Live scores, odds, phase, elapsed time
+- **Always fresh** - Updated every 30 seconds as events progress
+- **Worth the cost** - 2 credits for real-time data vs 1 credit for static list
+- **Live-only** - No mixed results, guaranteed live events
 
 **Key Difference**: `/events?status=live` returns a static list without stats/odds. This endpoint returns **real-time live data** with scores and odds updated every 30 seconds.
 
@@ -28,17 +28,17 @@ Returns all currently live sporting events with real-time statistics and odds. T
   **Migration from `/events?status=live`**:
 
   If you're currently using `/events?status=live`, you're only getting a **static list** of event IDs and names without real-time data. That endpoint:
-  - ❌ Does NOT include live scores, odds, or statistics
-  - ❌ Static data (not updated in real-time)
-  - ✅ Costs only 1 credit
-  - ✅ Good for "Live Now" badges or event lists
+  - Does NOT include live scores, odds, or statistics
+  - Static data (not updated in real-time)
+  - Costs only 1 credit
+  - Good for "Live Now" badges or event lists
 
   This endpoint (`/live-events`):
-  - ✅ Includes live scores, odds movements, and real-time stats
-  - ✅ Updated every 30 seconds (fresh data)
-  - ✅ 10-100x faster response times
-  - ✅ Costs 2 credits (worth it for real-time data)
-  - ✅ Built for live dashboards and real-time applications
+  - Includes live scores, odds movements, and real-time stats
+  - Updated every 30 seconds (fresh data)
+  - 10-100x faster response times
+  - Costs 2 credits (worth it for real-time data)
+  - Built for live dashboards and real-time applications
 </Note>
 
 ## Authorization
@@ -467,14 +467,14 @@ const response = await fetch(
 
 | Scenario | Use `/live-events` | Use `/events?status=live` |
 |----------|-------------------|---------------------------|
-| Real-time live scores dashboard | ✅ Yes | ❌ No |
-| Live odds and price tracking | ✅ Yes | ❌ No |
-| Polling every 30-60 seconds | ✅ Yes | ❌ No |
-| Static "Live Now" list (no scores) | ❌ No | ✅ Yes |
-| Mixed upcoming + live + completed | ❌ No | ✅ Yes |
-| Budget-conscious single fetch | ❌ No | ✅ Yes |
-| High-frequency updates | ✅ Yes | ❌ No |
-| Need final scores for completed events | ❌ No | ✅ Yes (use `status=completed`) |
+| Real-time live scores dashboard | Yes | No |
+| Live odds and price tracking | Yes | No |
+| Polling every 30-60 seconds | Yes | No |
+| Static "Live Now" list (no scores) | No | Yes |
+| Mixed upcoming + live + completed | No | Yes |
+| Budget-conscious single fetch | No | Yes |
+| High-frequency updates | Yes | No |
+| Need final scores for completed events | No | Yes (use `status=completed`) |
 
 ## Error Responses
 
@@ -512,9 +512,9 @@ const response = await fetch(
 
 This endpoint requires the `read:live-events` permission, which is included in:
 
-- ✅ **PRO tier** - Included
-- ✅ **ENTERPRISE tier** - Included
-- ❌ **FREE tier** - Not available
+- **PRO tier** - Included
+- **ENTERPRISE tier** - Included
+- **FREE tier** - Not available
 
 <Tip>
   Upgrade to PRO tier to access this endpoint and unlock real-time live event tracking.

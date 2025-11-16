@@ -2,16 +2,18 @@
 title: "Trending Events"
 api: "GET https://api.mrdoge.co/odds/trending-events"
 auth: "bearer"
-description: "Get today's most-viewed events with AI picks and recommendations"
+description: "Get today's most-viewed events"
 ---
 
 <Warning>
   **Requires Authentication**: This endpoint requires an API key and costs **1 credit** per request.
 </Warning>
 
-Returns the top 5 most-viewed events for today, including AI recommendations and Mr. Doge picks. Perfect for discovering popular betting opportunities and showing users what everyone else is looking at.
+Returns the top 5 most-viewed **upcoming and live** events for today. Perfect for discovering popular betting opportunities and showing users what everyone else is looking at.
 
-Events are ranked by view count and include full AI analysis.
+Events are ranked by view count and include basic event details with key markets. This is a lightweight endpoint optimized for speed - for full AI analysis, use the [Event Details](/api-reference/odds/event-details) endpoint.
+
+Use the `status` parameter to filter by event status (e.g., `status=completed` to see the most-viewed completed events of the day).
 
 <Info>
   Include the `locale` query parameter (`en`, `es`, or `pt`) to localize team, competition, and region names.
@@ -44,21 +46,45 @@ Events are ranked by view count and include full AI analysis.
   Options: `soccer`, `basketball`, `baseball`, `tennis`, `american-football`, `ice-hockey`, `volleyball`, `handball`
 </ParamField>
 
+<ParamField query="status" type="string" default="upcoming,live">
+  Filter by event status
+
+  Options: `upcoming`, `live`, `completed`
+
+  Pass multiple statuses with commas: `status=upcoming,live` or `status=completed`
+
+  Default: Returns `upcoming` and `live` events
+</ParamField>
+
 ## Response
 
-Returns an array of trending events (max 5).
+Returns an array of the top 5 most-viewed events for today, filtered by status (default: upcoming and live).
 
 Each event includes:
-- Full event details
-- Mr. Doge pick (if available)
-- All AI betting recommendations
+- Basic event details (teams, competition, region, status)
+- Markets and odds (SOCCER_MATCH_RESULT and SOCCER_UNDER_OVER only)
 - Current view count
+
+<Note>
+  **Lightweight Endpoint**: This endpoint does NOT include:
+  - Live stats (`stats` field)
+  - AI betting recommendations
+  - Mr. Doge picks
+  - Match simulations or analysis
+
+  For complete event data with AI analysis, use the [Event Details](/api-reference/odds/event-details) endpoint.
+</Note>
 
 ## Example Request
 
 ```bash
 curl -H "Authorization: Bearer sk_live_..." \
-  "https://api.mrdoge.co/odds/trending-events?timezone=America/New_York&sport=soccer&locale=en"
+  "https://api.mrdoge.co/odds/trending-events?sport=soccer&locale=en"
+```
+
+```bash Get Completed Events (Most Viewed Today)
+curl -H "Authorization: Bearer sk_live_..." \
+  "https://api.mrdoge.co/odds/trending-events?status=completed&sport=soccer&locale=en"
 ```
 
 ## Example Response
@@ -67,9 +93,9 @@ curl -H "Authorization: Bearer sk_live_..." \
 {
   "data": [
     {
-      "id": "43089384",
+      "id": "<string>",
       "competitionId": 847,
-      "startDateTime": "2025-11-09T16:30:00.000Z",
+      "startDateTime": "2025-11-15T15:00:00.000Z",
       "status": "upcoming",
       "views": 104,
       "sport": {
@@ -89,24 +115,24 @@ curl -H "Authorization: Bearer sk_live_..." \
       },
       "markets": [
         {
-          "id": "1488408114",
-          "eventId": "43089384",
+          "id": "<string>",
+          "eventId": "<string>",
           "betTypeSysname": "SOCCER_UNDER_OVER",
           "betItems": [
             {
-              "id": "6169425388",
+              "id": "<string>",
               "code": "U",
-              "caption": "Menos de 3,5",
-              "instanceCaption": "3,5",
+              "caption": "Under 2.5",
+              "instanceCaption": "2.5",
               "price": 1.62,
               "oddsText": "1.62",
               "isAvailable": true
             },
             {
-              "id": "6169425387",
+              "id": "<string>",
               "code": "O",
-              "caption": "Mais de 3,5",
-              "instanceCaption": "3,5",
+              "caption": "Over 2.5",
+              "instanceCaption": "2.5",
               "price": 2.2,
               "oddsText": "2.20",
               "isAvailable": true
@@ -116,21 +142,8 @@ curl -H "Authorization: Bearer sk_live_..." \
       ],
       "region": {
         "id": 6,
-        "caption": "Inglaterra"
-      },
-      "mrDogePicks": {
-        "id": "cmhqld8560dwvs201835nhnp6",
-        "eventId": "43089384",
-        "pickType": "single",
-        "recommendations": ["cmhqld8070dwrs2018xwtzjio"],
-        "totalOdds": 3.8,
-        "featuredOrder": null,
-        "isActive": true,
-        "expiresAt": "2025-11-09T14:30:00.085Z",
-        "settled": false,
-        "result": null
-      },
-      "bettingRecommendations": []
+        "caption": "England"
+      }
     }
   ],
   "count": 5

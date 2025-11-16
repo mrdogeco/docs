@@ -108,26 +108,25 @@ For full event details including markets and odds, use the [Get Event Details](/
 </ParamField>
 
 <ParamField query="limit" type="string" default="100">
-  Maximum number of events to return
+  Maximum number of events to return per page
 
   Default: `100`, Maximum: `100`
-
-  Use with `afterDate` for cursor-based pagination to fetch additional results.
 </ParamField>
 
-<ParamField query="afterDate" type="string">
-  **Pagination cursor**: Fetch events starting after this datetime (ISO 8601 format)
+<ParamField query="page" type="string" default="1">
+  Page number for pagination
 
-  Example: `2025-11-14T15:30:00Z`
+  Example: `page=1`, `page=2`, `page=3`
+
+  Default: `1` (first page)
 
   <Note>
     **How pagination works**:
-    1. First request: `GET /events?limit=100` → Returns 100 events
-    2. Get the last event's `startDateTime` from response
-    3. Next request: `GET /events?limit=100&afterDate=2025-11-14T15:30:00Z` → Returns next 100 events after that time
-    4. Repeat until no more results
+    1. First request: `GET /events?date=2025-11-15&page=1&limit=100` → Returns first 100 events
+    2. Next request: `GET /events?date=2025-11-15&page=2&limit=100` → Returns next 100 events (101-200)
+    3. Continue incrementing `page` until no more results
 
-    This is **cursor-based pagination** - more efficient than offset-based pagination for time-series data.
+    Each page is cached separately for optimal performance.
   </Note>
 </ParamField>
 
@@ -402,43 +401,51 @@ print(data)
 
 ## Pagination Strategy
 
-Since the endpoint returns a maximum of 100 events per request, use these strategies to retrieve more data:
+The endpoint returns a maximum of 100 events per request. Use the `page` parameter to paginate through results:
 
-### By Date Range
-
-```bash
-# Week 1: Nov 1-7
-curl -H "Authorization: Bearer sk_live_..." \
-  "https://api.mrdoge.co/odds/events?startDate=2025-11-01&endDate=2025-11-07&limit=100&locale=en"
-
-# Week 2: Nov 8-14
-curl -H "Authorization: Bearer sk_live_..." \
-  "https://api.mrdoge.co/odds/events?startDate=2025-11-08&endDate=2025-11-14&limit=100&locale=en"
-```
-
-### By Competition
+### Page-Based Pagination
 
 ```bash
-# Get Premier League events
+# Page 1: First 100 events for a specific date
 curl -H "Authorization: Bearer sk_live_..." \
-  "https://api.mrdoge.co/odds/events?competitionId=847&limit=100&locale=en"
+  "https://api.mrdoge.co/odds/events?date=2025-11-15&page=1&limit=100&locale=en"
 
-# Get La Liga events
+# Page 2: Next 100 events (events 101-200)
 curl -H "Authorization: Bearer sk_live_..." \
-  "https://api.mrdoge.co/odds/events?competitionId=29&limit=100&locale=en"
+  "https://api.mrdoge.co/odds/events?date=2025-11-15&page=2&limit=100&locale=en"
+
+# Page 3: Next 100 events (events 201-300)
+curl -H "Authorization: Bearer sk_live_..." \
+  "https://api.mrdoge.co/odds/events?date=2025-11-15&page=3&limit=100&locale=en"
 ```
 
-### By Region
+### Pagination with Date Ranges
 
 ```bash
-# Get English events
+# Week's events - Page 1
 curl -H "Authorization: Bearer sk_live_..." \
-  "https://api.mrdoge.co/odds/events?regionId=6&limit=100&locale=en"
+  "https://api.mrdoge.co/odds/events?startDate=2025-11-15&endDate=2025-11-22&page=1&locale=en"
 
-# Get Spanish events
+# Week's events - Page 2
 curl -H "Authorization: Bearer sk_live_..." \
-  "https://api.mrdoge.co/odds/events?regionId=5&limit=100&locale=en"
+  "https://api.mrdoge.co/odds/events?startDate=2025-11-15&endDate=2025-11-22&page=2&locale=en"
 ```
+
+### Pagination with Filters
+
+```bash
+# Premier League events - Page 1
+curl -H "Authorization: Bearer sk_live_..." \
+  "https://api.mrdoge.co/odds/events?competitionId=847&page=1&locale=en"
+
+# Premier League events - Page 2
+curl -H "Authorization: Bearer sk_live_..." \
+  "https://api.mrdoge.co/odds/events?competitionId=847&page=2&locale=en"
+```
+
+<Note>
+  **Performance**: Each page is cached separately in Redis. When event data changes, all cached pages are invalidated automatically to ensure data consistency.
+</Note>
 
 ## Common Filters
 

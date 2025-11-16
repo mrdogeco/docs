@@ -147,14 +147,18 @@ Returns a complete event object with all related data.
   </Expandable>
 </ResponseField>
 
-### Live Data
+### Statistics
 
-<ResponseField name="liveEventData" type="array">
-  Array of live data objects (if event is live)
+<ResponseField name="stats" type="object">
+  Match statistics and live data (null for upcoming events, object for live/completed events)
 
-  <Expandable title="LiveEventData Object">
-    <ResponseField name="eventId" type="string">
-      Event ID
+  <Expandable title="Stats Object">
+    <ResponseField name="homeGoals" type="integer">
+      Home team score
+    </ResponseField>
+
+    <ResponseField name="awayGoals" type="integer">
+      Away team score
     </ResponseField>
 
     <ResponseField name="phaseSysname" type="string">
@@ -164,19 +168,24 @@ Returns a complete event object with all related data.
       - `SOCCER_MATCH_FIRST_HALF`
       - `SOCCER_MATCH_SECOND_HALF`
       - `BASKETBALL_QUARTER_1`
+      - `FULL_TIME` (completed)
+    </ResponseField>
+
+    <ResponseField name="phaseCaption" type="string">
+      Localized phase description (e.g., "First Half", "Partida finalizada")
     </ResponseField>
 
     <ResponseField name="isLive" type="boolean">
       Whether event is currently live
     </ResponseField>
 
-    <ResponseField name="liveDataJson" type="object">
-      Sport-specific live data including:
-      - Scores
-      - Statistics (corners, cards, fouls, etc.)
-      - Period/quarter scores
-      - Live odds
+    <ResponseField name="timeline" type="array">
+      Array of match events (goals, cards, corners, etc.)
     </ResponseField>
+
+    <Note>
+      **Sport-specific fields**: Soccer includes corners, cards, fouls; Basketball includes quarters; Tennis includes sets, etc.
+    </Note>
   </Expandable>
 </ResponseField>
 
@@ -218,92 +227,147 @@ print(event)
 
 ## Example Response
 
-```json
-{
-  "id": "evt_abc123",
-  "competitionId": 1,
-  "regionId": 1,
-  "sportId": 1,
-  "startDateTime": "2025-11-08T15:00:00Z",
-  "status": "upcoming",
-  "views": 1250,
-  "metadata": {
-    "sportName": "soccer",
-    "homeTeamName": "Arsenal",
-    "awayTeamName": "Chelsea",
-    "homeTeamId": 100,
-    "awayTeamId": 101
-  },
-  "homeTeam": {
-    "id": 100,
-    "caption": "Arsenal",
-    "regionId": 1
-  },
-  "awayTeam": {
-    "id": 101,
-    "caption": "Chelsea",
-    "regionId": 1
-  },
-  "competition": {
-    "id": 1,
-    "caption": "Premier League",
-    "regionId": 1,
-    "region": {
-      "id": 1,
-      "caption": "England"
-    }
-  },
-  "markets": [
+<Tabs>
+  <Tab title="Upcoming Event">
+    ```json
     {
-      "id": "mkt_xyz789",
-      "betTypeSysname": "SOCCER_MATCH_RESULT",
-      "betItems": [
-        {
-          "id": "bet_123",
-          "code": "1",
-          "caption": "Arsenal",
-          "price": 2.10,
-          "oddsText": "2.10",
-          "isAvailable": true
+      "data": {
+        "id": "42099047",
+        "startDateTime": "2025-09-13T11:30:00.000Z",
+        "status": "upcoming",
+        "views": 1250,
+        "homeTeam": {
+          "id": 95450,
+          "name": "Arsenal"
         },
-        {
-          "id": "bet_124",
-          "code": "X",
-          "caption": "Draw",
-          "price": 3.40,
-          "oddsText": "3.40",
-          "isAvailable": true
+        "awayTeam": {
+          "id": 11045,
+          "name": "Nottingham Forest"
         },
-        {
-          "id": "bet_125",
-          "code": "2",
-          "caption": "Chelsea",
-          "price": 3.75,
-          "oddsText": "3.75",
-          "isAvailable": true
-        }
-      ]
+        "sport": {
+          "id": 1,
+          "name": "soccer",
+          "sysname": "SOCCER_MATCH"
+        },
+        "competition": {
+          "id": 847,
+          "caption": "Premier League"
+        },
+        "region": {
+          "id": 6,
+          "caption": "England"
+        },
+        "stats": null,
+        "markets": [
+          {
+            "id": "<string>",
+            "betTypeSysname": "SOCCER_MATCH_RESULT",
+            "betItems": [
+              {
+                "id": "<string>",
+                "code": "1",
+                "caption": "1",
+                "price": 1.4,
+                "isAvailable": true
+              },
+              {
+                "id": "<string>",
+                "code": "X",
+                "caption": "X",
+                "price": 4.7,
+                "isAvailable": true
+              },
+              {
+                "id": "<string>",
+                "code": "2",
+                "caption": "2",
+                "price": 8.1,
+                "isAvailable": true
+              }
+            ]
+          }
+        ],
+        "bettingRecommendations": [
+          {
+            "id": "<string>",
+            "outcome": "Under 2.5",
+            "odds": 2.1,
+            "confidence": "High",
+            "edgePercentage": 47.6,
+            "kellyFraction": 0.905,
+            "rationale": [
+              "The odds suggest a very low probability of more than 2.5 goals being scored."
+            ],
+            "riskFactors": [
+              "risk of defensive strategies leading to fewer goals"
+            ]
+          }
+        ],
+        "mrDogePicks": { ... },
+        "matchSimulation": { ... },
+        "analysisInsight": { ... },
+        "eventNews": [ ... ]
+      }
     }
-  ],
-  "bettingRecommendations": [
+    ```
+  </Tab>
+
+  <Tab title="Completed Event">
+    ```json
     {
-      "id": "rec_abc",
-      "outcome": "Arsenal",
-      "odds": 2.10,
-      "confidence": "High",
-      "edgePercentage": 6.8,
-      "kellyFraction": 0.032,
-      "rationale": [
-        "Arsenal excellent home form (8 wins in last 10)",
-        "Chelsea struggling away (2 wins in last 8)"
-      ],
-      "riskFactors": [
-        "Chelsea have key players returning from injury"
-      ]
+      "data": {
+        "id": "42243300",
+        "startDateTime": "2025-09-04T10:35:00.000Z",
+        "status": "completed",
+        "views": 823,
+        "homeTeam": {
+          "id": 123456,
+          "name": "FC Masar"
+        },
+        "awayTeam": {
+          "id": 789012,
+          "name": "Gazl Kafr Eldwar"
+        },
+        "sport": {
+          "id": 1,
+          "name": "soccer"
+        },
+        "stats": {
+          "homeGoals": 0,
+          "awayGoals": 0,
+          "homeCorners": 5,
+          "awayCorners": 1,
+          "homeYellowCards": 2,
+          "awayYellowCards": 2,
+          "homeRedCards": 0,
+          "awayRedCards": 0,
+          "phaseSysname": "SOCCER_MATCH_SECOND_HALF",
+          "phaseCaption": "Match Finished",
+          "isLive": false,
+          "timeline": [
+            {
+              "type": "YellowCardWithoutPlayer",
+              "context": "A",
+              "captions": ["1", "Gazl Kafr Eldwar"],
+              "phaseCode": "1H",
+              "timeOffset": 1
+            },
+            {
+              "type": "Corner",
+              "context": "H",
+              "captions": ["18", "FC Masar"],
+              "phaseCode": "1H",
+              "timeOffset": 18
+            }
+          ]
+        },
+        "markets": [ ... ],
+        "bettingRecommendations": [ ... ]
+      }
     }
-  ]
-}
-```
+    ```
+  </Tab>
+</Tabs>
 
 ## Use Cases
 
