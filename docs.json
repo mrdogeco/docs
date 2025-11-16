@@ -37,23 +37,20 @@
           {
             "group": "Sports Endpoints",
             "pages": [
-              "api-reference/odds/health",
-              "api-reference/odds/regions",
-              "api-reference/odds/competitions",
-              "api-reference/odds/events",
-              "api-reference/odds/live-events",
-              "api-reference/odds/event-details",
-              "api-reference/odds/trending-events"
+              "api-reference/sports/health",
+              "api-reference/sports/regions",
+              "api-reference/sports/competitions",
+              "api-reference/sports/events",
+              "api-reference/sports/live-events",
+              "api-reference/sports/event-details",
+              "api-reference/sports/trending-events"
             ]
           },
           {
             "group": "AI Endpoints",
             "pages": [
               "api-reference/ai/mr-doge-picks",
-              "api-reference/ai/betting-recommendations",
-              "api-reference/ai/value-opportunities",
-              "api-reference/ai/processed-insights",
-              "api-reference/ai/performance"
+              "api-reference/ai/betting-recommendations"
             ]
           }
         ]

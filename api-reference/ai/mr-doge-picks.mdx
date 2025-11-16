@@ -1,6 +1,6 @@
 ---
 title: "Get Mr. Doge Picks"
-api: "GET https://api.mrdoge.co/ai/mr-doge-picks"
+api: "GET https://api.mrdoge.co/v2/ai/mr-doge-picks"
 auth: "bearer"
 description: "Get featured AI-curated betting picks - single bets or parlays"
 ---
@@ -140,11 +140,11 @@ Returns an array of Mr. Doge pick objects.
 <CodeGroup>
 ```bash cURL
 curl -H "Authorization: Bearer sk_live_..." \
-  "https://api.mrdoge.co/ai/mr-doge-picks?today=true&limit=3"
+  "https://api.mrdoge.co/v2/ai/mr-doge-picks?today=true&limit=3"
 ```
 
 ```javascript JavaScript
-const response = await fetch('https://api.mrdoge.co/ai/mr-doge-picks?today=true&limit=3', {
+const response = await fetch('https://api.mrdoge.co/v2/ai/mr-doge-picks?today=true&limit=3', {
   headers: {
     'Authorization': 'Bearer sk_live_...'
   }
@@ -162,7 +162,7 @@ headers = {
 }
 
 response = requests.get(
-    'https://api.mrdoge.co/ai/mr-doge-picks',
+    'https://api.mrdoge.co/v2/ai/mr-doge-picks',
     headers=headers,
     params={'today': 'true', 'limit': '3'}
 )

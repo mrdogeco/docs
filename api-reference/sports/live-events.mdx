@@ -1,6 +1,6 @@
 ---
 title: "Live Events"
-api: "GET https://api.mrdoge.co/odds/live-events"
+api: "GET https://api.mrdoge.co/v2/matches/live"
 auth: "bearer"
 description: "Get currently live events with real-time stats and odds (optimized for sub-second response)"
 ---
@@ -236,16 +236,16 @@ The response format is identical to the `/events` endpoint, with the following f
 <CodeGroup>
 ```bash cURL
 curl -H "Authorization: Bearer sk_live_..." \
-  "https://api.mrdoge.co/odds/live-events?locale=en"
+  "https://api.mrdoge.co/v2/matches/live?locale=en"
 ```
 
 ```bash cURL - Filter by Sport
 curl -H "Authorization: Bearer sk_live_..." \
-  "https://api.mrdoge.co/odds/live-events?sport=soccer&locale=en"
+  "https://api.mrdoge.co/v2/matches/live?sport=soccer&locale=en"
 ```
 
 ```javascript JavaScript
-const response = await fetch('https://api.mrdoge.co/odds/live-events?locale=en', {
+const response = await fetch('https://api.mrdoge.co/v2/matches/live?locale=en', {
   headers: {
     'Authorization': 'Bearer sk_live_...'
   }
@@ -263,7 +263,7 @@ headers = {
 }
 
 response = requests.get(
-    'https://api.mrdoge.co/odds/live-events',
+    'https://api.mrdoge.co/v2/matches/live',
     headers=headers,
     params={'locale': 'en', 'sport': 'soccer'}
 )
@@ -443,7 +443,7 @@ If you're currently using `/events?status=live`, here's how to migrate:
 ```javascript
 // Static list, no live data
 const response = await fetch(
-  'https://api.mrdoge.co/odds/events?status=live&locale=en',
+  'https://api.mrdoge.co/v2/matches?status=live&locale=en',
   { headers: { 'Authorization': 'Bearer sk_live_...' } }
 );
 // Cost: 1 credit
@@ -455,7 +455,7 @@ const response = await fetch(
 ```javascript
 // Real-time data with scores and odds
 const response = await fetch(
-  'https://api.mrdoge.co/odds/live-events?locale=en',
+  'https://api.mrdoge.co/v2/matches/live?locale=en',
   { headers: { 'Authorization': 'Bearer sk_live_...' } }
 );
 // Cost: 2 credits

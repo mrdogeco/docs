@@ -1,6 +1,6 @@
 ---
 title: "Trending Events"
-api: "GET https://api.mrdoge.co/odds/trending-events"
+api: "GET https://api.mrdoge.co/v2/matches/trending"
 auth: "bearer"
 description: "Get today's most-viewed events"
 ---
@@ -11,7 +11,7 @@ description: "Get today's most-viewed events"
 
 Returns the top 5 most-viewed **upcoming and live** events for today. Perfect for discovering popular betting opportunities and showing users what everyone else is looking at.
 
-Events are ranked by view count and include basic event details with key markets. This is a lightweight endpoint optimized for speed - for full AI analysis, use the [Event Details](/api-reference/odds/event-details) endpoint.
+Events are ranked by view count and include basic event details with key markets. This is a lightweight endpoint optimized for speed - for full AI analysis, use the [Event Details](/api-reference/sports/event-details) endpoint.
 
 Use the `status` parameter to filter by event status (e.g., `status=completed` to see the most-viewed completed events of the day).
 
@@ -72,19 +72,19 @@ Each event includes:
   - Mr. Doge picks
   - Match simulations or analysis
 
-  For complete event data with AI analysis, use the [Event Details](/api-reference/odds/event-details) endpoint.
+  For complete event data with AI analysis, use the [Event Details](/api-reference/sports/event-details) endpoint.
 </Note>
 
 ## Example Request
 
 ```bash
 curl -H "Authorization: Bearer sk_live_..." \
-  "https://api.mrdoge.co/odds/trending-events?sport=soccer&locale=en"
+  "https://api.mrdoge.co/v2/matches/trending?sport=soccer&locale=en"
 ```
 
 ```bash Get Completed Events (Most Viewed Today)
 curl -H "Authorization: Bearer sk_live_..." \
-  "https://api.mrdoge.co/odds/trending-events?status=completed&sport=soccer&locale=en"
+  "https://api.mrdoge.co/v2/matches/trending?status=completed&sport=soccer&locale=en"
 ```
 
 ## Example Response

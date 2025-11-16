@@ -1,6 +1,6 @@
 ---
 title: "Events"
-api: "GET https://api.mrdoge.co/odds/events"
+api: "GET https://api.mrdoge.co/v2/matches"
 auth: "bearer"
 description: "Get sporting events with filtering by competition, region, date, and status"
 ---
@@ -17,12 +17,12 @@ This is the main endpoint for **browsing event lists and schedules**. It support
 - `completed` - Finished events (includes final scores and stats)
 
 <Warning>
-**For real-time live data**: Use the [Get Live Events](/api-reference/odds/live-events) endpoint (2 credits) instead of `status=live` on this endpoint. The `/live-events` endpoint provides real-time scores, odds, and statistics with sub-second response times.
+**For real-time live data**: Use the [Get Live Events](/api-reference/sports/live-events) endpoint (2 credits) instead of `status=live` on this endpoint. The `/live-events` endpoint provides real-time scores, odds, and statistics with sub-second response times.
 
 This endpoint (`/events`) is designed for **static event lists and schedules**. Live events returned here will NOT include real-time stats or odds.
 </Warning>
 
-For full event details including markets and odds, use the [Get Event Details](/api-reference/odds/event-details) endpoint.
+For full event details including markets and odds, use the [Get Event Details](/api-reference/sports/event-details) endpoint.
 
 <Note>
   **Pagination**: This endpoint returns a maximum of 100 events per request. To retrieve more events, use date ranges (`startDate`/`endDate`) or filter by specific competitions/regions and make multiple requests.
@@ -73,7 +73,7 @@ For full event details including markets and odds, use the [Get Event Details](/
   Default: Returns both `upcoming` and `live` events
 
   <Warning>
-    **Using `status=live`?** This returns a static list of live events without real-time data. For live scores, odds, and statistics, use the dedicated [/live-events](/api-reference/odds/live-events) endpoint instead.
+    **Using `status=live`?** This returns a static list of live events without real-time data. For live scores, odds, and statistics, use the dedicated [/live-events](/api-reference/sports/live-events) endpoint instead.
   </Warning>
 </ParamField>
 
@@ -268,11 +268,11 @@ For full event details including markets and odds, use the [Get Event Details](/
 <CodeGroup>
 ```bash cURL
 curl -H "Authorization: Bearer sk_live_..." \
-  "https://api.mrdoge.co/odds/events?competitionId=1&date=2025-11-08&limit=10&status=upcoming&status=live&status=completed&locale=en"
+  "https://api.mrdoge.co/v2/matches?competitionId=1&date=2025-11-08&limit=10&status=upcoming&status=live&status=completed&locale=en"
 ```
 
 ```javascript JavaScript
-const response = await fetch('https://api.mrdoge.co/odds/events?competitionId=1&date=2025-11-08&limit=10&status=upcoming&status=live&status=completed&locale=en', {
+const response = await fetch('https://api.mrdoge.co/v2/matches?competitionId=1&date=2025-11-08&limit=10&status=upcoming&status=live&status=completed&locale=en', {
   headers: {
     'Authorization': 'Bearer sk_live_...'
   }
@@ -290,7 +290,7 @@ headers = {
 }
 
 response = requests.get(
-    'https://api.mrdoge.co/odds/events',
+    'https://api.mrdoge.co/v2/matches',
     headers=headers,
     params={
         'competitionId': '1',
@@ -408,15 +408,15 @@ The endpoint returns a maximum of 100 events per request. Use the `page` paramet
 ```bash
 # Page 1: First 100 events for a specific date
 curl -H "Authorization: Bearer sk_live_..." \
-  "https://api.mrdoge.co/odds/events?date=2025-11-15&page=1&limit=100&locale=en"
+  "https://api.mrdoge.co/v2/matches?date=2025-11-15&page=1&limit=100&locale=en"
 
 # Page 2: Next 100 events (events 101-200)
 curl -H "Authorization: Bearer sk_live_..." \
-  "https://api.mrdoge.co/odds/events?date=2025-11-15&page=2&limit=100&locale=en"
+  "https://api.mrdoge.co/v2/matches?date=2025-11-15&page=2&limit=100&locale=en"
 
 # Page 3: Next 100 events (events 201-300)
 curl -H "Authorization: Bearer sk_live_..." \
-  "https://api.mrdoge.co/odds/events?date=2025-11-15&page=3&limit=100&locale=en"
+  "https://api.mrdoge.co/v2/matches?date=2025-11-15&page=3&limit=100&locale=en"
 ```
 
 ### Pagination with Date Ranges
@@ -424,11 +424,11 @@ curl -H "Authorization: Bearer sk_live_..." \
 ```bash
 # Week's events - Page 1
 curl -H "Authorization: Bearer sk_live_..." \
-  "https://api.mrdoge.co/odds/events?startDate=2025-11-15&endDate=2025-11-22&page=1&locale=en"
+  "https://api.mrdoge.co/v2/matches?startDate=2025-11-15&endDate=2025-11-22&page=1&locale=en"
 
 # Week's events - Page 2
 curl -H "Authorization: Bearer sk_live_..." \
-  "https://api.mrdoge.co/odds/events?startDate=2025-11-15&endDate=2025-11-22&page=2&locale=en"
+  "https://api.mrdoge.co/v2/matches?startDate=2025-11-15&endDate=2025-11-22&page=2&locale=en"
 ```
 
 ### Pagination with Filters
@@ -436,11 +436,11 @@ curl -H "Authorization: Bearer sk_live_..." \
 ```bash
 # Premier League events - Page 1
 curl -H "Authorization: Bearer sk_live_..." \
-  "https://api.mrdoge.co/odds/events?competitionId=847&page=1&locale=en"
+  "https://api.mrdoge.co/v2/matches?competitionId=847&page=1&locale=en"
 
 # Premier League events - Page 2
 curl -H "Authorization: Bearer sk_live_..." \
-  "https://api.mrdoge.co/odds/events?competitionId=847&page=2&locale=en"
+  "https://api.mrdoge.co/v2/matches?competitionId=847&page=2&locale=en"
 ```
 
 <Note>
@@ -468,7 +468,7 @@ curl -H "Authorization: Bearer sk_live_..." \
     ```
 
     <Warning>
-      **Important**: This returns a **static list only** without real-time data. For live scores, odds, and statistics, use the [/live-events](/api-reference/odds/live-events) endpoint instead.
+      **Important**: This returns a **static list only** without real-time data. For live scores, odds, and statistics, use the [/live-events](/api-reference/sports/live-events) endpoint instead.
     </Warning>
   </Accordion>
 

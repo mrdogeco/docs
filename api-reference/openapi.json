@@ -22,7 +22,7 @@
     }
   ],
   "paths": {
-    "/odds/health": {
+    "/v2/health": {
       "get": {
         "summary": "Health Check",
         "description": "Check the API service health status, database connectivity, and version information.",
@@ -56,7 +56,7 @@
         }
       }
     },
-    "/odds/regions": {
+    "/v2/regions": {
       "get": {
         "summary": "List Regions",
         "description": "Get all available regions (countries) with sports coverage, competition counts, and localized names.",
@@ -147,7 +147,7 @@
         }
       }
     },
-    "/odds/competitions": {
+    "/v2/competitions": {
       "get": {
         "summary": "List Competitions",
         "description": "Get all available competitions (leagues/tournaments) with event counts.",
@@ -237,7 +237,7 @@
         }
       }
     },
-    "/odds/events": {
+    "/v2/matches": {
       "get": {
         "summary": "List Events",
         "description": "Get sporting events with filtering by competition, region, date, and status. Returns events with basic information.",
@@ -368,7 +368,7 @@
         }
       }
     },
-    "/odds/events/{eventId}": {
+    "/v2/matches/{eventId}": {
       "get": {
         "summary": "Get Event Details",
         "description": "Get complete event information including teams, markets, odds, live data, AI recommendations, and Mr. Doge picks. This endpoint returns all data needed to display a full event page.",
@@ -403,7 +403,7 @@
         }
       }
     },
-    "/odds/live-events": {
+    "/v2/matches/live": {
       "get": {
         "summary": "List Live Events",
         "description": "Get all currently live events with real-time scores and odds. Updated every 10 seconds.",
@@ -453,7 +453,7 @@
         }
       }
     },
-    "/odds/trending-events": {
+    "/v2/matches/trending": {
       "get": {
         "summary": "Get Trending Events",
         "description": "Get today's most-viewed events with AI picks and recommendations. Useful for discovering popular betting opportunities.",
@@ -498,7 +498,7 @@
         }
       }
     },
-    "/odds/teams": {
+    "/v2/teams": {
       "get": {
         "summary": "Search Teams",
         "description": "Search for teams by name across all sports.",
@@ -541,7 +541,7 @@
         }
       }
     },
-    "/odds/stats": {
+    "/v2/stats": {
       "get": {
         "summary": "Get API Statistics",
         "description": "Get overall statistics about available data in the API (total regions, competitions, events, etc.).",
@@ -583,7 +583,7 @@
         }
       }
     },
-    "/ai/mr-doge-picks": {
+    "/v2/ai/mr-doge-picks": {
       "get": {
         "summary": "Get Mr. Doge Picks",
         "description": "Get featured AI-curated betting picks. These are high-confidence recommendations that can be single bets or parlays. Costs 10 credits per request.",
@@ -663,7 +663,7 @@
         }
       }
     },
-    "/ai/betting-recommendations": {
+    "/v2/ai/betting-recommendations": {
       "get": {
         "summary": "Get Betting Recommendations",
         "description": "Get AI-generated value betting recommendations for individual markets. Each recommendation includes confidence level, edge percentage, Kelly fraction, rationale, and risk factors. Costs 2 credits per request.",
@@ -750,7 +750,7 @@
         }
       }
     },
-    "/ai/value-opportunities": {
+    "/v2/ai/value-opportunities": {
       "get": {
         "summary": "Get Top Value Opportunities",
         "description": "Get the highest-edge betting opportunities currently available. Returns only recommendations that meet minimum edge threshold.",
@@ -829,7 +829,7 @@
         }
       }
     },
-    "/ai/performance": {
+    "/v2/ai/performance": {
       "get": {
         "summary": "Get AI Performance Metrics",
         "description": "Get historical performance statistics for AI recommendations including win rates, ROI, and performance by confidence level.",

@@ -1,6 +1,6 @@
 ---
 title: "Competitions"
-api: "GET https://api.mrdoge.co/odds/competitions"
+api: "GET https://api.mrdoge.co/v2/competitions"
 description: "Get all available competitions (leagues/tournaments) with event counts"
 ---
 
@@ -99,7 +99,7 @@ Use this endpoint to:
 ## Example Request
 
 ```bash
-curl "https://api.mrdoge.co/odds/competitions?regionId=6&date=2025-11-15&locale=en"
+curl "https://api.mrdoge.co/v2/competitions?regionId=6&date=2025-11-15&locale=en"
 ```
 
 ## Example Response
@@ -156,5 +156,5 @@ curl "https://api.mrdoge.co/odds/competitions?regionId=6&date=2025-11-15&locale=
 </CardGroup>
 
 <Note>
-  Competition data is optimized for fast responses. Combine with the [Events endpoint](/api-reference/odds/events) to build complete league schedules.
+  Competition data is optimized for fast responses. Combine with the [Events endpoint](/api-reference/sports/events) to build complete league schedules.
 </Note>

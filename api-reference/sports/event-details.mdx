@@ -1,6 +1,6 @@
 ---
 title: "Event Details"
-api: "GET https://api.mrdoge.co/odds/events/{eventId}"
+api: "GET https://api.mrdoge.co/v2/matches/{eventId}"
 auth: "bearer"
 description: "Get complete event information including teams, markets, odds, live data, and AI recommendations"
 ---
@@ -207,11 +207,11 @@ Returns a complete event object with all related data.
 
 <CodeGroup>
 ```bash cURL
-curl "https://api.mrdoge.co/odds/events/evt_abc123?locale=en"
+curl "https://api.mrdoge.co/v2/matches/evt_abc123?locale=en"
 ```
 
 ```javascript JavaScript
-const response = await fetch('https://api.mrdoge.co/odds/events/evt_abc123?locale=en');
+const response = await fetch('https://api.mrdoge.co/v2/matches/evt_abc123?locale=en');
 const event = await response.json();
 console.log(event);
 ```
@@ -219,7 +219,7 @@ console.log(event);
 ```python Python
 import requests
 
-response = requests.get('https://api.mrdoge.co/odds/events/evt_abc123?locale=en')
+response = requests.get('https://api.mrdoge.co/v2/matches/evt_abc123?locale=en')
 event = response.json()
 print(event)
 ```

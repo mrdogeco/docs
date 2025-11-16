@@ -1,6 +1,6 @@
 ---
 title: "Get Betting Recommendations"
-api: "GET https://api.mrdoge.co/ai/betting-recommendations"
+api: "GET https://api.mrdoge.co/v2/ai/betting-recommendations"
 auth: "bearer"
 description: "Get AI-generated value betting recommendations with confidence levels and edge analysis"
 ---
@@ -177,12 +177,12 @@ Returns an array of betting recommendation objects.
 <CodeGroup>
 ```bash cURL
 curl -H "Authorization: Bearer sk_live_..." \
-  "https://api.mrdoge.co/ai/betting-recommendations?confidence=High&minEdge=5&limit=5"
+  "https://api.mrdoge.co/v2/ai/betting-recommendations?confidence=High&minEdge=5&limit=5"
 ```
 
 ```javascript JavaScript
 const response = await fetch(
-  'https://api.mrdoge.co/ai/betting-recommendations?confidence=High&minEdge=5&limit=5',
+  'https://api.mrdoge.co/v2/ai/betting-recommendations?confidence=High&minEdge=5&limit=5',
   {
     headers: { 'Authorization': 'Bearer sk_live_...' }
   }
@@ -195,7 +195,7 @@ const recommendations = await response.json();
 import requests
 
 response = requests.get(
-    'https://api.mrdoge.co/ai/betting-recommendations',
+    'https://api.mrdoge.co/v2/ai/betting-recommendations',
     headers={'Authorization': 'Bearer sk_live_...'},
     params={'confidence': 'High', 'minEdge': '5', 'limit': '5'}
 )

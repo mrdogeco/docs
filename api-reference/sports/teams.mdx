@@ -1,6 +1,6 @@
 ---
 title: "Search Teams"
-api: "GET https://api.mrdoge.co/odds/teams"
+api: "GET https://api.mrdoge.co/v2/teams"
 auth: "bearer"
 description: "Search for teams by name across all sports"
 ---
@@ -53,7 +53,7 @@ Returns an array of team objects.
 
 ```bash
 curl -H "Authorization: Bearer sk_live_..." \
-  "https://api.mrdoge.co/odds/teams?search=Arsenal&limit=3"
+  "https://api.mrdoge.co/v2/teams?search=Arsenal&limit=3"
 ```
 
 ## Example Response
