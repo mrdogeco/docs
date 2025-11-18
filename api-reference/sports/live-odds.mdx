@@ -1,0 +1,105 @@
+---
+title: "Live Odds"
+api: "GET https://api.mrdoge.co/v2/matches/{eventId}/live-odds"
+auth: "bearer"
+description: "Fetch all live betting markets (and their bet items) for a specific event in real time."
+---
+
+<Warning>
+  **Requires Authentication**: This endpoint costs **2 credits** per request.
+</Warning>
+
+Use this endpoint when you need the complete live odds book for an event. It returns every market and its live bet items exactly as they are stored in our live odds engine—perfect for building real-time betting interfaces or price monitoring dashboards.
+
+## Path Parameters
+
+<ParamField path="eventId" type="string" required>
+  The event identifier or slug (both `43108087` and `43108087-finland-vs-andorra` are supported).
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="dataSource" type="string" default="novibet">
+  Optional odds provider (`novibet`, `bet365`, etc.). Defaults to `novibet`.
+</ParamField>
+
+## Response
+
+<ResponseField name="eventId" type="string">
+  The event identifier you requested.
+</ResponseField>
+
+<ResponseField name="dataSource" type="string">
+  Data source used for this snapshot.
+</ResponseField>
+
+<ResponseField name="capturedAt" type="string">
+  ISO timestamp of the most recent odds snapshot.
+</ResponseField>
+
+<ResponseField name="liveMarkets" type="array">
+  Array of live markets, each with its bet items.
+
+  <Expandable title="Live Market Object">
+    <ResponseField name="marketId" type="string">
+      Provider market identifier (when available).
+    </ResponseField>
+    <ResponseField name="marketSysname" type="string">
+      Market system name (e.g., `SOCCER_MATCH_RESULT`).
+    </ResponseField>
+    <ResponseField name="marketCaption" type="string">
+      Human-friendly caption when provided by the data source.
+    </ResponseField>
+    <ResponseField name="betItems" type="array">
+      Live bet items for that market.
+      <Expandable title="Bet Item Object">
+        <ResponseField name="code" type="string">
+          Outcome code (`1`, `X`, `O`, etc.).
+        </ResponseField>
+        <ResponseField name="caption" type="string">
+          Human-readable outcome caption.
+        </ResponseField>
+        <ResponseField name="price" type="number">
+          Current decimal odds.
+        </ResponseField>
+        <ResponseField name="priceChange" type="number">
+          Delta since the previous snapshot (if available).
+        </ResponseField>
+        <ResponseField name="isAvailable" type="boolean">
+          Whether the outcome is currently tradable.
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example Request
+
+```bash
+curl -H "Authorization: Bearer sk_live_..." \
+  "https://api.mrdoge.co/v2/matches/43108087/live-odds"
+```
+
+## Example Response
+
+```json
+{
+  "data": {
+    "eventId": "43108087",
+    "dataSource": "novibet",
+    "capturedAt": "2025-11-17T17:25:01.015Z",
+    "liveMarkets": [
+      {
+        "marketId": "1508075182",
+        "marketSysname": "SOCCER_MATCH_RESULT",
+        "marketCaption": "Match Result",
+        "betItems": [
+          { "code": "1", "caption": "Finland", "price": 1.03, "isAvailable": true },
+          { "code": "X", "caption": "Draw", "price": 11.5, "isAvailable": true },
+          { "code": "2", "caption": "Andorra", "price": 67.0, "isAvailable": true }
+        ]
+      }
+    ]
+  }
+}
+```

@@ -382,7 +382,7 @@
             "description": "Event ID",
             "schema": {
               "type": "string",
-              "example": "evt_123456"
+              "example": "123456"
             }
           }
         ],
@@ -585,7 +585,7 @@
     },
     "/v2/ai/mr-doge-picks": {
       "get": {
-        "summary": "Get Mr. Doge Picks",
+        "summary": "Mr. Doge Picks",
         "description": "Get featured AI-curated betting picks. These are high-confidence recommendations that can be single bets or parlays. Costs 10 credits per request.",
         "tags": ["AI"],
         "security": [],
@@ -665,7 +665,7 @@
     },
     "/v2/ai/betting-recommendations": {
       "get": {
-        "summary": "Get Betting Recommendations",
+        "summary": "AI Recommendations",
         "description": "Get AI-generated value betting recommendations for individual markets. Each recommendation includes confidence level, edge percentage, Kelly fraction, rationale, and risk factors. Costs 2 credits per request.",
         "tags": ["AI"],
         "security": [],
@@ -961,7 +961,7 @@
         "properties": {
           "id": {
             "type": "string",
-            "example": "evt_123456"
+            "example": "123456"
           },
           "competitionId": {
             "type": "integer",
@@ -1073,7 +1073,7 @@
           },
           "eventId": {
             "type": "string",
-            "example": "evt_123456"
+            "example": "123456"
           },
           "betTypeSysname": {
             "type": "string",
@@ -1109,7 +1109,7 @@
           "price": {
             "type": "number",
             "format": "float",
-            "example": 2.10,
+            "example": 2.1,
             "description": "Decimal odds"
           },
           "oddsText": {
@@ -1190,7 +1190,7 @@
           },
           "eventId": {
             "type": "string",
-            "example": "evt_123456"
+            "example": "123456"
           },
           "marketId": {
             "type": "string",
@@ -1207,7 +1207,7 @@
           "odds": {
             "type": "number",
             "format": "float",
-            "example": 2.10
+            "example": 2.1
           },
           "confidence": {
             "type": "string",
@@ -1241,9 +1241,7 @@
             "items": {
               "type": "string"
             },
-            "example": [
-              "Away team has key players returning from injury"
-            ]
+            "example": ["Away team has key players returning from injury"]
           },
           "dataSupport": {
             "type": "array",
@@ -1286,7 +1284,7 @@
           "totalOdds": {
             "type": "number",
             "format": "float",
-            "example": 8.50,
+            "example": 8.5,
             "description": "Combined odds for parlay (product of all recommendation odds)"
           },
           "settled": {

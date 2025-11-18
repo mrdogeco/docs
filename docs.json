@@ -43,6 +43,7 @@
               "api-reference/sports/events",
               "api-reference/sports/live-events",
               "api-reference/sports/event-details",
+              "api-reference/sports/live-odds",
               "api-reference/sports/trending-events"
             ]
           },
@@ -101,7 +102,8 @@
       "x": "https://x.com/mrdogeapp",
       "instagram": "https://www.instagram.com/mrdoge.ai",
       "linkedin": "https://www.linkedin.com/company/mrdoge",
-      "reddit": "https://www.reddit.com/r/mrdoge/"
+      "reddit": "https://www.reddit.com/r/mrdoge/",
+      "github": "https://github.com/mrdogeco"
     }
   },
   "api": {

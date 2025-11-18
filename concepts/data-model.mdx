@@ -604,7 +604,7 @@ Betting markets available for an event.
 ```json
 {
   "id": "mkt_123",
-  "eventId": "evt_abc123",
+  "eventId": "123456",
   "betTypeSysname": "SOCCER_MATCH_RESULT",
 }
 ```
@@ -674,7 +674,7 @@ Real-time match statistics updated during the event.
 ```json
 {
   "id": "live_001",
-  "eventId": "evt_abc123",
+  "eventId": "123456",
   "betContextId": "ctx_123",
   "liveDataJson": {
     "discriminator": "SoccerMatchLiveDataModel",
@@ -849,7 +849,7 @@ AI-generated betting picks with confidence scoring.
 ```json
 {
   "id": "rec_001",
-  "eventId": "evt_abc123",
+  "eventId": "123456",
   "marketId": "mkt_123",
   "betItemId": "bet_001",
   "outcome": "Arsenal",
@@ -886,10 +886,10 @@ Featured AI recommendations (parlays or highlighted picks).
 ```json
 {
   "id": "pick_001",
-  "eventId": "evt_abc123",
+  "eventId": "123456",
   "pickType": "parlay",
   "recommendations": [
-    {"eventId": "evt_abc123", "outcome": "Arsenal", "odds": 2.10},
+    {"eventId": "123456", "outcome": "Arsenal", "odds": 2.10},
     {"eventId": "evt_def456", "outcome": "Over 2.5", "odds": 1.85}
   ],
   "totalOdds": 3.89,
@@ -920,7 +920,7 @@ Market analysis and value opportunities.
 ```json
 {
   "id": "insight_001",
-  "eventId": "evt_abc123",
+  "eventId": "123456",
   "marketEfficiencyScore": 87.5,
   "valueOpportunities": [
     {
