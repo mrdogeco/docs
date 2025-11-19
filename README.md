@@ -1,43 +1,47 @@
-# Mintlify Starter Kit
+<p align="center">
+  <img src="./logo/light.svg" alt="Mr. Doge API" width="180" />
+</p>
 
-Use the starter kit to get your docs deployed and ready to customize.
+<p align="center">
+  <strong>Mr. Doge API Documentation</strong><br/>
+  Low-latency sports odds, live markets, and AI betting signals for developers
+</p>
 
-Click the green **Use this template** button at the top of this repo to copy the Mintlify starter kit. The starter kit contains examples with
+<p align="center">
+  <a href="https://api.mrdoge.co"><code>api.mrdoge.co</code></a> •
+  <a href="https://docs.mrdoge.co">Hosted Docs</a> •
+  <a href="https://x.com/mrdogeapp">@mrdogeapp</a>
+</p>
 
-- Guide pages
-- Navigation
-- Customizations
-- API reference pages
-- Use of popular components
+## TL;DR
 
-**[Follow the full quickstart guide](https://starter.mintlify.com/quickstart)**
+- **SDK-first docs**: Every endpoint ships with live examples, auth snippets, and credit costs.
+- **Real-time focus**: `/v2/matches/live` pulls from Redis + live tracking for sub-second odds.
+- **AI extras**: Built-in MRDOGE Picks + value bet recommender with transparent credit pricing.
+- **500 credits on signup**: Hit the API immediately—no billing setup required.
 
-## Development
+## Local Development
 
-Install the [Mintlify CLI](https://www.npmjs.com/package/mint) to preview your documentation changes locally. To install, use the following command:
+1. Install the Mintlify CLI:
+   ```bash
+   npm install -g mint
+   ```
+2. From `docs/`, run the dev server:
+   ```bash
+   mint dev
+   ```
+3. Preview at <http://localhost:3000>. Edits hot-reload instantly.
 
-```
-npm i -g mint
-```
+## Publishing Flow
 
-Run the following command at the root of your documentation, where your `docs.json` is located:
+- `main` branch → production docs (Mintlify GitHub App handles syncs).
+- All PRs should include screenshots of new UI components or snippets when relevant.
+- Use semantic commit messages (`docs:`, `fix:`, `feat:`) to keep the changelog clean.
 
-```
-mint dev
-```
+## Contributing
 
-View your local preview at `http://localhost:3000`.
+1. Fork `mrdoge.co/docs` or create a feature branch.
+2. Run `mint lint` before pushing to catch broken links or invalid frontmatter.
+3. Open a PR tagged with `docs` plus a short summary (e.g., `docs: add live odds tutorial`).
 
-## Publishing changes
-
-Install our GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app) to propagate changes from your repo to your deployment. Changes are deployed to production automatically after pushing to the default branch.
-
-## Need help?
-
-### Troubleshooting
-
-- If your dev environment isn't running: Run `mint update` to ensure you have the most recent version of the CLI.
-- If a page loads as a 404: Make sure you are running in a folder with a valid `docs.json`.
-
-### Resources
-- [Mintlify documentation](https://mintlify.com/docs)
+Questions? Ping `support@mrdoge.co` or open a discussion on [r/mrdoge](https://www.reddit.com/r/mrdoge/).
