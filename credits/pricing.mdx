@@ -82,10 +82,10 @@ These endpoints are completely free and don't consume any credits:
 
 | Endpoint | Description |
 |----------|-------------|
-| `GET /odds/health` | API health check |
-| `GET /odds/regions` | List available regions/countries |
-| `GET /odds/competitions` | List competitions by region |
-| `GET /odds/stats` | System-wide statistics |
+| `GET /v2/health` | API health check |
+| `GET /v2/regions` | List available regions/countries |
+| `GET /v2/competitions` | List competitions by region |
+| `GET /v2/stats` | System-wide statistics |
 
 ### Standard Endpoints (1 Credit)
 
@@ -93,13 +93,11 @@ Most endpoints cost **1 credit** per request:
 
 | Endpoint | Description |
 |----------|-------------|
-| `GET /odds/events` | List events with odds (supports `status=live` for live events) |
-| `GET /odds/events/:id` | Single event details |
-| `GET /odds/events/:id/markets` | Markets for an event |
-| `GET /odds/events/:id/result` | Event final result |
-| `GET /odds/events/:id/status` | Event betting status |
-| `GET /odds/teams` | Search teams |
-| `GET /odds/bet-items/:id/odds-movement` | Odds movement for bet |
+| `GET /v2/matches` | List matches with odds (supports `status=live` for live events) |
+| `GET /v2/matches/{matchId}` | Single match details (markets + status) |
+| `GET /v2/bets/events/{eventId}/settle-bet` | Event final result + settlement |
+| `GET /v2/teams` | Search teams |
+| `GET /v2/bets/bet-items/{betItemId}/odds-movement` | Odds movement for a bet item |
 
 ### Premium Endpoints (2-10 Credits)
 
@@ -107,10 +105,11 @@ Advanced features with higher computational costs:
 
 | Endpoint | Cost | Description |
 |----------|------|-------------|
-| `GET /odds/trending-events` | Most viewed events |
+| `GET /v2/matches/trending` | **2 credits** | Most viewed matches |
 | `GET /v2/matches/{eventId}/live-odds` | **2 credits** | Current live odds |
-| `GET /ai/betting-recommendations` | **2 credits** | Top value bets with edge analysis |
-| `GET /ai/mr-doge-picks` | **10 credits** | Featured parlay picks with AI analysis |
+| `GET /v2/ai/betting-recommendations` | **2 credits** | Top value bets with edge analysis |
+| `GET /v2/ai/value-opportunities` | **5 credits** | Highest edge bets across sports |
+| `GET /v2/ai/mr-doge-picks` | **10 credits** | Featured parlay picks with AI analysis |
 
 <Note>
   Costs are subject to change. Check the `X-Credits-Consumed` response header to see the actual cost of each request.
@@ -495,9 +494,9 @@ For very large credit purchases or enterprise needs:
 
   <Accordion title="Do you offer free trials?" icon="gift">
     Every new account gets **500 free credits** to test the API! You can also use these free endpoints without consuming any credits:
-    - `/odds/regions`
-    - `/odds/competitions`
-    - `/odds/stats`
+    - `/v2/regions`
+    - `/v2/competitions`
+    - `/v2/stats`
     - And more!
 
     When ready for production, start with the STARTER package ($29.90) for 20,000 credits.

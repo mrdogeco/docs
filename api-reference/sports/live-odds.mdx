@@ -17,6 +17,12 @@ Use this endpoint when you need the complete live odds book for an event. It ret
   The event identifier or slug (both `43108087` and `43108087-finland-vs-andorra` are supported).
 </ParamField>
 
+## Headers
+
+<ParamField header="Authorization" type="string" required default="Bearer " placeholder="Bearer sk_live_...">
+  Your API key for authentication.
+</ParamField>
+
 ## Query Parameters
 
 <ParamField query="dataSource" type="string" default="novibet">

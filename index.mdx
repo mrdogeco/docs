@@ -41,7 +41,7 @@ Use our API to power betting applications, analytics platforms, prediction model
 ## Key Features
 
 <CardGroup cols={2}>
-  <Card title="42+ Endpoints" icon="plug">
+  <Card title="10+ Endpoints" icon="plug">
     Comprehensive API covering events, odds, live data, AI predictions, and bet
     settlement.
   </Card>
@@ -81,7 +81,7 @@ Use our API to power betting applications, analytics platforms, prediction model
 
 <Steps>
   <Step title="Create Your Account">
-    Sign up at [mrdoge.co](https://mrdoge.co) and verify your email
+    Sign up at [mrdoge.co](https://mrdoge.co) and you're instantly ready to build — no email verification required
   </Step>
   <Step title="Purchase Credits">
     Choose a credit package starting from $29.90 for 20,000 credits
@@ -99,22 +99,22 @@ Use our API to power betting applications, analytics platforms, prediction model
 
 ## Quick Example
 
-Here's how simple it is to get today's soccer events with betting recommendations:
+Here's how simple it is to get today's soccer matches with live markets attached:
 
 <CodeGroup>
 ```bash cURL
 curl -H "Authorization: Bearer sk_live_your_api_key" \
-  "https://api.mrdoge.co/odds/events?sport=soccer&status=upcoming&status=live&locale=en"
+  "https://api.mrdoge.co/v2/matches?sport=soccer&status=upcoming&status=live&locale=en"
 ```
 
 ```javascript JavaScript
-const response = await fetch("https://api.mrdoge.co/odds/events?sport=soccer&status=upcoming&status=live&locale=en", {
+const response = await fetch("https://api.mrdoge.co/v2/matches?sport=soccer&status=upcoming&status=live&locale=en", {
   headers: {
     Authorization: "Bearer sk_live_your_api_key",
   },
 });
-const events = await response.json();
-console.log(`Found ${events.length} upcoming matches`);
+const payload = await response.json();
+console.log(`Found ${payload.count} upcoming matches`);
 ```
 
 ```python Python
@@ -122,12 +122,12 @@ import requests
 
 headers = {'Authorization': 'Bearer sk_live_your_api_key'}
 response = requests.get(
-    'https://api.mrdoge.co/odds/events',
+    'https://api.mrdoge.co/v2/matches',
     params={'sport': 'soccer', 'status': ['upcoming', 'live'], 'locale': 'en'},
     headers=headers
 )
 events = response.json()
-print(f"Found {len(events)} upcoming matches")
+print(f"Found {events.get('count', len(events.get('data', [])))} upcoming matches")
 ```
 
 </CodeGroup>
@@ -137,32 +137,80 @@ print(f"Found {len(events)} upcoming matches")
 {
   "data": [
     {
-      "id": "123456",
-      "homeTeam": "Arsenal",
-      "awayTeam": "Chelsea",
-      "startTime": "2025-11-05T20:00:00Z",
-      "competition": "Premier League",
-      "region": "England",
+      "id": "42099047",
+      "startDateTime": "2025-09-13T11:30:00.000Z",
+      "status": "upcoming",
+      "homeTeamId": 95450,
+      "homeTeam": {
+        "id": 95450,
+        "name": "Arsenal"
+      },
+      "awayTeamId": 11045,
+      "awayTeam": {
+        "id": 11045,
+        "name": "Nottingham Forest"
+      },
+      "sportId": 1,
+      "sport": {
+        "id": 1,
+        "name": "soccer"
+      },
+      "competitionId": 847,
+      "competition": {
+        "id": 847,
+        "caption": "Premier League"
+      },
+      "regionId": 6,
+      "region": {
+        "id": 6,
+        "caption": "England"
+      },
       "markets": [
         {
-          "name": "Match Winner",
+          "id": "1432181681",
+          "betTypeSysname": "SOCCER_MATCH_RESULT",
           "betItems": [
-            { "outcome": "Arsenal", "odds": 2.10 },
-            { "outcome": "Draw", "odds": 3.40 },
-            { "outcome": "Chelsea", "odds": 3.80 }
+            {
+              "id": "5940732426",
+              "code": "X",
+              "price": 4.7,
+              "isAvailable": true
+            },
+            {
+              "id": "5940732427",
+              "code": "2",
+              "price": 8.1,
+              "isAvailable": true
+            },
+            {
+              "id": "5940732425",
+              "code": "1",
+              "price": 1.4,
+              "isAvailable": true
+            }
           ]
-        }
-      ],
-      "aiRecommendation": {
-        "outcome": "Arsenal",
-        "confidence": "High",
-        "edgePercentage": 7.2,
-        "kellyFraction": 0.034
-      }
+        },
+        {
+          "id": "1432181705",
+          "betTypeSysname": "SOCCER_UNDER_OVER",
+          "betItems": [
+            {
+              "id": "5940732580",
+              "code": "O",
+              "price": 1.72,
+              "isAvailable": true
+            },
+            {
+              "id": "5940732581",
+              "code": "U",
+              "price": 2.1,
+              "isAvailable": true
+            }
+          ]
+        },
+      ]
     }
   ],
-  "creditsRemaining": 19999,
-  "creditsConsumed": 1
 }
 ```
 </ResponseExample>
@@ -174,7 +222,7 @@ print(f"Found {len(events)} upcoming matches")
     Get up and running in 5 minutes with step-by-step instructions
   </Card>
   <Card title="API Reference" icon="book" href="/api-reference/sports/events">
-    Explore all 42+ endpoints with interactive examples
+    Explore all 10+ endpoints with interactive examples
   </Card>
   <Card title="Credits & Pricing" icon="tag" href="/credits/pricing">
     Understand our pay-as-you-go credit system and packages

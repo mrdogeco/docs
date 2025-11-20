@@ -1,0 +1,71 @@
+---
+title: "Images"
+api: "GET https://api.mrdoge.co/images/[teams|regions]/{id}.png"
+description: "Serve official team or region shield badges directly from the Mr. Doge CDN." 
+---
+
+<Info>
+  Public endpoint — no API key required. Images are cached for 1 year and returned as `image/png`.
+</Info>
+
+The image service lets you render official team or region icons without hosting assets yourself.
+
+- **Teams**: `https://api.mrdoge.co/images/teams/{teamId}.png`
+- **Regions**: `https://api.mrdoge.co/images/regions/{regionId}.png`
+
+If an image is missing, the API responds with `204 No Content`, so make sure to provide a fallback on the client.
+
+## Usage Examples
+
+<Tabs>
+  <Tab title="Plain HTML">
+
+```html
+<img
+  src="https://api.mrdoge.co/images/teams/95450.png"
+  alt="Team badge"
+  width="64"
+  height="64"
+  loading="lazy"
+/>
+```
+
+  </Tab>
+  <Tab title="Next.js Image">
+
+```tsx
+import Image from "next/image";
+
+export function TeamBadge({ teamId }: { teamId: number }) {
+  return (
+    <Image
+      src={`https://api.mrdoge.co/images/teams/${teamId}.png`}
+      alt="Team badge"
+      width={64}
+      height={64}
+      sizes="64px"
+    />
+  );
+}
+```
+
+  </Tab>
+</Tabs>
+
+Point any image component at the CDN URL and we stream the PNG instantly. Next.js will add responsive sizing and caching, while plain `<img>` tags still benefit from the 1-year cache headers.
+
+## Response
+
+<ResponseField name="Content-Type" type="string">
+  Always `image/png`
+</ResponseField>
+
+<ResponseField name="Cache-Control" type="string">
+  `public, max-age=31536000, immutable`
+</ResponseField>
+
+<ResponseField name="Status" type="integer">
+  `200` (image found) or `204` (no image available)
+</ResponseField>
+
+**Tip:** When displaying shields in web apps, point your image tag directly at the CDN and apply lazy-loading or blur placeholders for a smoother UX.

@@ -17,9 +17,9 @@ This is the main endpoint for **browsing event lists and schedules**. It support
 - `completed` - Finished events (includes final scores and stats)
 
 <Warning>
-**For real-time live data**: Use the [Get Live Events](/api-reference/sports/live-events) endpoint (2 credits) instead of `status=live` on this endpoint. The `/live-events` endpoint provides real-time scores, odds, and statistics with sub-second response times.
+**For real-time live data**: Use the [Get Live Events](/api-reference/sports/live-events) endpoint (2 credits) instead of `status=live` on this endpoint. The `/v2/matches/live` endpoint provides real-time scores, odds, and statistics with sub-second response times.
 
-This endpoint (`/events`) is designed for **static event lists and schedules**. Live events returned here will NOT include real-time stats or odds.
+This endpoint (`/v2/matches`) is designed for **static event lists and schedules**. Live events returned here will NOT include real-time stats or odds.
 </Warning>
 
 For full event details including markets and odds, use the [Get Event Details](/api-reference/sports/event-details) endpoint.
@@ -65,7 +65,7 @@ For full event details including markets and odds, use the [Get Event Details](/
 
   Options:
   - `upcoming` - Events that haven't started (no stats field)
-  - `live` - Currently ongoing events (**no stats/odds** - use `/live-events` for real-time data)
+  - `live` - Currently ongoing events (**no stats/odds** - use `/v2/matches/live` for real-time data)
   - `completed` - Finished events (includes `stats` field with final scores)
 
   Pass multiple statuses with a comma (`status=upcoming,completed`) or by repeating the parameter (`status=upcoming&status=completed`).
@@ -73,7 +73,7 @@ For full event details including markets and odds, use the [Get Event Details](/
   Default: Returns both `upcoming` and `live` events
 
   <Warning>
-    **Using `status=live`?** This returns a static list of live events without real-time data. For live scores, odds, and statistics, use the dedicated [/live-events](/api-reference/sports/live-events) endpoint instead.
+    **Using `status=live`?** This returns a static list of live events without real-time data. For live scores, odds, and statistics, use the dedicated [/live-events](/api-reference/sports/live-events) endpoint instead (`/v2/matches/live`).
   </Warning>
 </ParamField>
 
@@ -145,15 +145,15 @@ For full event details including markets and odds, use the [Get Event Details](/
 </Info>
 
 <Tip>
-  **Getting Live Events with Real-Time Data**: Use the dedicated `/live-events` endpoint for real-time scores, odds, and statistics:
+  **Getting Live Events with Real-Time Data**: Use the dedicated `/v2/matches/live` endpoint for real-time scores, odds, and statistics:
 
   ```bash
-  GET /odds/live-events?sport=soccer&locale=en
+  GET /v2/matches/live?sport=soccer&locale=en
   ```
 
   This provides sub-second response times and includes live stats, odds movements, and real-time scores.
 
-  **Don't use** `/events?status=live` for real-time data - it only returns a static list without stats.
+  **Don't use** `/v2/matches?status=live` for real-time data - it only returns a static list without stats.
 </Tip>
 
 ## Response
@@ -206,7 +206,7 @@ For full event details including markets and odds, use the [Get Event Details](/
   <Note>
     **Important**: This endpoint does NOT return `stats` for `upcoming` or `live` events:
     - `upcoming` events: No stats (event hasn't started)
-    - `live` events: No stats (**use `/live-events` for real-time data**)
+    - `live` events: No stats (**use `/v2/matches/live` for real-time data**)
     - `completed` events: Includes final stats (static data)
   </Note>
 
@@ -468,7 +468,7 @@ curl -H "Authorization: Bearer sk_live_..." \
     ```
 
     <Warning>
-      **Important**: This returns a **static list only** without real-time data. For live scores, odds, and statistics, use the [/live-events](/api-reference/sports/live-events) endpoint instead.
+      **Important**: This returns a **static list only** without real-time data. For live scores, odds, and statistics, use the [/live-events](/api-reference/sports/live-events) endpoint instead (`/v2/matches/live`).
     </Warning>
   </Accordion>
 

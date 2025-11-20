@@ -57,29 +57,29 @@ Credits are the currency of the Mr. Doge API. Instead of monthly subscriptions o
 
 Most endpoints cost **1 credit** per request:
 
-- `/odds/events` - Get events with odds (supports `status=live` for live events)
-- `/odds/events/:eventId` - Single event details
-- `/odds/teams` - Search teams
-- `/ai/betting-recommendations` - AI recommendations (filtered)
+- `/v2/matches` - Get matches with odds (supports `status=live` for live events)
+- `/v2/matches/{matchId}` - Single match details (markets + status)
+- `/v2/teams` - Search teams
+- `/v2/ai/betting-recommendations` - AI recommendations (filtered)
 - And 20+ more standard endpoints
 
 ### Free Endpoints (0 Credits)
 
 Some public endpoints are completely free:
 
-- `/odds/health` - API health check
-- `/odds/regions` - Available regions/countries
-- `/odds/competitions` - List competitions
-- `/odds/stats` - System statistics
+- `/v2/health` - API health check
+- `/v2/regions` - Available regions/countries
+- `/v2/competitions` - List competitions
+- `/v2/stats` - System statistics
 
 ### Premium Endpoints (2-10 Credits)
 
 Advanced features cost more:
 
-- `/odds/odds-history` - **2 credits** - Historical odds data
+- `/v2/bets/bet-items/{betItemId}/odds-movement` - **2 credits** - Historical odds data
 - `/v2/matches/{eventId}/live-odds` - **2 credits** - Current live odds
-- `/ai/value-opportunities` - **5 credits** - Best value bets with edge analysis
-- `/ai/mr-doge-picks` - **10 credits** - Featured parlay picks with AI analysis
+- `/v2/ai/value-opportunities` - **5 credits** - Best value bets with edge analysis
+- `/v2/ai/mr-doge-picks` - **10 credits** - Featured parlay picks with AI analysis
 
 <Card title="Full Pricing Details" icon="tag" href="/credits/pricing">
   See complete pricing, packages, and how to purchase credits
@@ -100,7 +100,7 @@ X-Auto-Recharge: false
 
 **Example in code:**
 ```javascript
-const response = await fetch('https://api.mrdoge.co/odds/events?locale=en', {
+const response = await fetch('https://api.mrdoge.co/v2/matches?locale=en', {
   headers: { 'Authorization': 'Bearer sk_live_...' }
 });
 
@@ -163,7 +163,7 @@ Save credits with these best practices:
   </Card>
 
   <Card title="Use Free Endpoints" icon="gift">
-    Leverage free endpoints like `/odds/regions` and `/odds/stats` for reference data.
+    Leverage free endpoints like `/v2/regions` and `/v2/stats` for reference data.
   </Card>
 
   <Card title="Batch Requests" icon="layer-group">
@@ -181,7 +181,7 @@ Save credits with these best practices:
 ```javascript ❌ Inefficient (100 credits)
 // Fetching 100 events individually
 for (let i = 0; i < 100; i++) {
-  await fetch(`https://api.mrdoge.co/odds/events/${eventIds[i]}?locale=en`, {
+  await fetch(`https://api.mrdoge.co/v2/matches/${eventIds[i]}?locale=en`, {
     headers: { 'Authorization': 'Bearer sk_live_...' }
   }); // 100 requests = 100 credits
 }
@@ -190,7 +190,7 @@ for (let i = 0; i < 100; i++) {
 ```javascript ✅ Efficient (1 credit)
 // Fetch all events in one request with filters
 const response = await fetch(
-  'https://api.mrdoge.co/odds/events?competitionId=premier-league&limit=100&locale=en',
+  'https://api.mrdoge.co/v2/matches?competitionId=premier-league&limit=100&locale=en',
   { headers: { 'Authorization': 'Bearer sk_live_...' } }
 ); // 1 request = 1 credit!
 ```

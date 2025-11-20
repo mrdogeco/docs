@@ -37,12 +37,12 @@ Include your API key in the `Authorization` header with the `Bearer` scheme:
 
 <CodeGroup>
 ```bash cURL
-curl -X GET "https://api.mrdoge.co/odds/events?locale=en" \
+curl -X GET "https://api.mrdoge.co/v2/matches?locale=en" \
   -H "Authorization: Bearer sk_live_your_api_key_here"
 ```
 
 ```javascript JavaScript
-const response = await fetch("https://api.mrdoge.co/odds/events?locale=en", {
+const response = await fetch("https://api.mrdoge.co/v2/matches?locale=en", {
   headers: {
     Authorization: "Bearer sk_live_your_api_key_here",
   },
@@ -53,12 +53,12 @@ const response = await fetch("https://api.mrdoge.co/odds/events?locale=en", {
 import requests
 
 headers = {'Authorization': 'Bearer sk_live_your_api_key_here'}
-response = requests.get('https://api.mrdoge.co/odds/events?locale=en', headers=headers)
+response = requests.get('https://api.mrdoge.co/v2/matches?locale=en', headers=headers)
 ```
 
 ```php PHP
 <?php
-$ch = curl_init('https://api.mrdoge.co/odds/events?locale=en');
+$ch = curl_init('https://api.mrdoge.co/v2/matches?locale=en');
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
     'Authorization: Bearer sk_live_your_api_key_here'
 ]);
@@ -166,11 +166,13 @@ Most endpoints cost **1 credit** per request. Some specialized endpoints cost mo
 | Endpoint Category                                              | Cost per Request     |
 | -------------------------------------------------------------- | -------------------- |
 | No-cost endpoints (regions, competitions, health)              | **0 credits** (free) |
-| Standard events endpoint (`/odds/events`)                      | **1 credit**         |
-| Trending events endpoint (`/odds/trending-events`)             | **2 credits**        |
-| Specific event endpoint (`/odds/events/:eventId`)              | **1 credit**         |
-| AI recommendations (`/ai/betting-recommendations`)             | **2 credits**        |
-| AI predictions (`/ai/mr-doge-picks`)                           | **3 credits**        |
+| Standard matches endpoint (`/v2/matches`)                      | **1 credit**         |
+| Trending matches endpoint (`/v2/matches/trending`)             | **2 credits**        |
+| Specific match endpoint (`/v2/matches/{matchId}`)              | **1 credit**         |
+| Match settlement (`/v2/bets/events/{eventId}/settle-bet`)      | **1 credit**         |
+| Live odds (`/v2/matches/{matchId}/live-odds`)                  | **2 credits**        |
+| AI recommendations (`/v2/ai/betting-recommendations`)          | **2 credits**        |
+| AI predictions (`/v2/ai/mr-doge-picks`)                        | **3 credits**        |
 
 <Card title="Understand Credits" icon="coins" href="/credits/overview">
   Learn how credits work, pricing, purchasing, and auto-recharge
@@ -193,7 +195,7 @@ require("dotenv").config();
 
 const apiKey = process.env.MRDOGE_API_KEY;
 
-fetch("https://api.mrdoge.co/odds/events?locale=en", {
+fetch("https://api.mrdoge.co/v2/matches?locale=en", {
   headers: { Authorization: `Bearer ${apiKey}` },
 });
 ```

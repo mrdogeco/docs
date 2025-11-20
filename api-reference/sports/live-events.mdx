@@ -11,29 +11,29 @@ description: "Get currently live events with real-time stats and odds (optimized
 
 Returns all currently live sporting events with real-time statistics and odds. This endpoint is optimized for speed, providing sub-second response times even under heavy load.
 
-**Why use this endpoint instead of `/events?status=live`?**
+**Why use this endpoint instead of `/v2/matches?status=live`?**
 - **10-100x faster** - Optimized for real-time performance
 - **Real-time data included** - Live scores, odds, phase, elapsed time
 - **Always fresh** - Updated every 30 seconds as events progress
 - **Worth the cost** - 2 credits for real-time data vs 1 credit for static list
 - **Live-only** - No mixed results, guaranteed live events
 
-**Key Difference**: `/events?status=live` returns a static list without stats/odds. This endpoint returns **real-time live data** with scores and odds updated every 30 seconds.
+**Key Difference**: `/v2/matches?status=live` returns a static list without stats/odds. This endpoint returns **real-time live data** with scores and odds updated every 30 seconds.
 
 <Info>
   **Freshness Guarantee**: Events are updated in real-time as matches progress. Maximum staleness is 30 seconds.
 </Info>
 
 <Note>
-  **Migration from `/events?status=live`**:
+  **Migration from `/v2/matches?status=live`**:
 
-  If you're currently using `/events?status=live`, you're only getting a **static list** of event IDs and names without real-time data. That endpoint:
+  If you're currently using `/v2/matches?status=live`, you're only getting a **static list** of event IDs and names without real-time data. That endpoint:
   - Does NOT include live scores, odds, or statistics
   - Static data (not updated in real-time)
   - Costs only 1 credit
   - Good for "Live Now" badges or event lists
 
-  This endpoint (`/live-events`):
+  This endpoint (`/v2/matches/live`):
   - Includes live scores, odds movements, and real-time stats
   - Updated every 30 seconds (fresh data)
   - 10-100x faster response times
@@ -77,7 +77,7 @@ Returns all currently live sporting events with real-time statistics and odds. T
 
 ### Event Object
 
-The response format is identical to the `/events` endpoint, with the following fields:
+The response format is identical to the `/v2/matches` endpoint, with the following fields:
 
 <ResponseField name="id" type="string">
   Unique event ID
@@ -437,7 +437,7 @@ This endpoint is optimized for high-frequency polling and real-time applications
 
 ## Migration Guide
 
-If you're currently using `/events?status=live`, here's how to migrate:
+If you're currently using `/v2/matches?status=live`, here's how to migrate:
 
 ### Before (General Events Endpoint)
 ```javascript
@@ -465,7 +465,7 @@ const response = await fetch(
 
 ### When to Use Each Endpoint
 
-| Scenario | Use `/live-events` | Use `/events?status=live` |
+| Scenario | Use `/v2/matches/live` | Use `/v2/matches?status=live` |
 |----------|-------------------|---------------------------|
 | Real-time live scores dashboard | Yes | No |
 | Live odds and price tracking | Yes | No |

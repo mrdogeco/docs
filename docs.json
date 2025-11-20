@@ -53,6 +53,10 @@
               "api-reference/ai/mr-doge-picks",
               "api-reference/ai/betting-recommendations"
             ]
+          },
+          {
+            "group": "Core Utilities",
+            "pages": ["api-reference/endpoint/images"]
           }
         ]
       }
