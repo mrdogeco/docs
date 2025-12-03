@@ -583,7 +583,7 @@
         }
       }
     },
-    "/v2/ai/mr-doge-picks": {
+    "/v2/ai/mrdoge-picks": {
       "get": {
         "summary": "Mr. Doge Picks",
         "description": "Get featured AI-curated betting picks. These are high-confidence recommendations that can be single bets or parlays. Costs 10 credits per request.",

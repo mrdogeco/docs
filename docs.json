@@ -50,7 +50,7 @@
           {
             "group": "AI Endpoints",
             "pages": [
-              "api-reference/ai/mr-doge-picks",
+              "api-reference/ai/mrdoge-picks",
               "api-reference/ai/betting-recommendations"
             ]
           },
