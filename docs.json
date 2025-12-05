@@ -110,6 +110,7 @@
       "github": "https://github.com/mrdogeco"
     }
   },
+  "openapi": "/api-reference/openapi.json",
   "api": {
     "baseUrl": "https://api.mrdoge.co",
     "auth": {
