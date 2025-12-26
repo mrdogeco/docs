@@ -135,6 +135,58 @@ Returns an array of Mr. Doge pick objects.
   Values: `won`, `lost`, or `push`
 </ResponseField>
 
+<ResponseField name="analysisInsight" type="object">
+  Detailed AI analysis of both teams
+
+  <Expandable title="Analysis Insight Object">
+    <ResponseField name="homeTeamAnalysis" type="object">
+      Home team analysis with `form`, `strengths`, `weaknesses`, `keyPatterns`, `offensiveThreat`, `defensiveStrength`
+    </ResponseField>
+
+    <ResponseField name="awayTeamAnalysis" type="object">
+      Away team analysis with same structure
+    </ResponseField>
+
+    <ResponseField name="matchContext" type="object">
+      Contains `keyMatchups`, `tacticalNotes`, `expectedIntensity`
+    </ResponseField>
+
+    <ResponseField name="dataQuality" type="string">
+      Quality of available data: `excellent`, `good`, `limited`
+    </ResponseField>
+
+    <ResponseField name="confidence" type="number">
+      Overall analysis confidence (0-100)
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="matchSimulation" type="object">
+  AI-simulated match outcome
+
+  <Expandable title="Match Simulation Object">
+    <ResponseField name="simulatedScore" type="object">
+      Predicted score with `home` and `away` values
+    </ResponseField>
+
+    <ResponseField name="goalTimeline" type="array">
+      Predicted goal timeline with `team`, `minute` for each goal
+    </ResponseField>
+
+    <ResponseField name="statistics" type="object">
+      Simulated match stats: `homeGoals`, `awayGoals`, `homeCorners`, `awayCorners`, `homeYellowCards`, etc.
+    </ResponseField>
+
+    <ResponseField name="confidence" type="number">
+      Simulation confidence (0-100)
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="eventNews" type="object">
+  Latest news affecting the event (injuries, suspensions, weather). Can be `null` if no news available.
+</ResponseField>
+
 ## Example Request
 
 <CodeGroup>

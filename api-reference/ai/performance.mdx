@@ -33,54 +33,64 @@ All performance data is based on settled bets with actual outcomes.
   Time period analyzed (e.g., "30 days")
 </ResponseField>
 
-<ResponseField name="recommendations" type="object">
-  Overall recommendation statistics
+<ResponseField name="overall" type="object">
+  Overall performance statistics
 
-  <Expandable title="Recommendation Stats">
-    <ResponseField name="total" type="integer">
-      Total recommendations made
+  <Expandable title="Overall Stats">
+    <ResponseField name="totalBets" type="integer">
+      Total bets analyzed
     </ResponseField>
 
     <ResponseField name="wins" type="integer">
       Number of winning bets
     </ResponseField>
 
-    <ResponseField name="losses" type="integer">
-      Number of losing bets
+    <ResponseField name="winRate" type="string">
+      Win percentage (e.g., `"55.5%"`)
     </ResponseField>
 
-    <ResponseField name="pushes" type="integer">
-      Number of pushes/voids
+    <ResponseField name="roi" type="string">
+      Return on investment percentage (e.g., `"-2.1%"`)
+    </ResponseField>
+
+    <ResponseField name="profit" type="string">
+      Total profit/loss in units (e.g., `"-312.45"`)
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="byConfidence" type="array">
+  Performance broken down by confidence level
+
+  <Expandable title="Confidence Level Object">
+    <ResponseField name="confidence" type="string">
+      Confidence level: `High`, `Medium`, or `Low`
+    </ResponseField>
+
+    <ResponseField name="total" type="integer">
+      Total bets at this confidence level
+    </ResponseField>
+
+    <ResponseField name="wins" type="integer">
+      Number of winning bets
     </ResponseField>
 
     <ResponseField name="winRate" type="string">
-      Win percentage (excludes pushes)
+      Win percentage (e.g., `"54.7%"`)
+    </ResponseField>
 
-      Example: `"63.3%"`
+    <ResponseField name="roi" type="string">
+      Return on investment (e.g., `"-6.8%"`)
+    </ResponseField>
+
+    <ResponseField name="avgEdge" type="string">
+      Average edge percentage (e.g., `"11.1%"`)
     </ResponseField>
   </Expandable>
 </ResponseField>
 
-<ResponseField name="picks" type="object">
-  Mr. Doge Picks statistics (same structure as recommendations)
-</ResponseField>
-
-<ResponseField name="byConfidence" type="object">
-  Performance broken down by confidence level
-
-  <Expandable title="By Confidence">
-    <ResponseField name="High" type="object">
-      High confidence recommendations stats
-    </ResponseField>
-
-    <ResponseField name="Medium" type="object">
-      Medium confidence recommendations stats
-    </ResponseField>
-
-    <ResponseField name="Low" type="object">
-      Low confidence recommendations stats
-    </ResponseField>
-  </Expandable>
+<ResponseField name="lastUpdated" type="string">
+  ISO timestamp of when stats were last calculated
 </ResponseField>
 
 ## Example Request

@@ -30,7 +30,7 @@
    ```bash
    mint dev
    ```
-3. Preview at <http://localhost:3000>. Edits hot-reload instantly.
+3. Preview at [http://localhost:3000](http://localhost:3000). Edits hot-reload instantly.
 
 ## Publishing Flow
 

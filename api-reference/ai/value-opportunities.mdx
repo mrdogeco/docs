@@ -43,7 +43,7 @@ Perfect for finding the best bets quickly without browsing all recommendations.
 
 ## Response
 
-<ResponseField name="opportunities" type="array">
+<ResponseField name="data" type="array">
   Array of betting recommendations (same structure as [Betting Recommendations](/api-reference/ai/betting-recommendations))
 </ResponseField>
 
@@ -57,8 +57,8 @@ Perfect for finding the best bets quickly without browsing all recommendations.
       Average edge percentage across all opportunities
     </ResponseField>
 
-    <ResponseField name="highConfidence" type="integer">
-      Number of high confidence opportunities
+    <ResponseField name="filters" type="object">
+      Applied filters (e.g., `{ "minEdge": 5 }`)
     </ResponseField>
   </Expandable>
 </ResponseField>

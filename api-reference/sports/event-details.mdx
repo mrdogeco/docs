@@ -39,7 +39,7 @@ Perfect for building detailed event pages in your application.
 ## Query Parameters
 
 <ParamField query="locale" type="string" default="en">
-  Language for team, competition, and region names. Supported: `en`, `es`, `pt`
+  Language for team, competition, region names, market names, and outcome captions. Supported: `en`, `es`, `pt`
 </ParamField>
 
 ## Response
@@ -113,6 +113,10 @@ Returns a complete event object with all related data.
       - `BASKETBALL_MATCH_RESULT_HANDICAP` - Spread
     </ResponseField>
 
+    <ResponseField name="displayName" type="string">
+      Localized market name based on the `locale` parameter (e.g., "Match Result" in English, "Resultado Final" in Portuguese)
+    </ResponseField>
+
     <ResponseField name="betItems" type="array">
       Array of betting options
 
@@ -126,7 +130,11 @@ Returns a complete event object with all related data.
         </ResponseField>
 
         <ResponseField name="caption" type="string">
-          Human-readable caption (e.g., "Home Win", "Draw")
+          Raw caption from the data source
+        </ResponseField>
+
+        <ResponseField name="translatedCaption" type="string">
+          Localized outcome caption based on the `locale` parameter (e.g., "Home Win" in English, "Vitória Mandante" in Portuguese)
         </ResponseField>
 
         <ResponseField name="price" type="number">
@@ -202,7 +210,11 @@ Returns a complete event object with all related data.
     </ResponseField>
 
     <ResponseField name="marketCaption" type="string">
-      Human-readable market caption when available
+      Raw market caption from the data source
+    </ResponseField>
+
+    <ResponseField name="marketDisplayName" type="string">
+      Localized market name based on the `locale` parameter (e.g., "Match Result" in English, "Resultado Final" in Portuguese)
     </ResponseField>
 
     <ResponseField name="betItems" type="array">
@@ -213,8 +225,8 @@ Returns a complete event object with all related data.
           Outcome code (`1`, `X`, `O`, etc.)
         </ResponseField>
 
-        <ResponseField name="caption" type="string">
-          Human-readable outcome caption
+        <ResponseField name="translatedCaption" type="string">
+          Localized outcome caption based on the `locale` parameter
         </ResponseField>
 
         <ResponseField name="price" type="number">

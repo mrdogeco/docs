@@ -29,6 +29,10 @@ Use this endpoint when you need the complete live odds book for an event. It ret
   Optional odds provider (`novibet`, `bet365`, etc.). Defaults to `novibet`.
 </ParamField>
 
+<ParamField query="locale" type="string" default="en">
+  Language for market names and outcome captions. Supported: `en`, `es`, `pt`
+</ParamField>
+
 ## Response
 
 <ResponseField name="eventId" type="string">
@@ -56,14 +60,17 @@ Use this endpoint when you need the complete live odds book for an event. It ret
     <ResponseField name="marketCaption" type="string">
       Human-friendly caption when provided by the data source.
     </ResponseField>
+    <ResponseField name="marketDisplayName" type="string">
+      Localized market name based on the `locale` parameter (e.g., "Match Result" in English, "Resultado Final" in Portuguese).
+    </ResponseField>
     <ResponseField name="betItems" type="array">
       Live bet items for that market.
       <Expandable title="Bet Item Object">
         <ResponseField name="code" type="string">
           Outcome code (`1`, `X`, `O`, etc.).
         </ResponseField>
-        <ResponseField name="caption" type="string">
-          Human-readable outcome caption.
+        <ResponseField name="translatedCaption" type="string">
+          Localized outcome caption based on the `locale` parameter (e.g., "Home Win" in English, "Vitória Mandante" in Portuguese).
         </ResponseField>
         <ResponseField name="price" type="number">
           Current decimal odds.
@@ -83,29 +90,59 @@ Use this endpoint when you need the complete live odds book for an event. It ret
 
 ```bash
 curl -H "Authorization: Bearer sk_live_..." \
-  "https://api.mrdoge.co/v2/matches/43108087/live-odds"
+  "https://api.mrdoge.co/v2/matches/43108087/live-odds?locale=en"
 ```
 
 ## Example Response
 
-```json
-{
-  "data": {
-    "eventId": "43108087",
-    "dataSource": "novibet",
-    "capturedAt": "2025-11-17T17:25:01.015Z",
-    "liveMarkets": [
-      {
-        "marketId": "1508075182",
-        "marketSysname": "SOCCER_MATCH_RESULT",
-        "marketCaption": "Match Result",
-        "betItems": [
-          { "code": "1", "caption": "Finland", "price": 1.03, "isAvailable": true },
-          { "code": "X", "caption": "Draw", "price": 11.5, "isAvailable": true },
-          { "code": "2", "caption": "Andorra", "price": 67.0, "isAvailable": true }
+<Tabs>
+  <Tab title="English (locale=en)">
+    ```json
+    {
+      "data": {
+        "eventId": "43108087",
+        "dataSource": "novibet",
+        "capturedAt": "2025-11-17T17:25:01.015Z",
+        "liveMarkets": [
+          {
+            "marketId": "1508075182",
+            "marketSysname": "SOCCER_MATCH_RESULT",
+            "marketCaption": "Match Result",
+            "marketDisplayName": "Match Result",
+            "betItems": [
+              { "code": "1", "translatedCaption": "Finland", "price": 1.03, "isAvailable": true },
+              { "code": "X", "translatedCaption": "Draw", "price": 11.5, "isAvailable": true },
+              { "code": "2", "translatedCaption": "Andorra", "price": 67.0, "isAvailable": true }
+            ]
+          }
         ]
       }
-    ]
-  }
-}
-```
+    }
+    ```
+  </Tab>
+
+  <Tab title="Portuguese (locale=pt)">
+    ```json
+    {
+      "data": {
+        "eventId": "43108087",
+        "dataSource": "novibet",
+        "capturedAt": "2025-11-17T17:25:01.015Z",
+        "liveMarkets": [
+          {
+            "marketId": "1508075182",
+            "marketSysname": "SOCCER_MATCH_RESULT",
+            "marketCaption": "Match Result",
+            "marketDisplayName": "Resultado Final",
+            "betItems": [
+              { "code": "1", "translatedCaption": "Finlândia", "price": 1.03, "isAvailable": true },
+              { "code": "X", "translatedCaption": "Empate", "price": 11.5, "isAvailable": true },
+              { "code": "2", "translatedCaption": "Andorra", "price": 67.0, "isAvailable": true }
+            ]
+          }
+        ]
+      }
+    }
+    ```
+  </Tab>
+</Tabs>
