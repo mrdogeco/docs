@@ -6,20 +6,32 @@ export const metadata: Metadata = {
   description: "Installation and usage for mrdoge-ui components.",
 }
 
-const SDK_EXAMPLE = `import { createClient } from "@mrdoge/client"
+const SDK_EXAMPLE = `import { MrDoge } from "@mrdoge/client"
 import { EventCard } from "@/components/event-card"
 
-const mrdoge = createClient({ token })
-const match = await mrdoge.matches.get(matchId)
+const mrdoge = new MrDoge({ authEndpoint: "/api/mrdoge/token" })
+
+const match = await mrdoge.matches.get({ id: matchId })
+const [market] = await mrdoge.odds.list({ matchId })
+
+// mrdoge-ui uses generic status labels so it has no dependency on the
+// SDK's vocabulary — map the SDK's three states to the component's three.
+const status = { upcoming: "scheduled", live: "live", completed: "finished" }[
+  match.status
+]
 
 <EventCard
   competition={match.competition.name}
-  status={match.status}
-  home={{ name: match.home.name }}
-  away={{ name: match.away.name }}
-  homeScore={match.score?.home}
-  awayScore={match.score?.away}
-  odds={match.odds.map(toOddsOption)}
+  status={status}
+  kickoff={match.startTime}
+  home={{ name: match.homeTeam.name }}
+  away={{ name: match.awayTeam.name }}
+  odds={market.betItems.map((item) => ({
+    id: item.id,
+    label: item.code,
+    price: item.price.toFixed(2),
+    suspended: !item.isAvailable,
+  }))}
 />`
 
 export default function DocsPage() {
