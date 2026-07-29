@@ -1,36 +1,64 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# mrdoge-ui
 
-## Getting Started
+Open-source React components for sports betting apps: event cards, odds
+selectors, bet slips, match timelines, and related building blocks. MIT
+licensed.
 
-First, run the development server:
+Components are distributed as source code through a
+[shadcn/ui](https://ui.shadcn.com)-compatible registry, not as an installable
+package. Each component is copied into your project, so you own the
+resulting code and can modify it freely. There is no dependency on any
+particular data provider — every component takes plain props.
+
+## Installation
+
+Requires a project with Tailwind CSS and the shadcn/ui CLI configured
+(`npx shadcn@latest init`). Then install a component with:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npx shadcn@latest add https://mrdoge.co/r/event-card.json
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Components
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Component | Description |
+| --- | --- |
+| `event-card` | Match card with teams, live status, and a primary odds row |
+| `odds-selector` | Selectable price buttons with movement and suspended states |
+| `live-indicator` | Status pill: scheduled, live, or finished |
+| `bet-slip` | Selected picks, stake input, and computed potential payout |
+| `match-timeline` | Chronological feed of match events |
+| `team-form-indicator` | Recent match results for a team |
+| `competition-header` | Banner for a competition: name, region, and stage |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+See `/docs` in the showcase app for full usage, or `registry/mrdoge-ui/`
+for the component source.
 
-## Learn More
+## Development
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+pnpm install
+pnpm dev       # showcase app at localhost:3000
+pnpm build     # production build
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Registry JSON (served from `public/r/`) is generated from `registry.json`
+with:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+pnpm dlx shadcn@latest build
+```
 
-## Deploy on Vercel
+Run this after adding or editing a component so the built output in
+`public/r/` stays in sync with `registry.json`.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Use with the Mr. Doge SDK
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+mrdoge-ui components accept plain props, so they work with any data source.
+They pair directly with [`@mrdoge/client`](https://mrdoge.ai), which provides
+typed, real-time sports data over HTTP and WebSocket. See `/docs` for an
+example.
+
+## License
+
+MIT — see [LICENSE](./LICENSE).

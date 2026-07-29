@@ -1,0 +1,104 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "mrdoge-ui",
+  "homepage": "https://mrdoge.co",
+  "items": [
+    {
+      "name": "live-indicator",
+      "type": "registry:component",
+      "title": "Live Indicator",
+      "description": "Status pill for a match: scheduled, live, or finished.",
+      "registryDependencies": ["badge"],
+      "files": [
+        {
+          "path": "registry/mrdoge-ui/live-indicator/live-indicator.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "team-form-indicator",
+      "type": "registry:component",
+      "title": "Team Form Indicator",
+      "description": "Row of recent match results (W/D/L) for a team.",
+      "files": [
+        {
+          "path": "registry/mrdoge-ui/team-form-indicator/team-form-indicator.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "competition-header",
+      "type": "registry:component",
+      "title": "Competition Header",
+      "description": "Banner for a competition: logo, name, region, and stage.",
+      "registryDependencies": ["avatar", "badge"],
+      "files": [
+        {
+          "path": "registry/mrdoge-ui/competition-header/competition-header.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "odds-selector",
+      "type": "registry:component",
+      "title": "Odds Selector",
+      "description": "Selectable price buttons for a market, with price movement and suspended states.",
+      "registryDependencies": ["button"],
+      "files": [
+        {
+          "path": "registry/mrdoge-ui/odds-selector/odds-selector.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "event-card",
+      "type": "registry:component",
+      "title": "Event Card",
+      "description": "Match card with teams, score or kickoff time, status, and a primary odds row.",
+      "registryDependencies": ["avatar", "card"],
+      "files": [
+        {
+          "path": "registry/mrdoge-ui/event-card/event-card.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/mrdoge-ui/live-indicator/live-indicator.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/mrdoge-ui/odds-selector/odds-selector.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "match-timeline",
+      "type": "registry:component",
+      "title": "Match Timeline",
+      "description": "Chronological feed of match events (goals, cards, substitutions).",
+      "files": [
+        {
+          "path": "registry/mrdoge-ui/match-timeline/match-timeline.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "bet-slip",
+      "type": "registry:component",
+      "title": "Bet Slip",
+      "description": "Panel for selected picks with stake input and computed potential payout.",
+      "registryDependencies": ["button", "card", "input", "separator"],
+      "files": [
+        {
+          "path": "registry/mrdoge-ui/bet-slip/bet-slip.tsx",
+          "type": "registry:component"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "team-form-indicator",
+  "title": "Team Form Indicator",
+  "description": "Row of recent match results (W/D/L) for a team.",
+  "files": [
+    {
+      "path": "registry/mrdoge-ui/team-form-indicator/team-form-indicator.tsx",
+      "content": "import { cn } from \"@/lib/utils\"\n\nexport type FormResult = \"W\" | \"D\" | \"L\"\n\nexport interface TeamFormIndicatorProps {\n  /** Recent results, ordered oldest to newest (most recent last). */\n  results: FormResult[]\n  className?: string\n}\n\nconst resultStyles: Record<FormResult, string> = {\n  W: \"bg-emerald-600 text-white dark:bg-emerald-500\",\n  D: \"bg-muted text-muted-foreground\",\n  L: \"bg-destructive/80 text-destructive-foreground\",\n}\n\nexport function TeamFormIndicator({\n  results,\n  className,\n}: TeamFormIndicatorProps) {\n  return (\n    <div className={cn(\"flex items-center gap-1\", className)}>\n      {results.map((result, index) => (\n        <span\n          key={index}\n          className={cn(\n            \"flex size-5 items-center justify-center rounded-full text-[0.65rem] font-semibold\",\n            resultStyles[result]\n          )}\n        >\n          {result}\n        </span>\n      ))}\n    </div>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ],
+  "type": "registry:component"
+}

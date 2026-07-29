@@ -1,0 +1,14 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "match-timeline",
+  "title": "Match Timeline",
+  "description": "Chronological feed of match events (goals, cards, substitutions).",
+  "files": [
+    {
+      "path": "registry/mrdoge-ui/match-timeline/match-timeline.tsx",
+      "content": "import { CircleDot, LogOut, Square } from \"lucide-react\"\nimport type { ComponentType } from \"react\"\n\nimport { cn } from \"@/lib/utils\"\n\nexport type MatchTimelineEventType =\n  | \"goal\"\n  | \"yellow-card\"\n  | \"red-card\"\n  | \"substitution\"\n  | \"other\"\n\nexport interface MatchTimelineEntry {\n  id: string\n  /** Match minute, e.g. 45 or 90 (extra time is passed in via `description`). */\n  minute: number\n  type: MatchTimelineEventType\n  team: \"home\" | \"away\"\n  description: string\n}\n\nexport interface MatchTimelineProps {\n  /** Entries ordered chronologically, ascending minute. */\n  entries: MatchTimelineEntry[]\n  className?: string\n}\n\nconst eventIcon: Record<MatchTimelineEventType, ComponentType<{ className?: string }>> = {\n  goal: CircleDot,\n  \"yellow-card\": Square,\n  \"red-card\": Square,\n  substitution: LogOut,\n  other: CircleDot,\n}\n\nconst eventIconColor: Record<MatchTimelineEventType, string> = {\n  goal: \"text-foreground\",\n  \"yellow-card\": \"text-yellow-500\",\n  \"red-card\": \"text-destructive\",\n  substitution: \"text-muted-foreground\",\n  other: \"text-muted-foreground\",\n}\n\nexport function MatchTimeline({ entries, className }: MatchTimelineProps) {\n  return (\n    <ol className={cn(\"flex flex-col\", className)}>\n      {entries.map((entry) => {\n        const Icon = eventIcon[entry.type]\n        const isAway = entry.team === \"away\"\n\n        return (\n          <li\n            key={entry.id}\n            className={cn(\n              \"flex items-center gap-3 border-l py-2 pl-4\",\n              isAway && \"flex-row-reverse border-r border-l-0 pr-4 pl-0 text-right\"\n            )}\n          >\n            <span className=\"w-8 shrink-0 text-xs tabular-nums text-muted-foreground\">\n              {entry.minute}&apos;\n            </span>\n            <Icon className={cn(\"size-3.5 shrink-0\", eventIconColor[entry.type])} />\n            <span className=\"text-sm\">{entry.description}</span>\n          </li>\n        )\n      })}\n    </ol>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ],
+  "type": "registry:component"
+}

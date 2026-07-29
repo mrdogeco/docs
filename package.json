@@ -2,6 +2,16 @@
   "name": "mrdoge-ui",
   "version": "0.1.0",
   "private": true,
+  "description": "Open-source React components for sports betting apps.",
+  "license": "MIT",
+  "homepage": "https://github.com/mrdogeco/ui",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mrdogeco/ui.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mrdogeco/ui/issues"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -9,9 +19,16 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.27.0",
     "next": "16.2.12",
+    "radix-ui": "^1.6.7",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "shadcn": "^4.16.0",
+    "tailwind-merge": "^3.6.0",
+    "tw-animate-css": "^1.4.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

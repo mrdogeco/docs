@@ -1,0 +1,20 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "bet-slip",
+  "title": "Bet Slip",
+  "description": "Panel for selected picks with stake input and computed potential payout.",
+  "registryDependencies": [
+    "button",
+    "card",
+    "input",
+    "separator"
+  ],
+  "files": [
+    {
+      "path": "registry/mrdoge-ui/bet-slip/bet-slip.tsx",
+      "content": "\"use client\"\n\nimport { useState } from \"react\"\nimport { X } from \"lucide-react\"\n\nimport { cn } from \"@/lib/utils\"\nimport { Button } from \"@/components/ui/button\"\nimport { Card, CardContent, CardFooter, CardHeader, CardTitle } from \"@/components/ui/card\"\nimport { Input } from \"@/components/ui/input\"\nimport { Separator } from \"@/components/ui/separator\"\n\nexport interface BetSlipPick {\n  id: string\n  eventLabel: string\n  market: string\n  selection: string\n  /** Decimal odds, e.g. 1.85. */\n  price: number\n}\n\nexport interface BetSlipProps {\n  picks: BetSlipPick[]\n  onRemovePick?: (id: string) => void\n  className?: string\n}\n\nexport function BetSlip({ picks, onRemovePick, className }: BetSlipProps) {\n  const [stake, setStake] = useState(\"\")\n\n  const stakeValue = Number(stake)\n  const combinedPrice = picks.reduce((total, pick) => total * pick.price, 1)\n  const potentialPayout =\n    stakeValue > 0 ? (stakeValue * combinedPrice).toFixed(2) : \"0.00\"\n\n  return (\n    <Card className={cn(\"w-full max-w-sm\", className)}>\n      <CardHeader>\n        <CardTitle>Bet slip</CardTitle>\n      </CardHeader>\n      <CardContent className=\"flex flex-col gap-3\">\n        {picks.length === 0 ? (\n          <p className=\"py-6 text-center text-sm text-muted-foreground\">\n            No picks selected yet.\n          </p>\n        ) : (\n          picks.map((pick, index) => (\n            <div key={pick.id}>\n              {index > 0 ? <Separator className=\"mb-3\" /> : null}\n              <div className=\"flex items-start justify-between gap-2\">\n                <div className=\"min-w-0\">\n                  <p className=\"truncate text-sm font-medium\">\n                    {pick.eventLabel}\n                  </p>\n                  <p className=\"truncate text-xs text-muted-foreground\">\n                    {pick.market} &middot; {pick.selection}\n                  </p>\n                </div>\n                <div className=\"flex shrink-0 items-center gap-2\">\n                  <span className=\"text-sm font-semibold tabular-nums\">\n                    {pick.price.toFixed(2)}\n                  </span>\n                  <Button\n                    type=\"button\"\n                    variant=\"ghost\"\n                    size=\"icon-sm\"\n                    aria-label=\"Remove pick\"\n                    onClick={() => onRemovePick?.(pick.id)}\n                  >\n                    <X className=\"size-3.5\" />\n                  </Button>\n                </div>\n              </div>\n            </div>\n          ))\n        )}\n      </CardContent>\n      {picks.length > 0 ? (\n        <CardFooter className=\"flex-col items-stretch gap-3 border-t pt-4\">\n          <div className=\"flex items-center justify-between gap-3\">\n            <label htmlFor=\"bet-slip-stake\" className=\"text-sm text-muted-foreground\">\n              Stake\n            </label>\n            <Input\n              id=\"bet-slip-stake\"\n              type=\"number\"\n              inputMode=\"decimal\"\n              min={0}\n              placeholder=\"0.00\"\n              value={stake}\n              onChange={(event) => setStake(event.target.value)}\n              className=\"w-28 text-right\"\n            />\n          </div>\n          <div className=\"flex items-center justify-between text-sm\">\n            <span className=\"text-muted-foreground\">Potential payout</span>\n            <span className=\"font-semibold tabular-nums\">{potentialPayout}</span>\n          </div>\n        </CardFooter>\n      ) : null}\n    </Card>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ],
+  "type": "registry:component"
+}

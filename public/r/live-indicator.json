@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "live-indicator",
+  "title": "Live Indicator",
+  "description": "Status pill for a match: scheduled, live, or finished.",
+  "registryDependencies": [
+    "badge"
+  ],
+  "files": [
+    {
+      "path": "registry/mrdoge-ui/live-indicator/live-indicator.tsx",
+      "content": "import { Clock } from \"lucide-react\"\n\nimport { cn } from \"@/lib/utils\"\nimport { Badge } from \"@/components/ui/badge\"\n\nexport type LiveIndicatorStatus = \"scheduled\" | \"live\" | \"finished\"\n\nexport interface LiveIndicatorProps {\n  status: LiveIndicatorStatus\n  /** Kickoff time, shown when status is \"scheduled\". */\n  kickoff?: Date | string\n  /** Elapsed match clock (e.g. \"67'\"), shown when status is \"live\". */\n  elapsed?: string\n  className?: string\n}\n\nfunction formatKickoff(kickoff: Date | string) {\n  const date = typeof kickoff === \"string\" ? new Date(kickoff) : kickoff\n  return date.toLocaleTimeString(undefined, {\n    hour: \"numeric\",\n    minute: \"2-digit\",\n  })\n}\n\n// Only 3 states are representable here because that's all the underlying\n// event data reliably distinguishes — don't add a \"postponed\"/\"delayed\"\n// variant without a data source that can actually back it.\nexport function LiveIndicator({\n  status,\n  kickoff,\n  elapsed,\n  className,\n}: LiveIndicatorProps) {\n  if (status === \"live\") {\n    return (\n      <Badge\n        variant=\"destructive\"\n        className={cn(\"gap-1.5 border-transparent bg-destructive text-destructive-foreground\", className)}\n      >\n        <span className=\"relative flex size-1.5\">\n          <span className=\"absolute inline-flex size-full animate-ping rounded-full bg-destructive-foreground/60\" />\n          <span className=\"relative inline-flex size-1.5 rounded-full bg-destructive-foreground\" />\n        </span>\n        {elapsed ?? \"LIVE\"}\n      </Badge>\n    )\n  }\n\n  if (status === \"finished\") {\n    return (\n      <Badge variant=\"secondary\" className={className}>\n        Finished\n      </Badge>\n    )\n  }\n\n  return (\n    <Badge variant=\"outline\" className={cn(\"gap-1\", className)}>\n      <Clock className=\"size-3\" />\n      {kickoff ? formatKickoff(kickoff) : \"Scheduled\"}\n    </Badge>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ],
+  "type": "registry:component"
+}
