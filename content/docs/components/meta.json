@@ -1,0 +1,12 @@
+{
+  "title": "Components",
+  "pages": [
+    "event-card",
+    "odds-selector",
+    "live-indicator",
+    "bet-slip",
+    "match-timeline",
+    "team-form-indicator",
+    "competition-header"
+  ]
+}

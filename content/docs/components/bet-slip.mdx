@@ -1,0 +1,81 @@
+---
+title: Bet Slip
+description: Selected picks, stake input, and computed potential payout.
+---
+
+import { BetSlipDemo } from "@/components/docs/demos/bet-slip-demo"
+import { InstallTabs } from "@/components/docs/install-tabs"
+
+<ComponentPreview>
+  <BetSlipDemo />
+</ComponentPreview>
+
+## Installation
+
+<InstallTabs name="bet-slip" />
+
+## Usage
+
+```tsx
+import { BetSlip } from "@/components/bet-slip"
+
+<BetSlip
+  picks={[
+    { id: "1", eventLabel: "Palmeiras vs Flamengo", market: "Match Winner", selection: "Palmeiras", price: 1.85 },
+  ]}
+  onRemovePick={(id) => removePick(id)}
+/>
+```
+
+<Callout title="No real-money language">
+  Stake and payout are neutral terms by design — this is a UI building
+  block for any betting app, not a real-money wagering flow. Compute the
+  payout math however your product needs to.
+</Callout>
+
+## Props
+
+<TypeTable
+  type={{
+    picks: {
+      description: "Selected picks. See BetSlipPick below.",
+      type: "BetSlipPick[]",
+      required: true,
+    },
+    onRemovePick: {
+      description: "Called with a pick's id when its remove button is pressed.",
+      type: "(id: string) => void",
+    },
+    className: {
+      type: "string",
+    },
+  }}
+/>
+
+### BetSlipPick
+
+<TypeTable
+  type={{
+    id: {
+      type: "string",
+      required: true,
+    },
+    eventLabel: {
+      type: "string",
+      required: true,
+    },
+    market: {
+      type: "string",
+      required: true,
+    },
+    selection: {
+      type: "string",
+      required: true,
+    },
+    price: {
+      description: "Decimal odds, e.g. 1.85.",
+      type: "number",
+      required: true,
+    },
+  }}
+/>

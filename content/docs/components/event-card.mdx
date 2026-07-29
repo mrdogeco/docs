@@ -1,0 +1,109 @@
+---
+title: Event Card
+description: Match card with teams, live status, and a primary odds row.
+---
+
+import { EventCardDemo } from "@/components/docs/demos/event-card-demo"
+import { InstallTabs } from "@/components/docs/install-tabs"
+
+<ComponentPreview>
+  <EventCardDemo />
+</ComponentPreview>
+
+## Installation
+
+<InstallTabs name="event-card" />
+
+## Usage
+
+```tsx
+import { EventCard } from "@/components/event-card"
+
+<EventCard
+  competition="Brasileirão Série A"
+  status="live"
+  elapsed="63'"
+  home={{ name: "Palmeiras" }}
+  away={{ name: "Flamengo" }}
+  homeScore={2}
+  awayScore={1}
+  odds={[
+    { id: "home", label: "1", price: "1.85", movement: "up" },
+    { id: "draw", label: "X", price: "3.40", movement: "flat" },
+    { id: "away", label: "2", price: "4.20", movement: "down", suspended: true },
+  ]}
+/>
+```
+
+## Props
+
+<TypeTable
+  type={{
+    competition: {
+      description: "Competition or league name, shown above the teams.",
+      type: "string",
+      required: true,
+    },
+    status: {
+      description: "See Live Indicator.",
+      type: '"scheduled" | "live" | "finished"',
+      required: true,
+    },
+    kickoff: {
+      description: 'Kickoff time, shown when status is "scheduled".',
+      type: "Date | string",
+    },
+    elapsed: {
+      description: 'Elapsed match clock (e.g. "67\'"), shown when status is "live".',
+      type: "string",
+    },
+    home: {
+      description: "Home team. See EventCardTeam below.",
+      type: "EventCardTeam",
+      required: true,
+    },
+    away: {
+      description: "Away team. See EventCardTeam below.",
+      type: "EventCardTeam",
+      required: true,
+    },
+    homeScore: {
+      description: 'Shown when status is not "scheduled".',
+      type: "number",
+    },
+    awayScore: {
+      description: 'Shown when status is not "scheduled".',
+      type: "number",
+    },
+    odds: {
+      description: "Passed directly to the Odds Selector rendered in the footer.",
+      type: "OddsOption[]",
+      required: true,
+    },
+    selectedOddsId: {
+      description: "Id of the currently selected odds option.",
+      type: "string",
+    },
+    onSelectOdds: {
+      description: "Called with the option id when an odds button is pressed.",
+      type: "(id: string) => void",
+    },
+    className: {
+      type: "string",
+    },
+  }}
+/>
+
+### EventCardTeam
+
+<TypeTable
+  type={{
+    name: {
+      type: "string",
+      required: true,
+    },
+    logoUrl: {
+      type: "string",
+    },
+  }}
+/>

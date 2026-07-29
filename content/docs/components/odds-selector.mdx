@@ -1,0 +1,82 @@
+---
+title: Odds Selector
+description: Selectable price buttons for a market, with price movement and suspended states.
+---
+
+import { OddsSelectorDemo } from "@/components/docs/demos/odds-selector-demo"
+import { InstallTabs } from "@/components/docs/install-tabs"
+
+<ComponentPreview>
+  <OddsSelectorDemo />
+</ComponentPreview>
+
+## Installation
+
+<InstallTabs name="odds-selector" />
+
+## Usage
+
+```tsx
+import { OddsSelector } from "@/components/odds-selector"
+
+<OddsSelector
+  options={[
+    { id: "home", label: "1", price: "1.85", movement: "up" },
+    { id: "draw", label: "X", price: "3.40", movement: "flat" },
+    { id: "away", label: "2", price: "4.20", movement: "down", suspended: true },
+  ]}
+  selectedId={selectedId}
+  onSelect={setSelectedId}
+/>
+```
+
+## Props
+
+<TypeTable
+  type={{
+    options: {
+      description: "The market's selections. See OddsOption below.",
+      type: "OddsOption[]",
+      required: true,
+    },
+    selectedId: {
+      description: "Id of the currently selected option.",
+      type: "string",
+    },
+    onSelect: {
+      description: "Called with an option's id when it's pressed.",
+      type: "(id: string) => void",
+    },
+    className: {
+      type: "string",
+    },
+  }}
+/>
+
+### OddsOption
+
+<TypeTable
+  type={{
+    id: {
+      type: "string",
+      required: true,
+    },
+    label: {
+      description: 'Selection label, e.g. "1", "X", "2" or "Home", "Away".',
+      type: "string",
+      required: true,
+    },
+    price: {
+      description: 'Formatted price, e.g. "1.85".',
+      type: "string",
+      required: true,
+    },
+    movement: {
+      type: '"up" | "down" | "flat"',
+    },
+    suspended: {
+      description: "When true, the option is disabled and shows an em dash instead of a price.",
+      type: "boolean",
+    },
+  }}
+/>

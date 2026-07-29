@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // fumadocs-mdx codegen output — not our code, not tracked in git.
+    ".source/**",
   ]),
 ]);
 

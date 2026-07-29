@@ -1,0 +1,56 @@
+---
+title: Live Indicator
+description: Status pill for a match — scheduled, live, or finished.
+---
+
+import { LiveIndicator } from "@/registry/mrdoge-ui/live-indicator/live-indicator"
+import { InstallTabs } from "@/components/docs/install-tabs"
+
+<ComponentPreview>
+  <div className="flex flex-wrap items-center gap-3">
+    <LiveIndicator status="scheduled" kickoff={new Date()} />
+    <LiveIndicator status="live" elapsed="63'" />
+    <LiveIndicator status="finished" />
+  </div>
+</ComponentPreview>
+
+## Installation
+
+<InstallTabs name="live-indicator" />
+
+## Usage
+
+```tsx
+import { LiveIndicator } from "@/components/live-indicator"
+
+<LiveIndicator status="live" elapsed="63'" />
+```
+
+<Callout title="Only three states">
+  This component models exactly three states because that's all the
+  underlying match-status data reliably distinguishes. Don't add a
+  "postponed" or "delayed" variant without a data source that can actually
+  back it — see the note in the component source.
+</Callout>
+
+## Props
+
+<TypeTable
+  type={{
+    status: {
+      type: '"scheduled" | "live" | "finished"',
+      required: true,
+    },
+    kickoff: {
+      description: 'Kickoff time, shown when status is "scheduled".',
+      type: "Date | string",
+    },
+    elapsed: {
+      description: 'Elapsed match clock (e.g. "67\'"), shown when status is "live".',
+      type: "string",
+    },
+    className: {
+      type: "string",
+    },
+  }}
+/>

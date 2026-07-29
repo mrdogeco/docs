@@ -1,0 +1,72 @@
+---
+title: Match Timeline
+description: Chronological feed of match events.
+---
+
+import { MatchTimeline } from "@/registry/mrdoge-ui/match-timeline/match-timeline"
+import { InstallTabs } from "@/components/docs/install-tabs"
+import { sampleTimeline } from "@/components/docs/sample-data"
+
+<ComponentPreview>
+  <MatchTimeline entries={sampleTimeline} className="w-full max-w-sm" />
+</ComponentPreview>
+
+## Installation
+
+<InstallTabs name="match-timeline" />
+
+## Usage
+
+```tsx
+import { MatchTimeline } from "@/components/match-timeline"
+
+<MatchTimeline
+  entries={[
+    { id: "1", minute: 12, type: "goal", team: "home", description: "Goal — Silva" },
+    { id: "2", minute: 34, type: "yellow-card", team: "away", description: "Yellow card — Reyes" },
+  ]}
+/>
+```
+
+## Props
+
+<TypeTable
+  type={{
+    entries: {
+      description: "Entries ordered chronologically, ascending minute. See MatchTimelineEntry below.",
+      type: "MatchTimelineEntry[]",
+      required: true,
+    },
+    className: {
+      type: "string",
+    },
+  }}
+/>
+
+### MatchTimelineEntry
+
+<TypeTable
+  type={{
+    id: {
+      type: "string",
+      required: true,
+    },
+    minute: {
+      description: "Match minute, e.g. 45 or 90 (extra time is passed in via description).",
+      type: "number",
+      required: true,
+    },
+    type: {
+      type: '"goal" | "yellow-card" | "red-card" | "substitution" | "other"',
+      required: true,
+    },
+    team: {
+      type: '"home" | "away"',
+      required: true,
+    },
+    description: {
+      type: "string",
+      required: true,
+    },
+  }}
+/>

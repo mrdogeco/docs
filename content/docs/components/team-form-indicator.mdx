@@ -1,0 +1,39 @@
+---
+title: Team Form Indicator
+description: Recent match results for a team.
+---
+
+import { TeamFormIndicator } from "@/registry/mrdoge-ui/team-form-indicator/team-form-indicator"
+import { InstallTabs } from "@/components/docs/install-tabs"
+import { sampleForm } from "@/components/docs/sample-data"
+
+<ComponentPreview>
+  <TeamFormIndicator results={sampleForm} />
+</ComponentPreview>
+
+## Installation
+
+<InstallTabs name="team-form-indicator" />
+
+## Usage
+
+```tsx
+import { TeamFormIndicator } from "@/components/team-form-indicator"
+
+<TeamFormIndicator results={["L", "D", "W", "W", "W"]} />
+```
+
+## Props
+
+<TypeTable
+  type={{
+    results: {
+      description: 'Recent results, ordered oldest to newest (most recent last). Each is "W", "D", or "L".',
+      type: 'FormResult[]',
+      required: true,
+    },
+    className: {
+      type: "string",
+    },
+  }}
+/>
