@@ -5,6 +5,7 @@ import { SdkFeatures } from "@/components/marketing/sdk-features"
 import { SdkQuickstart } from "@/components/marketing/sdk-quickstart"
 import { SdkPricing } from "@/components/marketing/sdk-pricing"
 import { SdkCta } from "@/components/marketing/sdk-cta"
+import { Footer } from "@/components/marketing/footer"
 
 export default function Home() {
   return (
@@ -14,6 +15,7 @@ export default function Home() {
       <SdkQuickstart />
       <SdkPricing />
       <SdkCta />
+      <Footer />
     </HomeLayout>
   )
 }

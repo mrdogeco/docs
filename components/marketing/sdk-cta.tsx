@@ -2,32 +2,37 @@ import Link from "next/link"
 import { SiGithub } from "react-icons/si"
 
 import { Button } from "@/components/ui/button"
+import { BrandedCta } from "./branded-cta"
 
 export function SdkCta() {
   return (
-    <section className="mx-auto flex w-full max-w-5xl flex-col items-center gap-6 px-6 py-20 text-center">
-      <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-        Start shipping.
-      </h2>
-      <p className="max-w-xl text-muted-foreground">
-        Seven days free. Five minutes to first odds. Read the docs and start
-        building.
-      </p>
-      <div className="flex flex-wrap items-center justify-center gap-3">
-        <Button asChild size="lg">
-          <Link href="/docs">Read the docs</Link>
-        </Button>
-        <Button asChild variant="outline" size="lg">
-          <Link
-            href="https://github.com/mrdogeco/sdk"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <SiGithub />
-            Star on GitHub
-          </Link>
-        </Button>
-      </div>
-    </section>
+    <BrandedCta
+      title="Start shipping."
+      description="Seven days free. Five minutes to first odds. Read the docs and start building."
+    >
+      <Button
+        asChild
+        size="lg"
+        className="rounded-full bg-black px-6 py-3 text-white shadow-lg shadow-black/30 hover:bg-black/90"
+      >
+        <Link href="/docs">Read the docs</Link>
+      </Button>
+
+      <Button
+        asChild
+        variant="outline"
+        size="lg"
+        className="rounded-full border-black/20 bg-white/30 px-5 py-3 text-black backdrop-blur hover:bg-white/50 hover:text-black"
+      >
+        <Link
+          href="https://github.com/mrdogeco/sdk"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <SiGithub />
+          Star on GitHub
+        </Link>
+      </Button>
+    </BrandedCta>
   )
 }

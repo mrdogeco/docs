@@ -130,3 +130,10 @@
     @apply font-sans;
   }
 }
+
+/* Glass effect on the home/docs header — Fumadocs' NavOptions has no
+   className hook for this element, so override its own utility classes
+   directly. #nd-nav is stable across fumadocs-ui versions. */
+#nd-nav > div {
+  @apply bg-fd-background/50 backdrop-blur-2xl;
+}

@@ -36,8 +36,11 @@ export default async function Page(props: PageProps) {
   )
 }
 
+// The "ui" root has its own route (app/docs/ui/[[...slug]]) so it doesn't
+// nest inside this layout — exclude it here to avoid both routes trying to
+// statically generate the same paths.
 export function generateStaticParams() {
-  return source.generateParams()
+  return source.generateParams().filter((p) => p.slug?.[0] !== "ui")
 }
 
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
