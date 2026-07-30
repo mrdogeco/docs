@@ -1,7 +1,4 @@
 {
-  "title": "Components",
-  "defaultOpen": true,
-  "collapsible": false,
   "pages": [
     "event-card",
     "odds-selector",

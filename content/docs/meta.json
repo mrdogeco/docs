@@ -1,4 +1,3 @@
 {
-  "title": "mrdoge-ui",
-  "pages": ["index", "components"]
+  "pages": ["(ui)"]
 }
