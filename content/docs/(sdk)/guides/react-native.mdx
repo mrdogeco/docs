@@ -1,0 +1,205 @@
+---
+title: React Native
+description: Mobile app integration with token persistence and screen-aware subscriptions.
+---
+
+`@mrdoge/client` works out of the box on React Native (Expo and bare). Same
+JWT-based auth pattern as the browser.
+
+## Install
+
+```bash
+npm i @mrdoge/client
+```
+
+If you need to persist auth tokens across app launches, add AsyncStorage:
+
+```bash
+npx expo install @react-native-async-storage/async-storage
+```
+
+## Mint tokens from your backend
+
+Whatever backend you use (Next.js, Express, your own), expose a
+`/mrdoge/token` endpoint that calls `tokens.create`. See the
+[Next.js guide](/docs/guides/nextjs#server-mint-tokens-for-the-browser) for
+an example.
+
+## Client setup
+
+```ts title="lib/mrdoge.ts"
+import { MrDoge } from "@mrdoge/client";
+
+export const mrdoge = new MrDoge({
+  fetchToken: async () => {
+    const res = await fetch("https://your-api.com/mrdoge/token", {
+      method: "POST",
+      headers: {
+        // forward your app's session/JWT
+        Authorization: `Bearer ${await getAppToken()}`,
+      },
+    });
+    if (!res.ok) throw new Error("auth failed");
+    return res.json();
+  },
+});
+```
+
+The custom `fetchToken` lets you forward your app's session — gate the
+Mr. Doge token mint by your own auth.
+
+## Persist the token (optional)
+
+For warm starts, cache the last token in AsyncStorage:
+
+```ts
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { MrDoge } from "@mrdoge/client";
+
+export const mrdoge = new MrDoge({
+  fetchToken: async () => {
+    // try cache first
+    const cached = await AsyncStorage.getItem("mrdoge.token");
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      if (Date.parse(parsed.expiresAt) - Date.now() > 30_000) {
+        return parsed;
+      }
+    }
+
+    // otherwise mint a fresh one
+    const res = await fetch("https://your-api.com/mrdoge/token", {
+      method: "POST",
+    });
+    const fresh = await res.json();
+    await AsyncStorage.setItem("mrdoge.token", JSON.stringify(fresh));
+    return fresh;
+  },
+});
+```
+
+Saves a round-trip on cold start. The SDK still refreshes mid-flight if
+the token expires.
+
+## Screen-aware subscription
+
+Mobile apps churn screens hard — always cancel subscriptions on unmount.
+
+```tsx title="screens/LiveScreen.tsx"
+import { useEffect, useState } from "react";
+import { View, Text } from "react-native";
+import { mrdoge } from "../lib/mrdoge";
+import type { Match } from "@mrdoge/client";
+
+export function LiveScreen() {
+  const [matches, setMatches] = useState<Match[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    let sub: Awaited<ReturnType<typeof mrdoge.matches.subscribeLive>> | null =
+      null;
+
+    (async () => {
+      sub = await mrdoge.matches.subscribeLive({ sports: ["soccer"] });
+      if (cancelled) {
+        sub.cancel();
+        return;
+      }
+      setMatches(sub.snapshot);
+
+      sub.on("match.upd", (match) => {
+        setMatches((prev) => {
+          const i = prev.findIndex((m) => m.id === match.id);
+          if (i >= 0) {
+            const next = [...prev];
+            next[i] = match;
+            return next;
+          }
+          return [...prev, match];
+        });
+      });
+
+      sub.on("match.del", (matchId) => {
+        setMatches((prev) => prev.filter((m) => m.id !== matchId));
+      });
+    })();
+
+    return () => {
+      cancelled = true;
+      sub?.cancel();
+    };
+  }, []);
+
+  return (
+    <View>
+      {matches.map((m) => (
+        <Text key={m.id}>
+          {m.homeTeam.name} {m.stats?.homeScore}-{m.stats?.awayScore}{" "}
+          {m.awayTeam.name}
+        </Text>
+      ))}
+    </View>
+  );
+}
+```
+
+## Background and reconnect
+
+When the app backgrounds, iOS / Android may close the WebSocket. The SDK
+auto-reconnects on its own — your `sub.on()` listeners keep firing once
+the socket is back.
+
+For best foreground UX, wire `AppState` to `pingOrReconnect()`:
+
+```tsx title="lib/mrdoge.ts"
+import { AppState } from "react-native";
+import { MrDoge } from "@mrdoge/client";
+
+export const mrdoge = new MrDoge({ fetchToken });
+
+AppState.addEventListener("change", (state) => {
+  if (state === "active") mrdoge.pingOrReconnect();
+});
+```
+
+`pingOrReconnect()`:
+
+- No-ops when the socket is healthy.
+- Fires a reconnect when the socket is dead but no reconnect is in flight
+  (e.g. iOS killed the WS during background and the loop hadn't picked it
+  up yet).
+- Wakes the SDK's backoff loop when one is currently sleeping — so the
+  first user interaction after foreground doesn't wait out a stale
+  exponential delay (could be 30s+ on a long-failed reconnect series).
+
+Never throws. Safe to call on every AppState `change` event.
+
+For long backgrounds (>10 minutes), the JWT may expire mid-reconnect. The
+SDK refetches via your `fetchToken` callback transparently.
+
+## TanStack Query interop
+
+If you use TanStack Query, fetch via the SDK and cache with `staleTime`:
+
+```ts
+import { useQuery } from "@tanstack/react-query";
+import { mrdoge } from "../lib/mrdoge";
+
+export function useMatches(sport: string) {
+  return useQuery({
+    queryKey: ["matches", sport],
+    queryFn: () => mrdoge.matches.list({ sports: [sport], limit: 50 }),
+    staleTime: 60_000,
+  });
+}
+```
+
+The SDK doesn't fight your cache layer — every method is a plain async
+function.
+
+## Next
+
+<Cards>
+  <Card href="/docs/guides/nextjs" title="Next.js →" description="The token-mint backend." />
+  <Card href="/docs/reference/subscriptions" title="Subscriptions reference →" description="Lifecycle, events, reconnect behaviour." />
+</Cards>

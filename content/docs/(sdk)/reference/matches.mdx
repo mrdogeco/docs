@@ -1,0 +1,605 @@
+---
+title: Matches
+description: List, get, search, and subscribe to live matches across every major sport.
+---
+
+The `matches` resource is the workhorse of the SDK — every other resource
+hangs off it.
+
+## `matches.list`
+
+Paginated list of matches matching the filters you pass.
+
+```ts
+const { data, pagination } = await mrdoge.matches.list({
+  sports: ["soccer"],
+  status: ["live"],
+  limit: 20,
+});
+```
+
+**Params:**
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `sports` | `string[]` | One or more of `"soccer"`, `"basketball"`, `"tennis"`, `"volleyball"`, `"baseball"`, `"hockey"`, `"football"` |
+| `competitionIds` | `number[]` | Filter to one or more competitions |
+| `regionIds` | `number[]` | Filter to one or more regions |
+| `teamIds` | `number[]` | Filter to matches involving any of the listed teams |
+| `status` | `MatchStatus[]` | `["upcoming"]`, `["live"]`, `["completed"]`, or combinations |
+| `date` | `string` | `YYYY-MM-DD` — matches on this day |
+| `startDate` / `endDate` | `string` | Range filter |
+| `cursor` | `string` | Pagination cursor (opaque) |
+| `limit` | `number` | Max 100 |
+| `select` | `MatchSelect` | Field selector — see [selectors](#selectors) |
+| `locale` | `string` | `"en"`, `"pt-BR"`, `"es"` |
+| `timezone` | `string` | IANA timezone (e.g. `"America/Sao_Paulo"`) |
+
+**Returns:** `{ data: Match[]; pagination: { nextCursor: string | null; hasMore: boolean } }`
+
+See [pagination](/docs/concepts/pagination) for the cursor walk.
+
+## `matches.listAll`
+
+Auto-paginated version of `matches.list`. Walks all pages and returns the
+combined array.
+
+```ts
+const all = await mrdoge.matches.listAll(
+  { sports: ["soccer"], status: ["live"] },
+  {
+    onPage: (page, accumulated) => render(accumulated),
+    signal: controller.signal,
+  },
+);
+```
+
+**Params:** Same as `matches.list` minus `cursor`.
+
+**Options:**
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `onPage` | `(page, accumulated) => void` | Called per page for progressive rendering |
+| `signal` | `AbortSignal` | Cancel the walk mid-page |
+
+**Returns:** `Match[]` — every match across all pages.
+
+## `matches.get`
+
+Single match by ID with full detail (`MatchDetail`).
+
+```ts
+const match = await mrdoge.matches.get({ id: "match_abc123" });
+```
+
+**Params:**
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `id` | `string` | Match ID — strings, not numbers |
+| `select` | `MatchDetailSelect` | Field selector |
+| `locale` | `string` | Localization |
+
+**Returns:** `MatchDetail` — includes stats, markets, and current clock.
+
+## `matches.trending`
+
+Top matches by sport, server-prioritised.
+
+```ts
+const trending = await mrdoge.matches.trending({
+  sports: ["soccer"],
+  limit: 5,
+});
+```
+
+**Params:**
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `sports` | `string[]` | Optional — defaults to all sports |
+| `status` | `MatchStatus[]` | Optional |
+| `limit` | `number` | Max 50, default 5 |
+| `select` | `MatchSelect` | Field selector |
+
+**Returns:** `Match[]`
+
+## `matches.search`
+
+Free-text search across team names and competitions.
+
+```ts
+const results = await mrdoge.matches.search({
+  query: "liverpool",
+  limit: 10,
+});
+```
+
+**Params:**
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `query` | `string` | Min 2 chars |
+| `sports` | `string[]` | Optional — narrow by one or more sports |
+| `status` | `MatchStatus[]` | Optional |
+| `limit` | `number` | Max 20 |
+| `select` | `MatchSelect` | Field selector |
+
+**Returns:** `Match[]`
+
+## `matches.subscribeLive`
+
+Live-match subscription with WebSocket deltas. The killer feature.
+
+```ts
+const sub = await mrdoge.matches.subscribeLive({
+  sports: ["soccer"],
+});
+
+// Initial state — already populated from the HTTP cold-start cache
+console.log("Snapshot:", sub.snapshot.length, "matches");
+
+// Stream deltas
+sub.on("match.upd", (match) => render(match));
+sub.on("match.del", (matchId) => removeFromUI(matchId));
+
+// On any subscription closure (rate limit, auth expiry, server bounce, etc.)
+sub.on("closed", ({ reason, message }) => {
+  console.warn("Subscription closed:", reason, message);
+});
+
+// Tear down
+await sub.cancel();
+```
+
+**Params:**
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `sports` | `string[]` | Optional |
+| `regionIds` | `number[]` | Optional |
+| `competitionIds` | `number[]` | Optional |
+| `select` | `MatchSelect` | Field selector — applies to snapshot AND every delta |
+
+**Returns:** `Subscription<"matches.subscribeLive">` — see
+[subscriptions](/docs/reference/subscriptions).
+
+**Push events:** `match.upd` (full match payload), `match.del` (matchId string)
+
+<Callout type="info">
+  The SDK races HTTP cache against WebSocket connect for the initial snapshot
+  — `sub.snapshot` is populated in ~100ms instead of ~1.5s.
+  [Read the cold-start details →](/docs/concepts/transports#the-subscribelive-race)
+</Callout>
+
+## `matches.subscribe`
+
+Deep subscription for a single match — every stat update and status
+transition. For live order-book deltas on the same match, pair this with
+[`odds.subscribe`](/docs/reference/odds#oddssubscribe).
+
+```ts
+const sub = await mrdoge.matches.subscribe({
+  matchId: "match_abc123",
+});
+
+console.log("Match:", sub.snapshot);
+
+sub.on("stats.upd", (stats) => updateScoreboard(stats));
+sub.on("status.upd", ({ status }) => onPhaseChange(status));
+```
+
+**Params:**
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `matchId` | `string` | Required |
+| `select` | `MatchDetailSelect` | Field selector — applies to snapshot and `stats.upd` |
+
+**Returns:** `Subscription<"matches.subscribe">`
+
+**Push events:** `stats.upd` (`MatchStats`), `status.upd` (`{ status }`)
+
+## `matches.getLive`
+
+One-shot snapshot of all live matches matching the filters. No subscription,
+no deltas — useful for cron jobs or edge runtimes.
+
+```ts
+const snapshot = await mrdoge.matches.getLive({ sports: ["soccer"] });
+```
+
+**Params:**
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `sports` | `string[]` | Optional |
+| `regionIds` | `number[]` | Optional |
+| `competitionIds` | `number[]` | Optional |
+| `select` | `MatchSelect` | Field selector |
+
+**Returns:** `Match[]`
+
+## The `Match` shape
+
+```ts
+type Match = {
+  id: string;                       // string, not number
+  startTime: string;                // ISO 8601
+  status: "upcoming" | "live" | "completed";
+  homeTeam: { id: number; name: string };
+  awayTeam: { id: number; name: string };
+  sport: { id: number; name: SportName } | null;
+  competition: { id: number; name: string };
+  region: { id: number; name: string };
+  stats?: MatchStats | null;        // sport-discriminated — see below
+  timeline?: TimelineEvent[];       // sport-tagged event log
+};
+
+type SportName =
+  | "soccer" | "basketball" | "american_football" | "baseball"
+  | "ice_hockey" | "volleyball" | "handball" | "tennis";
+```
+
+### Where are the markets?
+
+Markets live on the dedicated `odds.*` resource — see
+[odds.list / odds.subscribe](/docs/reference/odds). The split keeps the
+`Match` payload lean: customers who render scores and stats only don't pay
+bandwidth for an order book they never use. Pull markets when you need
+them via `mrdoge.odds.list({ matchId })`.
+
+## `MatchStats` — sport-discriminated
+
+`MatchStats` is a **discriminated union** on `stats.sport`. Common
+fields (`clock`, `periods`, `homeScore`, `awayScore`) are typed without
+narrowing. Sport-specific fields require a narrow:
+
+```ts
+sub.on("match.upd", (match) => {
+  // Common — always typed
+  console.log(match.stats?.homeScore, match.stats?.clock?.display);
+
+  // Sport-specific — TS narrows on `stats.sport`
+  if (match.stats?.sport === "tennis") {
+    console.log(
+      `${match.stats.homeCurrentGamePoints} - ${match.stats.awayCurrentGamePoints}`,
+      match.stats.homeServes ? "serving" : "",
+    );
+  } else if (match.stats?.sport === "soccer") {
+    console.log(`Yellow: ${match.stats.homeYellowCards}`);
+  }
+});
+```
+
+### Primary score unit per sport
+
+`homeScore` and `awayScore` are always present, but the unit depends on
+the sport:
+
+| Sport | Unit |
+|---|---|
+| Soccer / Ice Hockey / Handball | Goals |
+| Basketball / American Football | Total points |
+| Baseball | Total runs |
+| Volleyball / Tennis | Sets won (per-set point totals live in `periods`) |
+
+### Per-sport fields
+
+<Tabs items={["Soccer", "Tennis", "Basketball", "Baseball", "Ice Hockey", "Volleyball", "Handball", "American Football"]}>
+  <Tab value="Soccer">
+
+```ts
+type SoccerStats = {
+  sport: "soccer";
+  clock: Clock | null;
+  periods?: Period[];
+  homeScore: number; awayScore: number;   // goals
+  // Cards
+  homeYellowCards?: number; awayYellowCards?: number;
+  homeRedCards?: number; awayRedCards?: number;
+  // Fouls
+  homeFouls?: number; awayFouls?: number;
+  // Set pieces
+  homeCorners?: number; awayCorners?: number;
+  homeThrowIns?: number; awayThrowIns?: number;
+  homeGoalKicks?: number; awayGoalKicks?: number;
+  homePenaltyKicks?: number; awayPenaltyKicks?: number;
+  // Play
+  homeTackles?: number; awayTackles?: number;
+  homeOffsides?: number; awayOffsides?: number;
+  homeShots?: number; awayShots?: number;
+  homeShotsOnTarget?: number; awayShotsOnTarget?: number;
+  homeWoodworkHits?: number; awayWoodworkHits?: number;
+  homePossession?: number; awayPossession?: number;  // 0–1 fraction
+  homeExpectedGoals?: number; awayExpectedGoals?: number;
+  injuryMinutes?: number;
+  // Player-level (StatPlayer[] = { name, value }[])
+  homePlayersGoals?: StatPlayer[]; awayPlayersGoals?: StatPlayer[];
+  homePlayersAssists?: StatPlayer[]; awayPlayersAssists?: StatPlayer[];
+  homePlayersFouls?: StatPlayer[]; awayPlayersFouls?: StatPlayer[];
+  homePlayersShots?: StatPlayer[]; awayPlayersShots?: StatPlayer[];
+  homePlayersShotsOnTarget?: StatPlayer[]; awayPlayersShotsOnTarget?: StatPlayer[];
+  homePlayersTackles?: StatPlayer[]; awayPlayersTackles?: StatPlayer[];
+  homePlayersOffsides?: StatPlayer[]; awayPlayersOffsides?: StatPlayer[];
+  homePlayersWoodworkHits?: StatPlayer[]; awayPlayersWoodworkHits?: StatPlayer[];
+};
+```
+
+  </Tab>
+  <Tab value="Tennis">
+
+```ts
+type TennisStats = {
+  sport: "tennis";
+  clock: Clock | null;
+  periods?: Period[];                       // per-set games (homeScore/awayScore on each Period)
+  homeScore: number; awayScore: number;     // sets won
+  /** Games won in the in-progress set. */
+  homeGamesInCurrentSet?: number; awayGamesInCurrentSet?: number;
+  /** Current game points — "0" / "15" / "30" / "40" / "AD". */
+  homeCurrentGamePoints?: string; awayCurrentGamePoints?: string;
+  /** Who's serving (mutually exclusive). */
+  homeServes?: boolean; awayServes?: boolean;
+  /** True when the current game is a tiebreak. */
+  isInTieBreak?: boolean;
+  /** Match format — 3 (best-of-3) or 5 (best-of-5). */
+  numberOfSets?: number;
+  /** Court surface code (provider-specific). */
+  courtType?: number;
+};
+```
+
+The data feed uses `player1` / `player2` but the SDK normalizes to
+`home` / `away` — player1 maps to home.
+
+  </Tab>
+  <Tab value="Basketball">
+
+```ts
+type BasketballStats = {
+  sport: "basketball";
+  clock: Clock | null;
+  periods?: Period[];                       // per-quarter scores
+  homeScore: number; awayScore: number;     // total points
+  homeFouls?: number; awayFouls?: number;
+  /** Reached the foul threshold for free-throw bonus. */
+  homeIsBonus?: boolean; awayIsBonus?: boolean;
+  /** Discrete ball possession (mutually exclusive). */
+  homeHasPossession?: boolean; awayHasPossession?: boolean;
+};
+```
+
+  </Tab>
+  <Tab value="Baseball">
+
+```ts
+type BaseballStats = {
+  sport: "baseball";
+  clock: Clock | null;
+  periods?: Period[];                       // per-inning scores
+  homeScore: number; awayScore: number;     // total runs
+  outs?: number; balls?: number; strikes?: number;
+  bases?: unknown[];                         // base-runner state
+};
+```
+
+Baseball matches typically return `timeline: []` — the data feed doesn't
+emit baseball events today.
+
+  </Tab>
+  <Tab value="Ice Hockey">
+
+```ts
+type IceHockeyStats = {
+  sport: "ice_hockey";
+  clock: Clock | null;
+  periods?: Period[];                       // per-period scores
+  homeScore: number; awayScore: number;     // goals
+};
+```
+
+  </Tab>
+  <Tab value="Volleyball">
+
+```ts
+type VolleyballStats = {
+  sport: "volleyball";
+  clock: Clock | null;
+  periods?: Period[];                       // per-set point totals
+  homeScore: number; awayScore: number;     // sets won
+  /** Who's serving (mutually exclusive). */
+  homeServes?: boolean; awayServes?: boolean;
+};
+```
+
+  </Tab>
+  <Tab value="Handball">
+
+```ts
+type HandballStats = {
+  sport: "handball";
+  clock: Clock | null;
+  periods?: Period[];                       // per-half scores
+  homeScore: number; awayScore: number;     // goals
+};
+```
+
+  </Tab>
+  <Tab value="American Football">
+
+```ts
+type AmericanFootballStats = {
+  sport: "american_football";
+  clock: Clock | null;
+  periods?: Period[];                       // per-quarter scores
+  homeScore: number; awayScore: number;     // total points
+};
+```
+
+  </Tab>
+</Tabs>
+
+## Timeline
+
+`match.timeline` is a sport-tagged event log — every notable in-match
+event in chronological order. Sibling to `stats`, not nested inside it:
+
+```ts
+type TimelineEvent = {
+  /** Event kind — sport-specific. See per-sport unions below. */
+  type: string;
+  /** Normalized side — "home" / "away" / "match" (game-level events). */
+  side: "home" | "away" | "match";
+  /** Phase code — "1H" / "Q1" / "S1" / "P1" / "TB" / "OT" / … */
+  phase: string;
+  /** Sport- and type-specific display strings. Positional, see below. */
+  captions: string[];
+  /**
+   * Time offset from match start, in seconds. Populated for sports where
+   * the data feed tracks per-event time (soccer, ice hockey, handball).
+   * `0` for sports without per-event timing (tennis — game-by-game order
+   * is preserved by array index; basketball / football boundary events).
+   * Always read events in array order; the field is for display only.
+   */
+  timeOffsetSeconds: number;
+};
+```
+
+Per-sport `type` is open string at runtime (forward-compatible with new
+event types from the data feed). TypeScript unions are exported for
+narrowing:
+
+```ts
+import type { SoccerTimelineEventType } from "@mrdoge/node";
+
+if (match.sport?.name === "soccer") {
+  for (const event of match.timeline ?? []) {
+    const type = event.type as SoccerTimelineEventType;
+    if (type === "GoalWithScorer") {
+      const [minute, team, player] = event.captions;
+      console.log(`Goal at ${minute}': ${player} (${team})`);
+    }
+  }
+}
+```
+
+### Known event types per sport
+
+| Sport | `type` values |
+|---|---|
+| Soccer | `StartOfMatch`, `EndOfFirstHalf`, `StartOfSecondHalf`, `EndOfNormalTime`, `GoalWithScorer`, `OwnGoal`, `ShotWithPlayer`, `ShotOnTargetWithPlayer`, `FoulWithPlayer`, `TackleWithPlayer`, `ThrowIn`, `GoalKick`, `Corner`, `PenaltyKick`, `YellowCardWithPlayer`, `RedCardWithPlayer`, `Substitution` |
+| Tennis | `GameWithPoints`, `Game`, `Set`, `Tiebreak` |
+| Basketball | `StartOfGame`, `EndOf<N>Quarter`, `StartOf<N>Quarter`, `EndOfHalfTime`, `StartOf/EndOfOvertime` |
+| American Football | Same shape as Basketball |
+| Ice Hockey | `StartOfGame`, `EndOf<N>Period`, `StartOf<N>Period`, `StartOf/EndOfOvertime`, `GoalWithoutScorer` |
+| Volleyball | `SetWithPoints`, `Set` |
+| Handball | `StartOfGame`, `EndOfFirstHalf`, `StartOfSecondHalf`, `EndOfNormalTime`, `GoalWithoutScorer` |
+| Baseball | (feed currently emits no baseball events; `timeline` is `[]`) |
+
+### `captions` shape per event (selected)
+
+- **Soccer `GoalWithScorer`**: `[matchMinute, teamName, playerName]`
+- **Soccer `EndOfFirstHalf` / `EndOfNormalTime`**: `[homeScore, awayScore]`
+- **Tennis `GameWithPoints`**: `[setNumber, gameInSet, playerName, currentPoints]`
+- **Tennis `Set`**: `[setNumber, winnerName, p1Games, p2Games]`
+- **Volleyball `SetWithPoints`**: `[setNumber, teamName, homePoints, awayPoints]`
+- **Hockey / Handball `GoalWithoutScorer`**: `[matchMinute, teamName]`
+- **Basketball / Football `EndOf<N>Quarter`**: `[homeScore, awayScore]`
+
+Other event types follow the same convention — the first element is
+typically a time marker; remaining elements are team / player / score
+data.
+
+## Clock semantics
+
+The `stats.clock` object handles count-up sports (soccer, ice hockey,
+handball), count-down sports (basketball, American football), and
+sports without a traditional clock (baseball, volleyball, tennis) under
+one schema. Each numeric field's semantics depend on the sport:
+
+| Field | Soccer / Hockey / Handball | Basketball / Football | Baseball / Volleyball / Tennis |
+|-------|--------|-------------------------------------------|------------------------|
+| `elapsedSeconds` | Total match-elapsed (0–5400+) | Elapsed within current period | `null` |
+| `remainingSeconds` | `null` (count-up) | Seconds left on the period clock | `null` |
+| `periodDurationSeconds` | `null` (no fixed half length) | 720s NBA quarter, 1200s NHL period, etc. | `null` |
+| `minute` | Running match minute (soccer only) | `null` | `null` |
+| `stoppage` | Added/injury time minutes (soccer only) — `null` outside stoppage | `null` | `null` |
+| `display` | `"44'"`, `"45+3'"`, `"HT"`, `"FT"` | `"Q3 7:42"`, `"OT 0:34"`, `"FT"` | `"Set 4"`, `"9º Inning"` |
+
+The `display` / `displayLong` strings are pre-formatted and localized by
+the server — render them directly for the lazy path. For custom clocks,
+read the numeric fields and switch on `clock.state`.
+
+## Default limits
+
+Each method has a server-enforced default and maximum on `limit`:
+
+| Method | Default | Max |
+|--------|---------|-----|
+| `matches.list` | 20 | 100 |
+| `matches.trending` | 5 | 50 |
+| `matches.search` | 10 | 20 |
+| `matches.getLive` | unbounded snapshot | — |
+
+## Selectors
+
+GraphQL-style projection — request only the fields you need. Reduces
+payload size, deserialization time, and re-render cost.
+
+```ts
+const { data } = await mrdoge.matches.list({
+  sports: ["soccer"],
+  select: {
+    id: true,
+    homeTeam: { name: true },
+    awayTeam: { name: true },
+    stats: { homeScore: true, awayScore: true, clock: { display: true } },
+    // omit sport, competition, region, etc.
+  },
+});
+```
+
+Selectors apply to every match-bearing method:
+
+- `matches.list`, `matches.get`, `matches.trending`, `matches.search`,
+  `matches.getLive` — applies to the response
+- `matches.subscribeLive` — applies to the initial **snapshot** AND every
+  `match.upd` push for the lifetime of the subscription
+- `matches.subscribe` — same for `stats.upd` and `odds.upd` deltas
+
+The `select` type (`MatchSelect` or `MatchDetailSelect`) walks the
+response shape recursively, so autocomplete drives every key. Selector
+rules:
+
+- `field: true` → include the full subtree
+- `field: { …nested }` → include only the listed nested fields
+- field omitted → not returned
+
+### Performance: projection is post-cache
+
+The server caches the full response shape **once**, then projects per
+request. Two calls with different `select` shapes share the same upstream
+fetch and cache entry — you don't pay a cache miss for picking different
+fields.
+
+This means feature-flag-driven selectors (e.g. one component renders
+`homeScore`, another renders `homeScore` + `clock.display`) are free — no
+extra round-trips.
+
+### Subscriptions: bandwidth savings compound
+
+For long-lived `subscribeLive` subscriptions, the selector applies to
+**every push**. A subscription rendering 50 live matches with a 10-field
+selector instead of the full ~60-field default cuts your bandwidth and
+JSON-parse cost ~6×. The server stores the selector per-subscription and
+projects each delta before sending.
+
+## Next
+
+<Cards>
+  <Card href="/docs/reference/odds" title="Odds →" description="odds.list / odds.subscribe — live order books per match." />
+  <Card href="/docs/reference/recommendations" title="AI Recommendations →" description="Edge-scored picks with reasoning and Kelly sizing." />
+  <Card href="/docs/reference/subscriptions" title="Subscriptions →" description="Event handlers, lifecycle, cancellation." />
+</Cards>

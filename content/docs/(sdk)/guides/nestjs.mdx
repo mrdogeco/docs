@@ -1,0 +1,164 @@
+---
+title: NestJS
+description: Injectable Mr. Doge service for clean DI inside Nest modules.
+---
+
+## Install
+
+```bash
+npm i @mrdoge/node
+```
+
+## The service
+
+Wrap the `MrDoge` class in an injectable service so controllers don't reach
+for the API key directly:
+
+```ts title="src/mrdoge/mrdoge.service.ts"
+import { Injectable } from "@nestjs/common";
+import { MrDoge } from "@mrdoge/node";
+
+@Injectable()
+export class MrDogeService {
+  readonly client: MrDoge;
+
+  constructor() {
+    this.client = new MrDoge({
+      apiKey: process.env.MRDOGE_API_KEY!,
+    });
+  }
+
+  get matches() {
+    return this.client.matches;
+  }
+
+  get recommendations() {
+    return this.client.ai.recommendations;
+  }
+
+  get tokens() {
+    return this.client.tokens;
+  }
+}
+```
+
+## The module
+
+```ts title="src/mrdoge/mrdoge.module.ts"
+import { Module, Global } from "@nestjs/common";
+import { MrDogeService } from "./mrdoge.service";
+
+@Global()
+@Module({
+  providers: [MrDogeService],
+  exports: [MrDogeService],
+})
+export class MrDogeModule {}
+```
+
+`@Global()` so any feature module can inject `MrDogeService` without
+re-importing.
+
+Register in `AppModule`:
+
+```ts title="src/app.module.ts"
+import { Module } from "@nestjs/common";
+import { MrDogeModule } from "./mrdoge/mrdoge.module";
+
+@Module({
+  imports: [MrDogeModule],
+})
+export class AppModule {}
+```
+
+## Controller
+
+```ts title="src/matches/matches.controller.ts"
+import { Controller, Get, Query, Post } from "@nestjs/common";
+import { MrDogeService } from "../mrdoge/mrdoge.service";
+
+@Controller("matches")
+export class MatchesController {
+  constructor(private readonly mrdoge: MrDogeService) {}
+
+  @Get()
+  async list(
+    @Query("sport") sport: string,
+    @Query("limit") limit = "20",
+  ) {
+    return this.mrdoge.matches.list({
+      sports: [sport],
+      limit: Number(limit),
+    });
+  }
+
+  @Post("token")
+  async mintToken() {
+    return this.mrdoge.tokens.create({ ttl: 600 });
+  }
+}
+```
+
+## Exception filter
+
+Catch SDK errors with a Nest exception filter so they map to clean HTTP
+status codes:
+
+```ts title="src/common/sdk-error.filter.ts"
+import {
+  Catch,
+  ArgumentsHost,
+  ExceptionFilter,
+  HttpStatus,
+} from "@nestjs/common";
+import {
+  RateLimitError,
+  ForbiddenError,
+  UnauthorizedError,
+  ValidationError,
+} from "@mrdoge/node";
+
+@Catch(RateLimitError, ForbiddenError, UnauthorizedError, ValidationError)
+export class SdkErrorFilter implements ExceptionFilter {
+  catch(err: unknown, host: ArgumentsHost) {
+    const ctx = host.switchToHttp();
+    const res = ctx.getResponse();
+
+    if (err instanceof RateLimitError) {
+      return res.status(HttpStatus.TOO_MANY_REQUESTS).json({
+        error: "rate_limited",
+        data: err.data,
+      });
+    }
+    if (err instanceof ForbiddenError) {
+      return res.status(HttpStatus.FORBIDDEN).json({
+        error: "forbidden",
+        data: err.data,
+      });
+    }
+    if (err instanceof UnauthorizedError) {
+      return res.status(HttpStatus.UNAUTHORIZED).json({ error: "unauthorized" });
+    }
+    if (err instanceof ValidationError) {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        error: "validation",
+        data: err.data,
+      });
+    }
+  }
+}
+```
+
+Register globally:
+
+```ts title="src/main.ts"
+import { SdkErrorFilter } from "./common/sdk-error.filter";
+app.useGlobalFilters(new SdkErrorFilter());
+```
+
+## Next
+
+<Cards>
+  <Card href="/docs/guides/express" title="Express →" description="The lighter-weight equivalent." />
+  <Card href="/docs/concepts/errors" title="Error handling →" description="Every error class the SDK can throw." />
+</Cards>

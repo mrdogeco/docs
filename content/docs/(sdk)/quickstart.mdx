@@ -1,0 +1,146 @@
+---
+title: Quickstart
+description: From zero to streaming live matches in five minutes.
+---
+
+This guide assumes you have an API key. Don't have one yet?
+[Mint one in the dashboard](/dashboard/keys).
+
+<Steps>
+
+<Step>
+
+## Install the SDK
+
+```bash
+npm i @mrdoge/node
+```
+
+</Step>
+
+<Step>
+
+## Create a client
+
+```ts title="bot.ts"
+import { MrDoge } from "@mrdoge/node";
+
+const mrdoge = new MrDoge({
+  apiKey: process.env.MRDOGE_API_KEY!,
+});
+```
+
+</Step>
+
+<Step>
+
+## Make your first call
+
+```ts title="bot.ts"
+const { data: matches } = await mrdoge.matches.list({
+  sports: ["soccer"],
+  status: ["live"],
+  limit: 5,
+});
+
+for (const match of matches) {
+  console.log(
+    `${match.homeTeam.name} vs ${match.awayTeam.name}`,
+    match.stats
+      ? `${match.stats.homeScore}-${match.stats.awayScore}`
+      : "(upcoming)",
+  );
+}
+```
+
+Run it:
+
+```bash
+MRDOGE_API_KEY=sk_live_… node bot.ts
+```
+
+You should see live matches print to stdout.
+
+</Step>
+
+<Step>
+
+## Subscribe to live updates
+
+The real magic — live deltas as scores and odds change.
+
+```ts title="bot.ts"
+const sub = await mrdoge.matches.subscribeLive({ sports: ["soccer"] });
+
+// initial state — already populated from the HTTP cold-start cache
+console.log("Snapshot:", sub.snapshot.length, "matches");
+
+// stream deltas as the server pushes them
+sub.on("match.upd", (match) => {
+  console.log(
+    `[${match.id}]`,
+    match.homeTeam.name,
+    match.stats?.homeScore,
+    "-",
+    match.stats?.awayScore,
+    match.awayTeam.name,
+  );
+});
+
+sub.on("match.del", (matchId) => {
+  console.log("[del]", matchId);
+});
+
+// later, when you're done:
+await sub.cancel();
+```
+
+Under the hood the SDK races HTTP cache (~100ms) against the WebSocket
+handshake (~1.5s) — whichever resolves first populates `sub.snapshot`. WS
+continues for the live deltas. See [transports](/docs/concepts/transports)
+for the deep dive.
+
+</Step>
+
+<Step>
+
+## Pull AI recommendations
+
+```ts title="bot.ts"
+const { data: recs } = await mrdoge.ai.recommendations.list({
+  minEdge: 0.05,
+  confidence: "High",
+  limit: 10,
+});
+
+for (const r of recs) {
+  console.log(
+    `${r.outcome} @ ${r.odds}`,
+    `(${r.confidence}, edge: ${(r.edgePercentage * 100).toFixed(1)}%)`,
+  );
+  for (const reason of r.rationale) {
+    console.log(`  · ${reason}`);
+  }
+  for (const risk of r.riskFactors) {
+    console.log(`  risk: ${risk}`);
+  }
+}
+```
+
+<Callout type="info">
+  AI recommendations are gated to the Business tier.
+  [Upgrade your plan](/dashboard/billing) if you get a `forbidden` error.
+</Callout>
+
+</Step>
+
+</Steps>
+
+## What's next
+
+<Cards>
+  <Card href="/docs/concepts/transports" title="How transports work →" description="HTTP, WebSocket, and the cold-start race." />
+  <Card href="/docs/concepts/pagination" title="Pagination →" description="Cursors and the listAll helper." />
+  <Card href="/docs/reference/matches" title="Matches reference →" description="Every match method, every param." />
+  <Card href="/docs/guides" title="Framework guides →" description="Next.js, Express, Nest, React Native." />
+</Cards>

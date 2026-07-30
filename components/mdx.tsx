@@ -8,6 +8,7 @@ import { Accordion, Accordions } from "fumadocs-ui/components/accordion"
 import { TypeTable } from "fumadocs-ui/components/type-table"
 import { File, Folder, Files } from "fumadocs-ui/components/files"
 import { ComponentPreview } from "@/components/docs/component-preview"
+import { FrameworkCard, FrameworkGrid } from "@/components/docs/framework-card"
 
 export function getMDXComponents(components?: MDXComponents) {
   return {
@@ -26,6 +27,8 @@ export function getMDXComponents(components?: MDXComponents) {
     Folder,
     Files,
     ComponentPreview,
+    FrameworkCard,
+    FrameworkGrid,
     ...components,
   } satisfies MDXComponents
 }

@@ -1,0 +1,152 @@
+---
+title: Teams
+description: List, search, and look up teams — with form data.
+---
+
+The `teams` resource exposes the team catalog plus team-form aggregates.
+
+## `teams.list`
+
+Paginated team list with optional substring search.
+
+```ts
+const teams = await mrdoge.teams.list({
+  sports: ["soccer"],
+  search: "liver",
+  limit: 50,
+});
+```
+
+**Params:**
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `sports` | `string[]` | Filter by one or more sports |
+| `regionIds` | `number[]` | Filter to one or more regions |
+| `competitionIds` | `number[]` | Filter to one or more competitions |
+| `search` | `string` | Case-insensitive substring match against team name |
+| `limit` | `number` | Max 500 |
+| `locale` | `string` | Localization |
+
+**Returns:** `Team[]`
+
+### The `Team` shape
+
+```ts
+type Team = {
+  id: number;
+  name: string;       // localized
+  sportId: number;
+};
+```
+
+## `teams.get`
+
+Single team by ID — same fields as `Team` plus the embedded sport reference.
+
+```ts
+const team = await mrdoge.teams.get({ id: 158346 }); // Liverpool
+```
+
+**Returns:** `TeamDetail`
+
+```ts
+type TeamDetail = {
+  id: number;
+  name: string;
+  sport: { id: number; name: string } | null;
+};
+```
+
+## `teams.form`
+
+Aggregated form for a team — wins/draws/losses across recent matches plus
+the underlying match details.
+
+```ts
+const form = await mrdoge.teams.form({
+  teamId: 158346, // Liverpool
+  sampleSize: 10,
+});
+
+console.log(
+  `${form.team.name}: ${form.summary.wins}W ${form.summary.draws}D ${form.summary.losses}L`,
+);
+console.log("Recent form:", form.summary.form.join(""));
+console.log("Streak:", form.summary.streak);
+
+for (const m of form.matches) {
+  console.log(
+    `vs ${m.opponent.name} (${m.isHome ? "H" : "A"})`,
+    `${m.score.for}-${m.score.against}`,
+    m.result,
+  );
+}
+```
+
+**Params:**
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `teamId` | `number` | Required |
+| `sampleSize` | `number` | 1–50, default 10 |
+| `locale` | `string` | Localization |
+
+**Returns:**
+
+```ts
+type TeamForm = {
+  team: TeamDetail;
+  summary: {
+    wins: number;
+    draws: number;
+    losses: number;
+    goalsFor: number;
+    goalsAgainst: number;
+    sampleSize: number;
+    form: string[];         // recent W/D/L codes, most recent first
+    streak: string;         // e.g. "W3", "L2", or "" if mixed
+  };
+  matches: TeamFormMatch[];
+};
+
+type TeamFormMatch = {
+  matchId: string;
+  startedAt: string;
+  competition: { id: number; name: string | null; region: string | null };
+  homeTeam: { id: number; name: string };
+  awayTeam: { id: number; name: string };
+  opponent: { id: number; name: string };
+  isHome: boolean;
+  score: {
+    for: number | null;
+    against: number | null;
+    home: number | null;
+    away: number | null;
+  };
+  result: "win" | "loss" | "draw" | "unknown";
+};
+```
+
+## Team logos
+
+Render team logos via the public image endpoint:
+
+```tsx
+<img
+  src={`https://api.mrdoge.co/images/teams/${team.id}.png`}
+  alt={team.name}
+/>
+```
+
+No auth, 1-year immutable cache. See [Images](/docs/reference/images) for
+Next.js / React Native setup, missing-image fallbacks, and performance
+notes.
+
+## Next
+
+<Cards>
+  <Card href="/docs/reference/regions-competitions" title="Regions & competitions →" description="The catalogue teams live inside." />
+  <Card href="/docs/reference/matches" title="Matches →" description="Filter matches by teamIds, listen to live deltas." />
+  <Card href="/docs/reference/images" title="Images →" description="Logo URLs, caching, framework setup." />
+</Cards>

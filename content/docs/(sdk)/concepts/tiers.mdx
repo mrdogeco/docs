@@ -1,0 +1,147 @@
+---
+title: Tiers & limits
+description: What each plan unlocks — methods, request volume, and concurrent subscriptions.
+---
+
+Mr. Doge plans gate two things: **which methods you can call** and **how many
+requests per minute**. Upgrading is one click in the dashboard.
+
+Every plan ships with a **7-day free trial**. Card required.
+
+## At a glance
+
+| Tier | Connections (per key) | Requests/min (per key) | Subs (per connection) | Methods |
+|------|-----------------------|------------------------|-----------------------|---------|
+| **Starter** | 25 | 300 | 25 | Discovery + reads |
+| **Growth** | 75 | 1,000 | 100 | + trending, live snapshots, live subscriptions |
+| **Business** | 250 | 5,000 | 500 | + per-match deep subs, AI picks, recommendations |
+
+[See pricing →](/dashboard/billing)
+
+<Callout type="info">
+  Caps stack: each WebSocket connection independently holds up to its
+  tier's subscription cap. A Starter key with 25 connections can hold
+  25 × 25 = **625 total subscriptions** across them. Most apps use one
+  connection per browser tab / mobile app instance.
+</Callout>
+
+## Method availability by tier
+
+<Callout type="info">
+  `auth`, `tokens.create`, and `subscription.cancel` are always allowed —
+  no method gating, no rate limiting.
+</Callout>
+
+### Starter
+
+Discovery + reads — everything you need to browse the catalog and pull match detail:
+
+- `regions.list`
+- `competitions.list`
+- `teams.list`, `teams.get`, `teams.form`
+- `matches.list`, `matches.get`, `matches.search`
+
+### Growth
+
+Starter, plus live data:
+
+- `matches.trending` — top matches by sport
+- `matches.getLive` — live snapshot (one-shot, no deltas)
+- `matches.subscribeLive` — full live subscription with WebSocket deltas
+
+### Business
+
+Growth, plus per-match streams, live odds, and AI:
+
+- `matches.subscribe` — single-match deep subscription (stats + status pushes)
+- `odds.list` — one-shot snapshot of every live market on a match
+- `odds.subscribe` — WebSocket-pushed live order-book deltas for a match
+- `ai.recommendations.list` / `ai.recommendations.get` — edge-and-confidence-scored picks with reasoning
+
+## Rate limits
+
+Limits are **per-key, per-minute**, shared across HTTP and WebSocket — you
+can't double your quota by mixing transports.
+
+When you hit a limit, the server returns `rate_limited` with metadata:
+
+```ts
+try {
+  await doge.matches.list({ sports: ["soccer"] });
+} catch (err) {
+  if (err instanceof RateLimitError) {
+    await new Promise((r) => setTimeout(r, err.retryAfterMs));
+    // retry
+  }
+}
+```
+
+`err.retryAfterMs` is the precise wait time — the SDK doesn't auto-retry,
+but the metadata makes it trivial to implement.
+
+## Subscription limits
+
+Each tier caps subscriptions **per WebSocket connection** — not per key.
+The check is local to each connection's subscription map; close a
+subscription (`sub.cancel()`) or close the connection to free a slot.
+
+| Tier | Subs per connection |
+|------|---------------------|
+| Starter | 25 |
+| Growth | 100 |
+| Business | 500 |
+
+Because a key can hold multiple concurrent connections (see [connection
+limits](#connection-limits) below), the **effective** max subscriptions
+per key is `subs/conn × max connections`:
+
+| Tier | Effective max (subs × conns) |
+|------|------------------------------|
+| Starter | 625 |
+| Growth | 7,500 |
+| Business | 125,000 |
+
+If a single connection exceeds its cap, `matches.subscribeLive` /
+`matches.subscribe` throws `SubscriptionLimitError`. Cancel an old
+subscription, open a new connection, or upgrade.
+
+## Connection limits
+
+WebSocket connections are also capped per key. A single browser tab is one
+connection; a load-balanced backend with 50 instances is 50 connections.
+
+If you need more, use the HTTP transport for bulk reads — it doesn't count
+against the connection limit.
+
+## Forbidden errors
+
+Calling a method outside your tier throws `ForbiddenError` with context:
+
+```ts
+try {
+  await doge.ai.recommendations.list({});
+} catch (err) {
+  if (err instanceof ForbiddenError) {
+    console.log(err.data);
+    // { method: "ai.recommendations.list", tier: "starter" }
+  }
+}
+```
+
+Use this to show an in-app upgrade prompt.
+
+## Upgrading
+
+Upgrades are instant — no key rotation, no redeployment. The dashboard flips
+your `sdkTier` in Stripe metadata, and the next request gets the new limits.
+
+JWTs minted before an upgrade keep their old tier until they expire (max 24
+hours). For most browser apps this is fine; if you need an immediate flip,
+invalidate the current token and remount the client.
+
+## Next
+
+<Cards>
+  <Card href="/docs/reference/matches" title="Reference →" description="Every method, what tier it needs, what it returns." />
+  <Card href="/docs/concepts/errors" title="Error handling →" description="Catching forbidden, rate-limit, and subscription errors." />
+</Cards>

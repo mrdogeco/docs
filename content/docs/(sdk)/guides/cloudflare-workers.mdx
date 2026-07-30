@@ -1,0 +1,101 @@
+---
+title: Cloudflare Workers
+description: Edge-runtime SDK with @mrdoge/http — zero Node dependencies.
+---
+
+`@mrdoge/http` is purpose-built for edge runtimes: zero Node-specific
+APIs, native `fetch`, works on Cloudflare Workers, Vercel Edge functions,
+AWS Lambda, and Bun.
+
+## Install
+
+```bash
+npm i @mrdoge/http
+```
+
+## Worker setup
+
+```ts title="src/index.ts"
+import { createHttpClient } from "@mrdoge/http";
+
+export default {
+  async fetch(req: Request, env: Env): Promise<Response> {
+    const doge = createHttpClient({ apiKey: env.MRDOGE_KEY });
+
+    const matches = await doge.call("matches.list", {
+      sports: ["soccer"],
+      limit: 10,
+    });
+
+    return Response.json(matches);
+  },
+} satisfies ExportedHandler<Env>;
+
+interface Env {
+  MRDOGE_KEY: string;
+}
+```
+
+Configure secrets via `wrangler secret put MRDOGE_KEY`.
+
+## Token-mint endpoint on the edge
+
+Use a Worker to mint tokens for your mobile / browser clients:
+
+```ts title="src/index.ts"
+export default {
+  async fetch(req: Request, env: Env): Promise<Response> {
+    if (req.method !== "POST") return new Response("method not allowed", { status: 405 });
+
+    const doge = createHttpClient({ apiKey: env.MRDOGE_KEY });
+    const result = await doge.call("tokens.create", { ttl: 600 });
+
+    return Response.json(result, {
+      headers: {
+        "Access-Control-Allow-Origin": "https://your-app.com",
+        "Cache-Control": "no-store",
+      },
+    });
+  },
+};
+```
+
+## Caching reads at the edge
+
+Use Workers' `caches.default` to add a CDN layer between you and the SDK:
+
+```ts
+async function cachedMatches(sport: string, env: Env): Promise<Match[]> {
+  const cacheKey = new Request(`https://internal/matches?sport=${sport}`);
+  const cached = await caches.default.match(cacheKey);
+  if (cached) return cached.json();
+
+  const doge = createHttpClient({ apiKey: env.MRDOGE_KEY });
+  const { data } = await doge.call("matches.list", { sports: [sport] });
+
+  const response = new Response(JSON.stringify(data), {
+    headers: { "Cache-Control": "s-maxage=30" },
+  });
+  await caches.default.put(cacheKey, response.clone());
+  return data;
+}
+```
+
+## What `@mrdoge/http` can't do
+
+- **No subscriptions** — `matches.subscribeLive` and `matches.subscribe`
+  throw `method_not_found`. Use `matches.getLive` for one-shot snapshots, or
+  hold the subscription in a Worker Durable Object if you need persistent
+  live data.
+- **No `auth`/`subscription.cancel`** — those are WebSocket protocol methods
+  that have no HTTP meaning.
+
+For everything else (lists, gets, AI picks, tokens), `@mrdoge/http` is
+fully featured.
+
+## Next
+
+<Cards>
+  <Card href="/docs/concepts/transports" title="Transports →" description="HTTP vs WebSocket trade-offs." />
+  <Card href="/docs/guides/node" title="Node.js →" description="Long-running server with subscriptions." />
+</Cards>

@@ -1,0 +1,196 @@
+---
+title: Installation
+description: Pick the package that fits your runtime — server, browser, or edge.
+---
+
+The Mr. Doge SDK ships as four packages. **Pick one** — they all expose the
+same resource surface; the difference is how you authenticate and what
+runtime they target.
+
+## Which package?
+
+<Cards>
+  <Card title="@mrdoge/node" description="Use on your backend. Authenticates with sk_live_… API keys. Both HTTP and WebSocket." />
+  <Card title="@mrdoge/client" description="Use in browsers, React Native, or any client where you must NOT embed an API key. Auth via short-lived JWTs." />
+  <Card title="@mrdoge/http" description="Use in serverless / edge runtimes (Lambda, Cloudflare Workers, Vercel Edge). Pure fetch, zero deps." />
+  <Card title="@mrdoge/protocol" description="Schemas and TypeScript types only. Useful for codegen, validation, or building tools on top of the protocol." />
+</Cards>
+
+## Install
+
+<Tabs items={["@mrdoge/node", "@mrdoge/client", "@mrdoge/http"]}>
+  <Tab value="@mrdoge/node">
+    <Tabs items={["npm", "pnpm", "yarn", "bun"]} groupId="package-manager" persist>
+      <Tab value="npm">
+```bash
+npm i @mrdoge/node
+```
+      </Tab>
+      <Tab value="pnpm">
+```bash
+pnpm add @mrdoge/node
+```
+      </Tab>
+      <Tab value="yarn">
+```bash
+yarn add @mrdoge/node
+```
+      </Tab>
+      <Tab value="bun">
+```bash
+bun add @mrdoge/node
+```
+      </Tab>
+    </Tabs>
+  </Tab>
+  <Tab value="@mrdoge/client">
+    <Tabs items={["npm", "pnpm", "yarn", "bun"]} groupId="package-manager" persist>
+      <Tab value="npm">
+```bash
+npm i @mrdoge/client
+```
+      </Tab>
+      <Tab value="pnpm">
+```bash
+pnpm add @mrdoge/client
+```
+      </Tab>
+      <Tab value="yarn">
+```bash
+yarn add @mrdoge/client
+```
+      </Tab>
+      <Tab value="bun">
+```bash
+bun add @mrdoge/client
+```
+      </Tab>
+    </Tabs>
+  </Tab>
+  <Tab value="@mrdoge/http">
+    <Tabs items={["npm", "pnpm", "yarn", "bun"]} groupId="package-manager" persist>
+      <Tab value="npm">
+```bash
+npm i @mrdoge/http
+```
+      </Tab>
+      <Tab value="pnpm">
+```bash
+pnpm add @mrdoge/http
+```
+      </Tab>
+      <Tab value="yarn">
+```bash
+yarn add @mrdoge/http
+```
+      </Tab>
+      <Tab value="bun">
+```bash
+bun add @mrdoge/http
+```
+      </Tab>
+    </Tabs>
+  </Tab>
+</Tabs>
+
+## Create a client
+
+<Tabs items={["@mrdoge/node", "@mrdoge/client", "@mrdoge/http"]}>
+  <Tab value="@mrdoge/node">
+```ts
+import { MrDoge } from "@mrdoge/node";
+
+const mrdoge = new MrDoge({
+  apiKey: process.env.MRDOGE_API_KEY!,
+});
+
+const { data: matches } = await mrdoge.matches.list({
+  sports: ["soccer"],
+  limit: 10,
+});
+```
+  </Tab>
+  <Tab value="@mrdoge/client">
+```ts
+import { MrDoge } from "@mrdoge/client";
+
+const mrdoge = new MrDoge({
+  // your backend route that mints short-lived JWTs
+  authEndpoint: "/api/mrdoge/token",
+});
+
+const sub = await mrdoge.matches.subscribeLive({ sports: ["soccer"] });
+sub.on("match.upd", (match) => render(match));
+```
+  </Tab>
+  <Tab value="@mrdoge/http">
+```ts
+import { createHttpClient } from "@mrdoge/http";
+
+const mrdoge = createHttpClient({
+  apiKey: process.env.MRDOGE_API_KEY!,
+});
+
+const { data: recs } = await mrdoge.call("ai.recommendations.list", {
+  minEdge: 0.05,
+  confidence: "High",
+  limit: 20,
+});
+```
+  </Tab>
+</Tabs>
+
+## Get an API key
+
+Head to your [dashboard](/dashboard/keys) to mint an `sk_live_…` key.
+Keys share your account's tier and rate limit, and you can mint additional
+keys per environment so you can revoke one without affecting the others.
+
+<Callout type="warn">
+  Never ship `sk_live_…` keys in client-side code. For browser or React
+  Native apps, the flow is **two packages**:
+
+  - **Your backend** installs `@mrdoge/node` and exposes a token-mint route
+    that calls `mrdoge.tokens.create()`. This route is the only place your
+    `sk_live_…` key ever lives.
+  - **Your frontend** installs `@mrdoge/client` and points it at that
+    route. The SDK fetches a short-lived JWT, refreshes it before expiry,
+    and never sees the API key.
+
+  Full walkthrough in [authentication](/docs/authentication).
+</Callout>
+
+## Constructor options
+
+Both `@mrdoge/node` and `@mrdoge/client` accept a few common options:
+
+| Option | Type | Notes |
+|--------|------|-------|
+| `baseUrl` | `string` | Server URL override. Default `wss://api.mrdoge.co/sdk/v1`. |
+| `locale` | `string` | Default locale, e.g. `"en"`, `"pt-BR"`, `"es"`. |
+| `timezone` | `string` | Default timezone (IANA), e.g. `"America/Sao_Paulo"`. |
+| `requestTimeoutMs` | `number` | Per-call timeout. Default `10000`. |
+| `maxReconnectAttempts` | `number` | Reconnect cap. Default `Infinity`. |
+
+Node-specific:
+
+| Option | Type | Notes |
+|--------|------|-------|
+| `apiKey` | `string` | Required. `sk_live_…`. |
+| `compression` | `boolean` | `permessage-deflate` on WS. Default `true`. |
+
+Client-specific:
+
+| Option | Type | Notes |
+|--------|------|-------|
+| `authEndpoint` | `string` | URL to POST for tokens. Required (or `fetchToken`). |
+| `fetchToken` | `() => Promise<{token, expiresAt}>` | Custom token fetcher. |
+| `authHeaders` | `Record<string,string>` | Extra headers on the auth POST. |
+| `refreshLeewaySec` | `number` | Seconds before expiry to refresh. Default `30`. |
+
+## Next
+
+<Cards>
+  <Card href="/docs/authentication" title="Authentication →" description="API keys, JWT tokens, and the auth flow for each package." />
+  <Card href="/docs/quickstart" title="Quickstart →" description="Your first live match subscription in 5 minutes." />
+</Cards>

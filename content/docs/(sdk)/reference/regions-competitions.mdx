@@ -1,0 +1,146 @@
+---
+title: Regions & Competitions
+description: The geographic and competition catalogue underpinning matches and teams.
+---
+
+`regions` and `competitions` are the discovery endpoints — use them to
+build sport/region/competition pickers.
+
+## `regions.list`
+
+List regions (countries, federations) optionally filtered by sport, status,
+and date.
+
+```ts
+const regions = await mrdoge.regions.list({
+  sports: ["soccer"],
+  date: "2026-05-18",
+});
+
+for (const region of regions) {
+  console.log(region.name, `(${region.competitionCount} competitions)`);
+}
+```
+
+**Params:**
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `sports` | `string[]` | Filter by one or more sports |
+| `status` | `MatchStatus[]` | Only regions with matches in this status |
+| `date` / `startDate` / `endDate` | `string` | Date filter |
+| `timezone` | `string` | IANA timezone |
+| `locale` | `string` | Localization |
+
+**Returns:** `Region[]`
+
+```ts
+type Region = {
+  id: number;
+  name: string;                     // localized, e.g. "England" / "Inglaterra"
+  eventCount?: number;              // only when filtered
+  competitionCount?: number;        // only when filtered
+  competitionIds?: number[];        // only when filtered
+};
+```
+
+When **at least one** filter is applied (`date`, `sports`, `status`),
+each region includes `eventCount`, `competitionCount`, and
+`competitionIds`. Without filters, the response is the full catalogue
+without counts.
+
+## `competitions.list`
+
+List competitions (leagues, tournaments).
+
+```ts
+const competitions = await mrdoge.competitions.list({
+  regionIds: [1],
+  sports: ["soccer"],
+  date: "2026-05-18",
+  limit: 50,
+});
+
+for (const c of competitions) {
+  console.log(c.name, `(${c.eventCount} matches)`);
+}
+```
+
+**Params:**
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `regionIds` | `number[]` | Filter to one or more regions |
+| `sports` | `string[]` | Filter by one or more sports |
+| `status` | `MatchStatus[]` | Match phase |
+| `date` / `startDate` / `endDate` | `string` | Date filter |
+| `timezone` | `string` | IANA timezone |
+| `locale` | `string` | Localization |
+| `limit` | `number` | Max 200 |
+
+**Returns:** `Competition[]`
+
+```ts
+type Competition = {
+  id: number;
+  name: string;                     // localized
+  regionId: number;
+  eventCount?: number;              // only when filtered
+};
+```
+
+## Region flags
+
+Render region flags via the public image endpoint:
+
+```tsx
+<img
+  src={`https://api.mrdoge.co/images/regions/${region.id}.png`}
+  alt={region.name}
+/>
+```
+
+No auth, 1-year immutable cache. See [Images](/docs/reference/images) for
+Next.js / React Native setup, missing-image fallbacks, and performance
+notes.
+
+<Callout type="info">
+  Competition logos are **not** available as an image endpoint. For
+  competition branding in UI, use the parent region's flag or a text-only
+  treatment of the competition name.
+</Callout>
+
+## Discovery pattern
+
+Sport picker → region picker → competition picker → matches:
+
+```ts
+// 1. user picks sport
+const sport = "soccer";
+
+// 2. show regions with at least one live match
+const regions = await mrdoge.regions.list({
+  sports: [sport],
+  status: ["live"],
+});
+
+// 3. user picks region — show its competitions
+const competitions = await mrdoge.competitions.list({
+  sports: [sport],
+  regionIds: [chosenRegion.id],
+  status: ["live"],
+});
+
+// 4. user picks competition — show matches
+const { data: matches } = await mrdoge.matches.list({
+  competitionIds: [chosenCompetition.id],
+  status: ["live"],
+});
+```
+
+## Next
+
+<Cards>
+  <Card href="/docs/reference/matches" title="Matches →" description="Filter by region, competition, team, or date." />
+  <Card href="/docs/reference/teams" title="Teams →" description="The teams living inside each competition." />
+</Cards>

@@ -1,0 +1,138 @@
+---
+title: Express
+description: Express middleware and route handlers using the SDK.
+---
+
+## Install
+
+```bash
+npm i @mrdoge/node express
+```
+
+## Singleton client
+
+Create one client per process and reuse it across requests — the SDK pools
+the WebSocket and rate-limit state automatically.
+
+```ts title="lib/mrdoge.ts"
+import { MrDoge } from "@mrdoge/node";
+
+export const mrdoge = new MrDoge({
+  apiKey: process.env.MRDOGE_API_KEY!,
+});
+```
+
+## Route: list matches
+
+```ts title="routes/matches.ts"
+import { Router } from "express";
+import { mrdoge } from "../lib/mrdoge";
+
+const router = Router();
+
+router.get("/api/matches", async (req, res) => {
+  try {
+    const { data } = await mrdoge.matches.list({
+      sports: req.query.sport ? [req.query.sport as string] : undefined,
+      status: req.query.status ? [req.query.status as never] : undefined,
+      limit: Number(req.query.limit ?? 20),
+    });
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
+});
+
+export default router;
+```
+
+## Route: mint a token for the browser
+
+Pair Express with `@mrdoge/client` in the browser — your backend never
+exposes the API key:
+
+```ts title="routes/token.ts"
+import { Router } from "express";
+import { mrdoge } from "../lib/mrdoge";
+
+const router = Router();
+
+router.post("/api/mrdoge/token", async (req, res) => {
+  // Optional: gate by your session
+  // if (!req.session?.userId) return res.sendStatus(401);
+
+  const { token, expiresAt } = await mrdoge.tokens.create({ ttl: 600 });
+  res.json({ token, expiresAt });
+});
+
+export default router;
+```
+
+## Error handler middleware
+
+Centralize error handling with a typed catch:
+
+```ts title="middleware/sdk-errors.ts"
+import {
+  RateLimitError,
+  ForbiddenError,
+  UnauthorizedError,
+  ValidationError,
+} from "@mrdoge/node";
+
+export function sdkErrors(err: any, req: any, res: any, next: any) {
+  if (err instanceof RateLimitError) {
+    return res.status(429).json({ error: "rate_limited", data: err.data });
+  }
+  if (err instanceof ForbiddenError) {
+    return res.status(403).json({ error: "forbidden", data: err.data });
+  }
+  if (err instanceof UnauthorizedError) {
+    return res.status(401).json({ error: "unauthorized" });
+  }
+  if (err instanceof ValidationError) {
+    return res.status(400).json({ error: "validation", data: err.data });
+  }
+  next(err);
+}
+```
+
+Mount after your routes:
+
+```ts
+app.use(sdkErrors);
+```
+
+## Streaming responses
+
+For Server-Sent Events on top of `subscribeLive`:
+
+```ts
+router.get("/api/matches/live", async (req, res) => {
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+
+  const sub = await mrdoge.matches.subscribeLive({ sports: ["soccer"] });
+
+  // initial snapshot
+  res.write(`data: ${JSON.stringify({ snapshot: sub.snapshot })}\n\n`);
+
+  // live deltas
+  sub.on("match.upd", (match) => {
+    res.write(`data: ${JSON.stringify({ type: "upd", match })}\n\n`);
+  });
+  sub.on("match.del", (matchId) => {
+    res.write(`data: ${JSON.stringify({ type: "del", matchId })}\n\n`);
+  });
+
+  req.on("close", () => sub.cancel());
+});
+```
+
+## Next
+
+<Cards>
+  <Card href="/docs/guides/nestjs" title="NestJS →" description="Injectable service, module setup." />
+  <Card href="/docs/concepts/errors" title="Error handling →" description="The full error class catalog." />
+</Cards>

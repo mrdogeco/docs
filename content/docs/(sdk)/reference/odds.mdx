@@ -1,0 +1,185 @@
+---
+title: Odds
+description: Live order books for a single match — one-shot snapshots or streaming deltas.
+---
+
+The `odds` resource is dedicated to live betting markets. It replaces the
+old `match.stats.liveBetItems` field — markets are no longer nested
+inside the `Match` shape, so customers who only render scores and stats
+pay zero bandwidth for an order book they don't use.
+
+<Callout type="info">
+  Requires the **Business tier**. [Upgrade →](/dashboard/billing)
+</Callout>
+
+## `odds.list`
+
+One-shot snapshot of every live market for a single match. Backed by the
+same in-memory cache as `odds.subscribe`'s initial snapshot — typical
+latency well under 100ms.
+
+```ts
+const markets = await mrdoge.odds.list({
+  matchId: "46215510",
+  locale: "es",
+});
+
+for (const market of markets) {
+  console.log(market.betType, "—", market.betItems.length, "items");
+  for (const item of market.betItems) {
+    console.log(`  ${item.code} (${item.caption}) @ ${item.price}`);
+  }
+}
+```
+
+**Params:**
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `matchId` | `string` | Required |
+| `betTypes` | `string[]` | Restrict to one or more market sysnames (e.g. `["SOCCER_MATCH_RESULT", "SOCCER_UNDER_OVER"]`) |
+| `select` | `MarketSelect` | Field selector — see [selectors](/docs/reference/matches#selectors) |
+| `locale` | `string` | Localizes each bet item's `caption` |
+
+**Returns:** `Market[]` — every available live market for the match.
+
+## `odds.subscribe`
+
+WebSocket subscription pushing the full latest markets array on every
+change. State-snapshot semantics — clients replace, never merge.
+
+```ts
+const sub = await mrdoge.odds.subscribe({
+  matchId: "46215510",
+  betTypes: ["SOCCER_MATCH_RESULT"],
+});
+
+// Initial snapshot (already populated from the cache cold-start)
+console.log("Snapshot:", sub.snapshot.length, "markets");
+
+// Live updates — the full markets array on every change
+sub.on("odds.upd", (markets) => repriceLines(markets));
+
+// Clean shutdown when the match completes
+sub.on("closed", ({ reason, message }) => {
+  if (reason === "data_unavailable" && message === "match_completed") {
+    teardownUi();
+  }
+});
+
+await sub.cancel();
+```
+
+**Params:**
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `matchId` | `string` | Required |
+| `betTypes` | `string[]` | Restrict pushes to specific market sysnames |
+| `select` | `MarketSelect` | Field selector applies to snapshot AND every push |
+| `locale` | `string` | Localizes each push's bet item captions |
+
+**Returns:** `Subscription<"odds.subscribe">` — see
+[subscriptions](/docs/reference/subscriptions).
+
+**Push events:** `odds.upd` — the full `Market[]` for the match.
+
+## The `Market` shape
+
+```ts
+type Market = {
+  id: string;
+  /** Market sysname, e.g. "SOCCER_MATCH_RESULT", "SOCCER_UNDER_OVER". */
+  betType: string;
+  betItems: BetItem[];
+};
+
+type BetItem = {
+  id: string;
+  /** Stable outcome identifier (`"1"`, `"X"`, `"2"`, `"O2.5"`, etc.). Locale-independent. */
+  code: string;
+  /** Formatted display label, localized per `locale`. See Localization below. */
+  caption: string | null;
+  /** Decimal odds (e.g. 2.10). */
+  price: number;
+  isAvailable: boolean;
+};
+```
+
+## Filtering by `betTypes`
+
+Pass `betTypes` to restrict the response to specific market sysnames.
+Matching is case-insensitive against `Market.betType`:
+
+```ts
+// Just the headline markets
+await mrdoge.odds.list({
+  matchId,
+  betTypes: [
+    "SOCCER_MATCH_RESULT",
+    "SOCCER_UNDER_OVER",
+    "SOCCER_BOTH_TEAMS_TO_SCORE",
+  ],
+});
+```
+
+For `odds.subscribe`, the filter applies to **every push** — you don't
+re-broadcast filtered-out market updates to the customer over the wire.
+A subscription scoped to two market types receives only those markets'
+deltas; the others are dropped server-side.
+
+## Localization
+
+`code` is the same identifier across every locale. `caption` is the
+formatted human-readable label of the bet item. Pass `locale` to choose
+the language; defaults to `"en"`.
+
+Resolution order:
+
+1. Per-call `locale` param
+2. Connection-level `X-Locale` header from auth
+3. `"en"`
+
+## Subscription completion
+
+When the underlying match completes (final whistle, abandonment), the
+gateway terminates every `odds.subscribe` for that match with a
+`subscription.closed` notification:
+
+```ts
+sub.on("closed", ({ reason, message }) => {
+  if (reason === "data_unavailable" && message === "match_completed") {
+    teardownUi();
+  }
+});
+```
+
+No final push fires — the order book is gone. Stats subscribers
+(`matches.subscribe`) receive a `status.upd` event instead; odds is
+terminal because there's nothing live left to stream.
+
+## Pattern: render a live odds board with filtering
+
+```ts
+const sub = await mrdoge.odds.subscribe({
+  matchId,
+  betTypes: ["SOCCER_MATCH_RESULT", "SOCCER_UNDER_OVER", "SOCCER_BOTH_TEAMS_TO_SCORE"],
+  locale: "en",
+  select: {
+    id: true,
+    betType: true,
+    betItems: { code: true, caption: true, price: true, isAvailable: true },
+  },
+});
+
+renderBoard(sub.snapshot);
+sub.on("odds.upd", renderBoard);
+```
+
+## Next
+
+<Cards>
+  <Card href="/docs/reference/matches" title="Matches →" description="Match stats and clock for the matches whose odds you're streaming." />
+  <Card href="/docs/reference/recommendations" title="AI Recommendations →" description="Edge-scored picks against these markets." />
+  <Card href="/docs/concepts/tiers" title="Tiers →" description="Odds methods require Business and up." />
+</Cards>

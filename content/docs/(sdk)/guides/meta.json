@@ -1,0 +1,12 @@
+{
+  "title": "Guides",
+  "pages": [
+    "index",
+    "nextjs",
+    "node",
+    "express",
+    "nestjs",
+    "react-native",
+    "cloudflare-workers"
+  ]
+}

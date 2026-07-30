@@ -1,0 +1,206 @@
+---
+title: Next.js
+description: Full-stack Next.js with route handlers for token minting and browser-side subscriptions.
+---
+
+Next.js is the recommended path — server components for one-shot reads,
+client components for live subscriptions, and a route handler that mints
+JWTs so your API key never leaves the server.
+
+## Install
+
+```bash
+npm i @mrdoge/node @mrdoge/client
+```
+
+`@mrdoge/node` for the server (API key auth), `@mrdoge/client` for the
+browser (JWT auth).
+
+## Server: mint tokens for the browser
+
+```ts title="app/api/mrdoge/token/route.ts"
+import { NextResponse } from "next/server";
+import { MrDoge } from "@mrdoge/node";
+
+const mrdoge = new MrDoge({ apiKey: process.env.MRDOGE_API_KEY! });
+
+export async function POST() {
+  // Optional: gate by your auth session
+  // const session = await auth();
+  // if (!session) return new Response("Unauthorized", { status: 401 });
+
+  const { token, expiresAt } = await mrdoge.tokens.create({ ttl: 600 });
+  return NextResponse.json({ token, expiresAt });
+}
+```
+
+## Browser: subscribe to live matches
+
+```tsx title="app/live/page.tsx"
+"use client";
+
+import { useEffect, useState } from "react";
+import { MrDoge, type Match } from "@mrdoge/client";
+
+const mrdoge = new MrDoge({
+  authEndpoint: "/api/mrdoge/token",
+});
+
+export default function LivePage() {
+  const [matches, setMatches] = useState<Match[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    let sub: Awaited<ReturnType<typeof mrdoge.matches.subscribeLive>> | null =
+      null;
+
+    (async () => {
+      sub = await mrdoge.matches.subscribeLive({ sports: ["soccer"] });
+      if (cancelled) {
+        sub.cancel();
+        return;
+      }
+      setMatches(sub.snapshot);
+
+      sub.on("match.upd", (match) => {
+        setMatches((prev) => {
+          const i = prev.findIndex((m) => m.id === match.id);
+          if (i >= 0) {
+            const next = [...prev];
+            next[i] = match;
+            return next;
+          }
+          return [...prev, match];
+        });
+      });
+
+      sub.on("match.del", (matchId) => {
+        setMatches((prev) => prev.filter((m) => m.id !== matchId));
+      });
+    })();
+
+    return () => {
+      cancelled = true;
+      sub?.cancel();
+    };
+  }, []);
+
+  return (
+    <ul>
+      {matches.map((m) => (
+        <li key={m.id}>
+          {m.homeTeam.name} {m.stats?.homeScore}–{m.stats?.awayScore}{" "}
+          {m.awayTeam.name}
+        </li>
+      ))}
+    </ul>
+  );
+}
+```
+
+## Foreground wake-up (optional)
+
+When the user tabs away and comes back, the WebSocket may be dead while the
+SDK's reconnect loop is sleeping in backoff. Wire `pingOrReconnect()` to
+`visibilitychange` so the first interaction after refocus is instant:
+
+```tsx title="app/live/page.tsx"
+"use client";
+
+import { useEffect } from "react";
+import { mrdoge } from "@/lib/mrdoge";
+
+useEffect(() => {
+  const onVisible = () => {
+    if (document.visibilityState === "visible") mrdoge.pingOrReconnect();
+  };
+  const onOnline = () => mrdoge.pingOrReconnect();
+  document.addEventListener("visibilitychange", onVisible);
+  window.addEventListener("online", onOnline);
+  return () => {
+    document.removeEventListener("visibilitychange", onVisible);
+    window.removeEventListener("online", onOnline);
+  };
+}, []);
+```
+
+`pingOrReconnect()` is a no-op when the socket is healthy, so it's cheap
+to call on every event. See the
+[Subscriptions reference →](/docs/reference/subscriptions#pingorreconnect--focus-aware-wake-up)
+for full mechanics.
+
+## Server components: one-shot reads
+
+For SSR / RSC, use `@mrdoge/node` directly — no client component, no
+hydration cost:
+
+```tsx title="app/recommendations/page.tsx"
+import { MrDoge } from "@mrdoge/node";
+
+const mrdoge = new MrDoge({ apiKey: process.env.MRDOGE_API_KEY! });
+
+export default async function RecommendationsPage() {
+  const { data: recs } = await mrdoge.ai.recommendations.list({
+    minEdge: 0.05,
+    confidence: "High",
+    limit: 20,
+  });
+
+  return (
+    <ul>
+      {recs.map((r) => (
+        <li key={r.id}>
+          <strong>{r.outcome}</strong> @ {r.odds.toFixed(2)} ({r.confidence})
+          <span> · edge {(r.edgePercentage * 100).toFixed(1)}%</span>
+          <ul>
+            {r.rationale.map((line, i) => (
+              <li key={i}>{line}</li>
+            ))}
+          </ul>
+        </li>
+      ))}
+    </ul>
+  );
+}
+```
+
+Pair with `export const revalidate = 60` for ISR.
+
+## Environment variables
+
+```bash title=".env.local"
+MRDOGE_API_KEY=sk_live_…
+```
+
+Don't prefix with `NEXT_PUBLIC_` — that exposes the key to the bundle.
+
+## Edge runtime
+
+The route handler can run on the edge by exporting `runtime`:
+
+```ts
+export const runtime = "edge";
+```
+
+`@mrdoge/node` doesn't work on edge (it opens WebSockets). Swap to
+`@mrdoge/http`:
+
+```ts
+import { createHttpClient } from "@mrdoge/http";
+
+const mrdoge = createHttpClient({ apiKey: process.env.MRDOGE_API_KEY! });
+
+export async function POST() {
+  const { token, expiresAt } = await mrdoge.call("tokens.create", {
+    ttl: 600,
+  });
+  return Response.json({ token, expiresAt });
+}
+```
+
+## Next
+
+<Cards>
+  <Card href="/docs/guides/react-native" title="React Native →" description="Same token pattern, mobile-specific tips." />
+  <Card href="/docs/reference/tokens" title="Tokens reference →" description="ttl bounds, refresh behaviour, security notes." />
+</Cards>

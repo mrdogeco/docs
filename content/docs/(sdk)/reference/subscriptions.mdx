@@ -1,0 +1,229 @@
+---
+title: Subscriptions
+description: Lifecycle, events, and cancellation for live WebSocket subscriptions.
+---
+
+Subscriptions are long-lived WebSocket channels — the server pushes events
+to you as data changes. The SDK abstracts framing, auth, and reconnection.
+
+## Subscription handle
+
+Every `subscribe*` method returns a typed `Subscription`:
+
+```ts
+class Subscription<M> {
+  readonly id: string;          // server-assigned (or "__pending_ws__" briefly during cold-start race)
+  readonly snapshot: SnapshotOf<M>;
+  on(event: PushEvent, fn: (data) => void): () => void;
+  on("snapshot", fn): () => void;
+  on("closed", fn): () => void;
+  cancel(): Promise<void>;
+}
+```
+
+Listen via `.on()` — never via constructor callbacks.
+
+## Methods that return subscriptions
+
+| Method | Snapshot type | Push events |
+|--------|---------------|-------------|
+| `matches.subscribeLive` | `Match[]` | `match.upd`, `match.del` |
+| `matches.subscribe` | `MatchDetail` | `stats.upd`, `status.upd` |
+| `odds.subscribe` | `Market[]` | `odds.upd` |
+
+`matches.subscribeLive` requires **Growth** tier; per-match
+`matches.subscribe` and `odds.subscribe` require **Business** tier.
+
+## Snapshot delivery
+
+The first thing every subscription delivers is `snapshot` — the current
+state matching your filters.
+
+```ts
+const sub = await mrdoge.matches.subscribeLive({ sports: ["soccer"] });
+console.log(sub.snapshot); // already populated
+```
+
+For `subscribeLive`, the snapshot arrives over HTTP (cache hit in ~100ms)
+while the WebSocket connects in parallel. The WS picks up live deltas as
+soon as it's ready. See [the race details →](/docs/concepts/transports#the-subscribelive-race).
+
+When the WS lands after HTTP won the race, the SDK fires a `snapshot`
+event with the canonical state:
+
+```ts
+sub.on("snapshot", (snapshot) => {
+  // optional — fires once when WS catches up with the HTTP snapshot,
+  // or after a reconnect
+});
+```
+
+## Event listeners
+
+### `matches.subscribeLive`
+
+```ts
+const sub = await mrdoge.matches.subscribeLive({ sports: ["soccer"] });
+
+sub.on("match.upd", (match) => {
+  // match: Match — full payload with the latest fields
+});
+
+sub.on("match.del", (matchId) => {
+  // matchId: string — match dropped out of the filter window
+});
+```
+
+### `matches.subscribe` (single match)
+
+```ts
+const sub = await mrdoge.matches.subscribe({ matchId: "match_abc" });
+
+sub.on("stats.upd", (stats) => {
+  // stats: MatchStats — full latest state, replace not merge
+});
+
+sub.on("status.upd", ({ status }) => {
+  // status: "upcoming" | "live" | "completed"
+});
+```
+
+### `odds.subscribe` (single match)
+
+```ts
+const sub = await mrdoge.odds.subscribe({ matchId: "match_abc" });
+
+sub.on("odds.upd", (markets) => {
+  // markets: Market[] — full refreshed book, replace not merge
+});
+```
+
+Splitting `matches.subscribe` (stats) from `odds.subscribe` (markets)
+means stats-only customers don't pay the WebSocket cost of streaming an
+order book, and odds-only customers don't pay the stats fanout. Use
+both together if you need both streams for the same match.
+
+## Cancellation
+
+Always cancel when you're done:
+
+```ts
+await sub.cancel();
+```
+
+This sends `subscription.cancel` to the server, frees a subscription slot,
+and releases server resources. Leaking subscriptions eats your tier's
+concurrent quota.
+
+In React, cancel on unmount:
+
+```tsx
+useEffect(() => {
+  let sub: Awaited<ReturnType<typeof mrdoge.matches.subscribeLive>> | null = null;
+
+  mrdoge.matches
+    .subscribeLive({ sports: ["soccer"] })
+    .then((s) => {
+      sub = s;
+      s.on("match.upd", setMatch);
+    });
+
+  return () => {
+    sub?.cancel();
+  };
+}, []);
+```
+
+## `closed` events
+
+The subscription can close for several reasons. Listen and react:
+
+```ts
+sub.on("closed", ({ reason, message }) => {
+  console.log("Closed:", reason, message);
+});
+```
+
+Common `reason` values:
+
+| Reason | When |
+|--------|------|
+| `user_cancelled` | You called `sub.cancel()` |
+| `disconnected` | WebSocket dropped and reconnect gave up |
+| `rate_limited` | Subscription quota exceeded |
+| `unauthorized` | Token expired and refresh failed |
+| `internal_error` | Server error in the subscription pipeline |
+
+## Concurrent limits
+
+The cap is **per WebSocket connection**, not per key. Each connection
+maintains its own subscription map and rejects new subscriptions over the
+cap:
+
+| Tier | Subs per connection |
+|------|---------------------|
+| Free | 5 |
+| Starter | 25 |
+| Growth | 100 |
+| Business | 500 |
+
+A single key can hold **multiple connections** (browser tabs, server
+instances) up to that tier's [connection cap](/docs/concepts/tiers).
+Effective max subs per key = `subs/conn × max connections`.
+
+Exceeding a single connection's cap throws `SubscriptionLimitError` at
+`subscribe*` time. Cancel an old subscription on the same connection, open
+a new connection, or upgrade tier.
+
+## Reconnection
+
+When the WebSocket drops, the SDK reconnects automatically with exponential
+backoff:
+
+1. WS drops (network blip, server restart)
+2. SDK reconnects, re-authenticates
+3. SDK resubscribes to active subscriptions
+4. New snapshot delivered via the `snapshot` event
+5. Deltas resume on the same `Subscription` handle
+
+You don't need to do anything — your `match.upd` / `stats.upd` etc.
+listeners keep firing.
+
+### `pingOrReconnect()` — focus-aware wake-up
+
+The SDK can't subscribe to OS-level focus signals on its own (no DOM or
+React Native runtime dependency). When the device comes back from a long
+background or a network drop, the WebSocket may be dead while the SDK's
+reconnect loop is still mid-backoff sleep — meaning the first user
+interaction pays that backoff delay.
+
+Wire `mrdoge.pingOrReconnect()` to your platform's focus event. It's a
+no-op when the socket is healthy, fires a reconnect when it's dead, and
+wakes the backoff loop when one is sleeping.
+
+```ts
+// React Native
+import { AppState } from "react-native";
+AppState.addEventListener("change", (state) => {
+  if (state === "active") mrdoge.pingOrReconnect();
+});
+
+// Browser / Next.js (client component)
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") mrdoge.pingOrReconnect();
+});
+window.addEventListener("online", () => mrdoge.pingOrReconnect());
+```
+
+Server-side consumers (`@mrdoge/node`) have no focus concept and don't
+need this.
+
+Never throws — failures fall through to the SDK's normal reconnect
+machinery.
+
+## Next
+
+<Cards>
+  <Card href="/docs/reference/matches" title="Matches →" description="subscribeLive and subscribe details." />
+  <Card href="/docs/concepts/errors" title="Errors →" description="Catching subscription failures and rate limits." />
+</Cards>

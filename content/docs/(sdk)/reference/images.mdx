@@ -1,0 +1,214 @@
+---
+title: Images
+description: Public CDN endpoints for team and region logos — cached, immutable, no auth required.
+---
+
+The Mr. Doge platform serves team and region logos at stable public URLs.
+No API key, no auth header, no SDK call — render them directly from `<img>`
+or `<Image>` tags.
+
+## Endpoints
+
+| Resource | URL pattern |
+|----------|-------------|
+| Team logo | `https://api.mrdoge.co/images/teams/<teamId>.png` |
+| Region flag | `https://api.mrdoge.co/images/regions/<regionId>.png` |
+
+Both return `200 OK` with `Content-Type: image/png` when the image exists.
+
+## Caching
+
+Every response sets:
+
+```http
+Cache-Control: public, max-age=31536000, immutable
+```
+
+That's **one year, immutable** — safe to cache aggressively on CDNs,
+service workers, and browser caches. The IDs are stable identifiers, so an
+update to a team's logo will only land when a new image is uploaded
+server-side (which happens infrequently and is treated as a new asset).
+
+## Use with the SDK
+
+The `Team` and `Region` shapes returned by the SDK don't include the image
+URL directly — construct it from the `id`:
+
+```ts
+import { MrDoge } from "@mrdoge/node";
+
+const mrdoge = new MrDoge({ apiKey: process.env.MRDOGE_API_KEY! });
+
+const teams = await mrdoge.teams.list({ sports: ["soccer"], limit: 20 });
+
+for (const team of teams) {
+  console.log(`https://api.mrdoge.co/images/teams/${team.id}.png`);
+}
+```
+
+A small helper keeps it tidy:
+
+```ts
+export function teamLogo(id: number) {
+  return `https://api.mrdoge.co/images/teams/${id}.png`;
+}
+
+export function regionFlag(id: number) {
+  return `https://api.mrdoge.co/images/regions/${id}.png`;
+}
+```
+
+## In your app
+
+<Tabs items={["HTML", "Next.js", "React Native"]}>
+  <Tab value="HTML">
+```tsx
+<img
+  src={`https://api.mrdoge.co/images/teams/${team.id}.png`}
+  alt={team.name}
+  width={32}
+  height={32}
+/>
+```
+
+Plain `<img>` tags work everywhere. The 1-year cache header means
+subsequent loads come from the browser cache.
+  </Tab>
+  <Tab value="Next.js">
+Allow the host in `next.config.ts`:
+
+```ts title="next.config.ts"
+import type { NextConfig } from "next";
+
+const config: NextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "api.mrdoge.co",
+        pathname: "/images/**",
+      },
+    ],
+  },
+};
+
+export default config;
+```
+
+Then use `next/image`:
+
+```tsx
+import Image from "next/image";
+
+<Image
+  src={`https://api.mrdoge.co/images/teams/${team.id}.png`}
+  alt={team.name}
+  width={32}
+  height={32}
+/>
+```
+
+Next.js will pull the image through its optimization pipeline and serve
+WebP/AVIF where supported.
+  </Tab>
+  <Tab value="React Native">
+```tsx
+import { Image } from "react-native";
+// or, recommended: expo-image
+// import { Image } from "expo-image";
+
+<Image
+  source={{ uri: `https://api.mrdoge.co/images/teams/${team.id}.png` }}
+  style={{ width: 32, height: 32 }}
+/>
+```
+
+`expo-image` honours `Cache-Control` properly and dedupes concurrent loads
+of the same URL — recommended over `react-native`'s built-in `Image` for
+production apps.
+  </Tab>
+</Tabs>
+
+## Missing images
+
+Not every team or region has a logo in the catalog. If the image is
+missing, the endpoint returns a non-200 status. Handle it with a fallback:
+
+<Tabs items={["HTML", "React"]}>
+  <Tab value="HTML">
+```html
+<img
+  src="https://api.mrdoge.co/images/teams/14.png"
+  alt="Liverpool"
+  onerror="this.src='/fallback-team.png'"
+/>
+```
+  </Tab>
+  <Tab value="React">
+```tsx
+const [src, setSrc] = useState(`https://api.mrdoge.co/images/teams/${team.id}.png`);
+
+<img
+  src={src}
+  alt={team.name}
+  onError={() => setSrc("/fallback-team.png")}
+/>
+```
+  </Tab>
+</Tabs>
+
+A colored circle with the team's initials is a common fallback — works
+without needing a generic asset:
+
+```tsx
+function TeamLogo({ team }: { team: { id: number; name: string } }) {
+  const [failed, setFailed] = useState(false);
+
+  if (failed) {
+    return (
+      <div className="initials-circle">
+        {team.name.split(" ").map((w) => w[0]).join("").slice(0, 2)}
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={`https://api.mrdoge.co/images/teams/${team.id}.png`}
+      alt={team.name}
+      onError={() => setFailed(true)}
+    />
+  );
+}
+```
+
+## What you don't get
+
+- **No on-the-fly resizing.** The endpoint serves the source PNG as-is.
+  For responsive sizes, run images through your own optimizer (`next/image`,
+  Cloudflare Images, imgix, etc.).
+- **No format negotiation.** PNG only. Use your image-optimization layer
+  to convert to WebP/AVIF.
+- **No competition logos.** Only `teams` and `regions` have image
+  endpoints. For competition branding, use the region's flag or the home
+  team's logo as a contextual fallback.
+- **No player headshots.** Player references inside `MatchStats` are
+  name-only — no per-player imagery.
+
+## Performance notes
+
+- **CDN-cached.** Cached at the edge in front of `api.mrdoge.co` and at
+  the browser/SW layer. Cold-fetch is a single round-trip; subsequent
+  loads come from cache.
+- **No auth round-trip.** The endpoint is excluded from API-key auth
+  middleware — no `Authorization` header required.
+- **Concurrent dedup.** When many UI cards mount simultaneously and
+  request the same URL, both browsers and `expo-image` dedupe to a single
+  fetch.
+
+## Next
+
+<Cards>
+  <Card href="/docs/reference/teams" title="Teams →" description="The team objects whose IDs you'll feed into the image URL." />
+  <Card href="/docs/reference/regions-competitions" title="Regions →" description="The region IDs for flag rendering." />
+</Cards>

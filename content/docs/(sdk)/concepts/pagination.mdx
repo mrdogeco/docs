@@ -1,0 +1,137 @@
+---
+title: Pagination
+description: Keyset cursors, the listAll helper, and progressive rendering for large result sets.
+---
+
+List endpoints (`matches.list`, `ai.recommendations.list`) use **keyset
+cursor pagination**. Each page returns a cursor pointing to the next, and
+the cursor is drift-safe — rows added or removed between pages won't
+cause duplicates or gaps.
+
+## The response shape
+
+```ts
+type Paginated<T> = {
+  data: T[];
+  pagination: {
+    nextCursor: string | null; // null when there's no more
+    hasMore: boolean;
+  };
+};
+```
+
+## Manual cursor walk
+
+```ts
+let cursor: string | undefined = undefined;
+const all: Match[] = [];
+
+while (true) {
+  const page = await mrdoge.matches.list({
+    sports: ["soccer"],
+    limit: 100,
+    cursor,
+  });
+
+  all.push(...page.data);
+  if (!page.pagination.hasMore) break;
+  cursor = page.pagination.nextCursor ?? undefined;
+}
+```
+
+<Callout type="info">
+  Cursors are **opaque base64 strings**. Don't parse, decode, or modify
+  them — just pass them back to the next request.
+</Callout>
+
+## The `listAll` helper
+
+For most cases, use `listAll` instead — it walks the cursors for you:
+
+```ts
+const all = await mrdoge.matches.listAll({
+  sports: ["soccer"],
+  // no `cursor` — listAll manages it
+});
+
+console.log(all.length); // every match across all pages
+```
+
+`listAll` is available on both paginated resources:
+
+```ts
+const allRecs = await mrdoge.ai.recommendations.listAll({ minEdge: 0.05 });
+const allMatches = await mrdoge.matches.listAll({ status: ["live"] });
+```
+
+## Progressive rendering with `onPage`
+
+For large result sets, render incrementally as pages arrive:
+
+```ts
+const matches: Match[] = [];
+
+await mrdoge.matches.listAll(
+  { sports: ["soccer"] },
+  {
+    onPage: (page, accumulated) => {
+      matches.push(...page);
+      render(matches); // update UI per page, don't wait for full walk
+    },
+  },
+);
+```
+
+This is how the Mr. Doge mobile app renders the matches feed — the first
+100 matches show up immediately, the rest stream in.
+
+## Cancellation
+
+Pass an `AbortSignal` to abort an in-flight walk:
+
+```ts
+const controller = new AbortController();
+
+setTimeout(() => controller.abort(), 5000);
+
+try {
+  const matches = await mrdoge.matches.listAll(
+    { sports: ["soccer"] },
+    { signal: controller.signal },
+  );
+} catch (err) {
+  if (err.name === "AbortError") {
+    console.log("Walk cancelled after 5s");
+  }
+}
+```
+
+`listAll` cancels mid-page — the in-flight request is aborted via fetch's
+native `AbortSignal`. Already-fetched pages are not returned. See
+[error handling](/docs/concepts/errors#abort).
+
+## Page size
+
+`limit` caps at **100** for `matches.list` and `ai.recommendations.list`.
+Other list methods have different caps — check
+[the reference](/docs/reference/matches) for each.
+
+Oversized `limit` values are rejected at validation time — the server
+returns `invalid_params`.
+
+## Why keyset and not offset?
+
+Offset pagination breaks when rows shift between requests:
+
+> *Request page 1 → request page 2, but a row was added at the top → row
+> at index 50 is now at index 51, you fetch index 50 again → duplicate.*
+
+Keyset cursors point to the **last seen row**, not an index. Adding rows
+above the cursor doesn't affect subsequent pages — no duplicates, no gaps.
+
+## Next
+
+<Cards>
+  <Card href="/docs/concepts/errors" title="Error handling →" description="AbortError, rate limits, and other failure modes." />
+  <Card href="/docs/reference/matches" title="Matches reference →" description="Every paginated method on matches." />
+</Cards>

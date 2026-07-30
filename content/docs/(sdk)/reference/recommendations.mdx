@@ -1,0 +1,139 @@
+---
+title: AI Recommendations
+description: Edge-and-confidence-scored bet recommendations with reasoning attached.
+---
+
+The `ai.recommendations` resource exposes Mr. Doge's tool-calling pipeline:
+single-outcome picks with quantified edge, Kelly sizing, supporting
+rationale, and risk factors — all localized server-side.
+
+<Callout type="info">
+  Requires the **Business tier**. [Upgrade →](/dashboard/billing)
+</Callout>
+
+## `ai.recommendations.list`
+
+Paginated list of recommendations. Filters compose — pass any combination
+of `matchId`, `confidence`, `minEdge`, `minOdds`, `maxOdds`.
+
+```ts
+const { data, pagination } = await mrdoge.ai.recommendations.list({
+  matchId: "46215510",
+  minEdge: 0.05,            // 5% edge minimum
+  confidence: "High",
+  minOdds: 1.5,
+  maxOdds: 3.0,
+  limit: 10,
+});
+```
+
+**Params:**
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `matchId` | `string` | Filter to a single match |
+| `confidence` | `"High" \| "Medium" \| "Low"` | Minimum confidence |
+| `minEdge` | `number` | Minimum edge as a fraction (`0.05` = 5%) |
+| `minOdds` | `number` | Minimum decimal odds (inclusive) |
+| `maxOdds` | `number` | Maximum decimal odds (inclusive) |
+| `cursor` | `string` | Pagination cursor (opaque) |
+| `limit` | `number` | Default 20, max 100 |
+| `locale` | `string` | `"en"`, `"pt-BR"`, `"es"` |
+
+**Returns:** `{ data: Recommendation[]; pagination: { nextCursor, hasMore } }`
+
+See [pagination](/docs/concepts/pagination) for the cursor walk.
+
+## `ai.recommendations.listAll`
+
+Auto-paginated version of `ai.recommendations.list`. Walks every page and
+returns the combined array. Supports `onPage` for progressive rendering
+and an `AbortSignal` for cancellation — same shape as `matches.listAll`.
+
+```ts
+const all = await mrdoge.ai.recommendations.listAll(
+  { matchId: "46215510", minEdge: 0.05 },
+  {
+    onPage: (page, accumulated) => render(accumulated),
+    signal: controller.signal,
+  },
+);
+```
+
+## `ai.recommendations.get`
+
+Single recommendation by id, with the same localization pipeline as list.
+
+```ts
+const rec = await mrdoge.ai.recommendations.get({
+  id: "cmpshp6ql0n99mp02g91n421i",
+  locale: "es",
+});
+```
+
+**Returns:** `Recommendation`
+
+## The `Recommendation` shape
+
+```ts
+type Recommendation = {
+  id: string;
+  matchId: string;
+  match?: Match;                    // optionally embedded summary
+  marketId: string;
+  betItemId?: string | null;
+  outcome: string;                  // localized — see Localization below
+  odds: number;                     // decimal odds at pick time
+  point?: number | null;            // handicap line, e.g. 2.5
+  confidence: "High" | "Medium" | "Low";
+  edgePercentage: number;           // 0.05 = 5%
+  kellyFraction?: number;           // suggested stake fraction
+  rationale: string[];              // localized reasoning bullets
+  riskFactors: string[];            // localized counter-arguments
+  settled: boolean;
+  result: "won" | "lost" | "push" | null;
+  createdAt: string;                // ISO 8601
+};
+```
+
+## Localization
+
+Pass `locale` to translate `outcome`, `rationale`, `riskFactors`, and
+the embedded `match.*` names. Defaults to `"en"`.
+
+Resolution order:
+
+1. Per-call `locale` param
+2. Connection-level `X-Locale` header from auth
+3. `"en"`
+
+## Pattern: best picks for a match, ranked by edge
+
+```ts
+const recs = await mrdoge.ai.recommendations.listAll({
+  matchId: "46215510",
+  minEdge: 0.03,
+  locale: "es",
+});
+
+const sorted = recs.sort((a, b) => b.edgePercentage - a.edgePercentage);
+
+for (const r of sorted) {
+  console.log(
+    `[${(r.edgePercentage * 100).toFixed(1)}%]`,
+    r.outcome,
+    `@ ${r.odds}`,
+    `(${r.confidence})`,
+  );
+  r.rationale.forEach((line) => console.log(`  · ${line}`));
+  r.riskFactors.forEach((line) => console.log(`  risk: ${line}`));
+}
+```
+
+## Next
+
+<Cards>
+  <Card href="/docs/reference/matches" title="Matches →" description="The match objects recommendations reference." />
+  <Card href="/docs/reference/odds" title="Odds →" description="Live order books for the markets you're recommending against." />
+  <Card href="/docs/concepts/tiers" title="Tiers →" description="AI methods require Business and up." />
+</Cards>

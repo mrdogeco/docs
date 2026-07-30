@@ -1,0 +1,141 @@
+---
+title: Node.js
+description: Plain Node — scripts, cron jobs, bots, and anything that just needs the SDK.
+---
+
+The simplest case. No framework, no SSR — just import and go.
+
+## Install
+
+```bash
+npm i @mrdoge/node
+```
+
+## Minimal script
+
+```ts title="bot.ts"
+import { MrDoge } from "@mrdoge/node";
+
+const mrdoge = new MrDoge({ apiKey: process.env.MRDOGE_API_KEY! });
+
+const { data: matches } = await mrdoge.matches.list({
+  sports: ["soccer"],
+  status: ["live"],
+  limit: 10,
+});
+
+for (const m of matches) {
+  console.log(
+    `${m.homeTeam.name} ${m.stats?.homeScore ?? "-"}-${m.stats?.awayScore ?? "-"} ${m.awayTeam.name}`,
+  );
+}
+
+await mrdoge.close();
+```
+
+Run:
+
+```bash
+MRDOGE_API_KEY=sk_live_… node bot.ts
+```
+
+## Long-running subscription
+
+```ts title="bot.ts"
+import { MrDoge } from "@mrdoge/node";
+
+const mrdoge = new MrDoge({ apiKey: process.env.MRDOGE_API_KEY! });
+
+const sub = await mrdoge.matches.subscribeLive({ sports: ["soccer"] });
+
+console.log("Snapshot:", sub.snapshot.length, "matches");
+
+sub.on("match.upd", (match) => {
+  console.log(
+    `[${new Date().toISOString()}]`,
+    match.homeTeam.name,
+    match.stats?.homeScore,
+    "-",
+    match.stats?.awayScore,
+    match.awayTeam.name,
+  );
+});
+
+sub.on("closed", ({ reason }) => {
+  console.error("subscription closed:", reason);
+  process.exit(1);
+});
+
+// graceful shutdown
+process.on("SIGINT", async () => {
+  await sub.cancel();
+  await mrdoge.close();
+  process.exit(0);
+});
+```
+
+## Cron / scheduled job
+
+For periodic data pulls (every 30 seconds, hourly, whatever), use HTTP — no
+need to hold a WebSocket open:
+
+```ts title="cron.ts"
+import { MrDoge } from "@mrdoge/node";
+
+const mrdoge = new MrDoge({ apiKey: process.env.MRDOGE_API_KEY! });
+
+async function tick() {
+  const trending = await mrdoge.matches.trending({ limit: 5 });
+  // ...do something with trending matches
+}
+
+setInterval(tick, 30_000);
+tick();
+```
+
+The first call uses HTTP (no WS connection). If you later call a
+subscribe method, the SDK opens a WebSocket transparently.
+
+## Listing everything
+
+For large datasets, use `listAll` with progressive logging:
+
+```ts
+const all = await mrdoge.matches.listAll(
+  { sports: ["soccer"], date: "2026-05-18" },
+  {
+    onPage: (page, accumulated) => {
+      console.log(`Got ${page.length} matches (total: ${accumulated.length})`);
+    },
+  },
+);
+
+console.log(`Done — ${all.length} matches`);
+```
+
+## Process-level abort
+
+For graceful shutdown with timeouts, pass an `AbortSignal`:
+
+```ts
+const controller = new AbortController();
+process.on("SIGTERM", () => controller.abort());
+
+try {
+  const matches = await mrdoge.matches.listAll(
+    { sports: ["soccer"] },
+    { signal: controller.signal },
+  );
+} catch (err) {
+  if (err.name === "AbortError") {
+    console.log("Process terminated, shutting down");
+  }
+}
+```
+
+## Next
+
+<Cards>
+  <Card href="/docs/guides/express" title="Express →" description="Wrap the SDK in Express routes." />
+  <Card href="/docs/guides/nestjs" title="NestJS →" description="Injectable service module." />
+</Cards>

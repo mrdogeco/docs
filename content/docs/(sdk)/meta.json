@@ -1,0 +1,14 @@
+{
+  "title": "Mr. Doge SDK",
+  "icon": "Zap",
+  "root": true,
+  "pages": [
+    "index",
+    "installation",
+    "authentication",
+    "quickstart",
+    "concepts",
+    "reference",
+    "guides"
+  ]
+}

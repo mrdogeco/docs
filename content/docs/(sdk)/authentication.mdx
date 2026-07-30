@@ -1,0 +1,391 @@
+---
+title: Authentication
+description: API keys for servers, short-lived JWTs for browsers — every detail.
+---
+
+The Mr. Doge SDK uses two auth modes:
+
+1. **API key** (`sk_live_…`) — server-to-server, long-lived,
+   used by `@mrdoge/node` and `@mrdoge/http`.
+2. **JWT** — short-lived token your backend mints via `@mrdoge/node`'s
+   `tokens.create()` and hands to your frontend's `@mrdoge/client`.
+
+<Cards>
+  <Card title="Backend / cron / worker" description="Use @mrdoge/node or @mrdoge/http with your API key directly." />
+  <Card title="Browser / React Native" description="Two packages: @mrdoge/node on your server mints JWTs, @mrdoge/client on the frontend consumes them." />
+</Cards>
+
+<Callout type="info">
+  Browser/mobile auth **always requires both packages**: `@mrdoge/node` on
+  your server to mint tokens (it holds the `sk_live_…` key), and
+  `@mrdoge/client` on the frontend (it never sees the key). There's no way
+  to skip the backend — Mr. Doge does not accept API keys directly from
+  browsers.
+</Callout>
+
+## Get an API key
+
+Mint a key in your [dashboard](/dashboard/keys). Keys are prefixed `sk_live_…`,
+share your account's tier + rate limit, and count against the same usage
+quota. Treat them like passwords — never embed one in client-side code.
+
+## Server-to-server
+
+Drop the API key in an env var and pass it to the constructor.
+
+```ts
+import { MrDoge } from "@mrdoge/node";
+
+const mrdoge = new MrDoge({
+  apiKey: process.env.MRDOGE_API_KEY!,
+});
+```
+
+On the wire, every request carries a Bearer header:
+
+```http
+POST /sdk/v1/rpc HTTP/1.1
+Host: api.mrdoge.co
+Authorization: Bearer sk_live_…
+Content-Type: application/json
+
+{ "jsonrpc": "2.0", "id": "…", "method": "matches.list", "params": {…} }
+```
+
+API keys don't expire — they're valid until manually revoked from the
+dashboard. Treat them like passwords. Rotate periodically (every 90 days
+is a sensible baseline).
+
+<Callout type="error">
+  **Never embed `sk_live_…` in client-side code.** Anyone
+  inspecting your bundle gets full access to your tier limits, your AI
+  picks, and your usage quota. Always use [JWTs for browsers](#browser--mobile).
+</Callout>
+
+## Browser & mobile
+
+`@mrdoge/client` never sees the API key. Your backend mints a short-lived
+JWT, the SDK fetches it, and refreshes it before expiry.
+
+### Step 1 — mint tokens on your backend
+
+Expose a route that calls `mrdoge.tokens.create()`:
+
+```ts title="app/api/mrdoge/token/route.ts (Next.js)"
+import { MrDoge } from "@mrdoge/node";
+
+const mrdoge = new MrDoge({ apiKey: process.env.MRDOGE_API_KEY! });
+
+export async function POST() {
+  const { token, expiresAt } = await mrdoge.tokens.create({ ttl: 600 });
+  return Response.json({ token, expiresAt });
+}
+```
+
+The response **must** match this shape — `@mrdoge/client` expects it:
+
+```ts
+type TokenResponse = {
+  token: string;          // signed JWT
+  expiresAt: string;      // ISO-8601 timestamp with offset
+};
+```
+
+`tokens.create()` params:
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `ttl` | `number` | Seconds. Bounded **60–86400**. Default **600** (10 min). |
+
+For other backends (Express, Nest, plain Node), see the
+[guides](/docs/guides) — the route handler is the same shape.
+
+### Step 2 — gate the mint route by your own auth
+
+Anyone who can POST to your token route can use Mr. Doge with your tier's
+quota. Gate it by your app's session:
+
+```ts title="app/api/mrdoge/token/route.ts"
+import { MrDoge } from "@mrdoge/node";
+import { auth } from "@/lib/auth";
+
+const mrdoge = new MrDoge({ apiKey: process.env.MRDOGE_API_KEY! });
+
+export async function POST() {
+  const session = await auth();
+  if (!session?.user) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
+  const { token, expiresAt } = await mrdoge.tokens.create({ ttl: 600 });
+  return Response.json({ token, expiresAt });
+}
+```
+
+For public/anonymous apps (e.g. a marketing widget), skip the session
+check but consider rate-limiting the route itself (e.g. with Vercel
+Firewall or Cloudflare Rate Limiting) — uncapped, scrapers will burn your
+tier quota.
+
+### Step 3 — consume from your frontend
+
+```ts
+import { MrDoge } from "@mrdoge/client";
+
+const mrdoge = new MrDoge({
+  authEndpoint: "/api/mrdoge/token",
+});
+```
+
+The SDK POSTs to `authEndpoint` whenever it needs a fresh token — first
+connect, after expiry, after a reconnect — automatically.
+
+### Custom `fetchToken` for advanced flows
+
+When `authEndpoint` isn't enough (forwarding cookies, signing the request,
+calling a different API entirely), pass a `fetchToken`:
+
+```ts
+const mrdoge = new MrDoge({
+  fetchToken: async () => {
+    const res = await fetch("/api/mrdoge/token", {
+      method: "POST",
+      credentials: "include",       // forward the session cookie
+      headers: {
+        "X-CSRF-Token": getCsrfToken(),
+      },
+    });
+    if (!res.ok) throw new Error(`token fetch failed: ${res.status}`);
+    return res.json();              // must be { token, expiresAt }
+  },
+});
+```
+
+`fetchToken` is just `() => Promise<{ token: string; expiresAt: string }>`
+— do whatever you need to produce that shape.
+
+### `authHeaders` shortcut
+
+For static headers, skip the custom `fetchToken` and use `authHeaders`:
+
+```ts
+const mrdoge = new MrDoge({
+  authEndpoint: "/api/mrdoge/token",
+  authHeaders: {
+    "X-App-Version": "1.2.3",
+    "X-Client-Id": "web",
+  },
+});
+```
+
+The SDK adds those headers to its built-in POST.
+
+## Token lifecycle
+
+### TTL trade-offs
+
+| TTL | Pros | Cons |
+|-----|------|------|
+| **60–300s** (short) | Tight blast radius if leaked; quick revocation | Frequent refresh round-trips |
+| **600–3600s** (default range) | Good balance for most apps | Moderate blast radius |
+| **3600–86400s** (long) | Fewer refreshes, lower load on your mint route | Longer blast radius if leaked |
+
+Default (`ttl: 600`) is the right starting point. Lower it for sensitive
+ops, raise it for high-traffic anonymous flows.
+
+### Refresh timing
+
+`@mrdoge/client` refreshes proactively — it calls your `fetchToken` /
+`authEndpoint` shortly **before** the current token expires. Default
+leeway is **30 seconds**; tune with `refreshLeewaySec`:
+
+```ts
+const mrdoge = new MrDoge({
+  authEndpoint: "/api/mrdoge/token",
+  refreshLeewaySec: 60,    // refresh 60s before expiry
+});
+```
+
+### What if a token expires mid-call?
+
+The SDK retries the in-flight request once with a freshly minted token. If
+the second attempt also returns `unauthorized`, it surfaces
+`UnauthorizedError` to your code. You'll typically never see this — the
+proactive refresh covers most cases.
+
+### What the JWT carries
+
+The JWT inherits:
+
+- The minting key's **tier** (starter, growth, business)
+- The minting key's **rate-limit class** (requests/min, subscriptions, connections)
+- The minting key's **identity** — tokens are scoped to the API key that minted them
+- A short expiry (`ttl`)
+
+The JWT **cannot**:
+
+- Mint other tokens (no recursive `tokens.create` access)
+- Outlive its `ttl`
+- Upgrade itself to a higher tier
+
+Even if leaked, the blast radius is bounded by the TTL.
+
+## Common patterns
+
+### Anonymous public widget
+
+No user auth — just rate-limit the route:
+
+```ts
+export async function POST(req: Request) {
+  // pseudo: enforce per-IP rate limit before minting
+  if (await isRateLimited(req)) {
+    return new Response("Too Many Requests", { status: 429 });
+  }
+  const { token, expiresAt } = await mrdoge.tokens.create({ ttl: 300 });
+  return Response.json({ token, expiresAt });
+}
+```
+
+### Per-user gated app
+
+```ts
+export async function POST() {
+  const session = await auth();
+  if (!session) return new Response("Unauthorized", { status: 401 });
+  const { token, expiresAt } = await mrdoge.tokens.create({ ttl: 600 });
+  return Response.json({ token, expiresAt });
+}
+```
+
+### Dev / staging / production
+
+Use a different key per environment so revoking the dev key doesn't break
+production (and vice versa):
+
+```bash title=".env.development"
+MRDOGE_API_KEY=sk_live_…
+```
+
+```bash title=".env.production"
+MRDOGE_API_KEY=sk_live_…
+```
+
+The SDK doesn't need to know which environment it's in — it auths with
+whatever key you give it. Test keys hit sandbox markets; live keys hit
+production.
+
+## Auth on the wire
+
+<Tabs items={["HTTP", "WebSocket"]}>
+  <Tab value="HTTP">
+Every HTTP request includes a `Bearer` header. The SDK does this automatically.
+```http
+Authorization: Bearer sk_live_…  or  Bearer <JWT>
+```
+  </Tab>
+  <Tab value="WebSocket">
+The first frame after `connect` is an `auth` method call. The SDK handles
+this automatically — you'll only see it in DevTools.
+```json
+{ "jsonrpc": "2.0", "id": "1", "method": "auth", "params": { "apiKey": "sk_live_…" } }
+```
+or, in the browser:
+```json
+{ "jsonrpc": "2.0", "id": "1", "method": "auth", "params": { "token": "<JWT>" } }
+```
+  </Tab>
+</Tabs>
+
+## Key rotation & revocation
+
+You can:
+
+- **Rotate**: mint a new key, deploy it, revoke the old one. Both keys
+  work during the overlap window.
+- **Revoke**: kills the key immediately. All in-flight requests with that
+  key throw `UnauthorizedError`. JWTs minted by the revoked key continue
+  to work until their `ttl` expires.
+
+Rotate immediately if:
+
+- A key was committed to a public repo
+- An employee with key access leaves
+- You see suspicious usage in the dashboard
+
+The dashboard surfaces last-used timestamps per key — useful for spotting
+unused (or compromised) keys.
+
+## Errors
+
+Auth failures throw `UnauthorizedError`:
+
+```ts
+import { UnauthorizedError } from "@mrdoge/node"; // or @mrdoge/client
+
+try {
+  await mrdoge.matches.list({ sports: ["soccer"] });
+} catch (err) {
+  if (err instanceof UnauthorizedError) {
+    // - invalid API key
+    // - revoked API key
+    // - expired JWT (refresh failed)
+    // - tampered JWT signature
+  }
+}
+```
+
+In the browser, on `UnauthorizedError`, your `fetchToken` is called once
+more before the error surfaces. If your auth route is returning 401
+(e.g. user's session expired), you'll get the SDK error after the retry.
+
+A separate **`AuthEndpointError`** (`@mrdoge/client` only) signals that
+your token-mint route itself is unreachable or returning non-2xx:
+
+```ts
+import { AuthEndpointError } from "@mrdoge/client";
+
+try {
+  await mrdoge.matches.list({ sports: ["soccer"] });
+} catch (err) {
+  if (err instanceof AuthEndpointError) {
+    // your /api/mrdoge/token route is down or 4xx/5xx
+  }
+}
+```
+
+See [error handling](/docs/concepts/errors) for the full error class catalog.
+
+## Debug with curl
+
+Quickly verify a key works without writing code:
+
+```bash
+curl -X POST https://api.mrdoge.co/sdk/v1/rpc \
+  -H "Authorization: Bearer sk_live_…" \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":"1","method":"matches.list","params":{"sports":["soccer"],"limit":3}}'
+```
+
+A successful response looks like:
+
+```json
+{ "jsonrpc": "2.0", "id": "1", "result": { "data": [...], "pagination": {...} } }
+```
+
+Auth failures return:
+
+```json
+{ "jsonrpc": "2.0", "id": "1", "error": { "code": "unauthorized", "message": "..." } }
+```
+
+(The HTTP status is `200` even on errors — the JSON-RPC envelope carries
+the failure. Standard JSON-RPC behaviour.)
+
+## Next
+
+<Cards>
+  <Card href="/docs/quickstart" title="Quickstart →" description="Your first call, end to end." />
+  <Card href="/docs/concepts/tiers" title="Tiers & limits →" description="What each plan unlocks." />
+  <Card href="/docs/reference/tokens" title="Tokens reference →" description="ttl bounds, refresh behaviour, what the JWT can and can't do." />
+</Cards>

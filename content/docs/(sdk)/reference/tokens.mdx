@@ -1,0 +1,126 @@
+---
+title: Tokens
+description: Mint short-lived JWTs from your backend so browsers can use the SDK safely.
+---
+
+`tokens.create` mints a JWT that inherits your API key's tier and rate
+limit. Use it to keep `sk_live_…` server-side while letting
+`@mrdoge/client` authenticate from a browser.
+
+<Callout type="info">
+  `tokens.create` is only on `@mrdoge/node`. The browser SDK can't mint
+  tokens — that would defeat the purpose.
+</Callout>
+
+## `tokens.create`
+
+```ts
+import { MrDoge } from "@mrdoge/node";
+
+const mrdoge = new MrDoge({ apiKey: process.env.MRDOGE_API_KEY! });
+
+const { token, expiresAt } = await mrdoge.tokens.create({ ttl: 600 });
+
+return Response.json({ token, expiresAt });
+```
+
+**Params:**
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `ttl` | `number` | Token lifetime in seconds. Bounds: **60–86400** (1 min to 24h). Default `600` (10 minutes). |
+
+**Returns:**
+
+```ts
+{
+  token: string;           // signed JWT
+  expiresAt: string;       // ISO timestamp
+}
+```
+
+## What the token can do
+
+The JWT carries:
+
+- The parent key's **tier** (`free`, `starter`, `growth`, `business`)
+- The parent key's **rate-limit class** (requests/min, subscriptions, connections)
+- A short expiry (`ttl`)
+
+The client SDK uses it like an API key for the duration — but it can't be
+used to mint more tokens, and it dies at expiry. Even if leaked, the blast
+radius is bounded.
+
+## Token flow
+
+```text
+Browser            Your backend            Mr. Doge API
+   │                    │                       │
+   │ POST /api/         │                       │
+   │ mrdoge/token       │                       │
+   ├───────────────────►│                       │
+   │                    │ tokens.create         │
+   │                    ├──────────────────────►│
+   │                    │                       │
+   │                    │◄── { token,           │
+   │                    │     expiresAt }       │
+   │◄── { token,        │                       │
+   │     expiresAt }    │                       │
+   │                    │                       │
+   │ ws.connect + auth(token)                   │
+   ├───────────────────────────────────────────►│
+   │◄────────────────────────────────────── ok  │
+```
+
+## Refresh
+
+`@mrdoge/client` refreshes the token automatically before it expires — call
+your `authEndpoint` again, get a fresh token, use it on the next WebSocket
+reconnect or HTTP call.
+
+You don't need to do anything in your code. The `refreshLeewaySec` option
+(default `30`) controls how early the refresh fires.
+
+Set `ttl` to balance:
+
+- **Short TTL (60–300s)** — tighter security, more refresh round-trips
+- **Long TTL (3600–86400s)** — fewer round-trips, longer blast radius if leaked
+
+The default `ttl: 600` (10 minutes) is a good starting point.
+
+## Pattern: Next.js route handler
+
+```ts title="app/api/mrdoge/token/route.ts"
+import { NextResponse } from "next/server";
+import { MrDoge } from "@mrdoge/node";
+
+const mrdoge = new MrDoge({ apiKey: process.env.MRDOGE_API_KEY! });
+
+export async function POST() {
+  // Optional: gate by user session
+  // const session = await auth();
+  // if (!session) return new Response("Unauthorized", { status: 401 });
+
+  const { token, expiresAt } = await mrdoge.tokens.create({ ttl: 600 });
+  return NextResponse.json({ token, expiresAt });
+}
+```
+
+Then on the client:
+
+```ts
+import { MrDoge } from "@mrdoge/client";
+
+const mrdoge = new MrDoge({
+  authEndpoint: "/api/mrdoge/token",
+});
+```
+
+See the [Next.js guide](/docs/guides/nextjs) for the full pattern.
+
+## Next
+
+<Cards>
+  <Card href="/docs/authentication" title="Authentication overview →" description="API keys, JWTs, and when to use each." />
+  <Card href="/docs/guides/nextjs" title="Next.js guide →" description="The full token-mint + client pattern." />
+</Cards>

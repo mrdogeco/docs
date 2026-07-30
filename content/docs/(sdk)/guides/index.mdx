@@ -1,0 +1,33 @@
+---
+title: Framework Guides
+description: Drop the SDK into your stack — Next.js, Node, Express, Nest, React Native, and edge runtimes.
+---
+
+The Mr. Doge SDK ships for every modern JavaScript runtime. Pick yours.
+
+<FrameworkGrid>
+  <FrameworkCard framework="nextjs" title="Next.js" description="Route handlers, server components, token-mint pattern." href="/docs/guides/nextjs" />
+  <FrameworkCard framework="node" title="Node.js" description="Bare-bones server, cron jobs, scripts." href="/docs/guides/node" />
+  <FrameworkCard framework="express" title="Express" description="Middleware, route handlers, proxy patterns." href="/docs/guides/express" />
+  <FrameworkCard framework="nest" title="NestJS" description="Injectable service, module setup, DI patterns." href="/docs/guides/nestjs" />
+  <FrameworkCard framework="react-native" title="React Native" description="Mobile app integration, token refresh, AsyncStorage." href="/docs/guides/react-native" />
+  <FrameworkCard framework="cloudflare" title="Cloudflare Workers" description="Edge runtime with @mrdoge/http — no Node APIs needed." href="/docs/guides/cloudflare-workers" />
+</FrameworkGrid>
+
+## Which package goes where?
+
+| Runtime | Package | Auth |
+|---------|---------|------|
+| Next.js (server) | `@mrdoge/node` | API key |
+| Next.js (browser) | `@mrdoge/client` | JWT |
+| Express / Nest / plain Node | `@mrdoge/node` | API key |
+| React Native | `@mrdoge/client` | JWT |
+| Cloudflare Workers / Lambda / Edge | `@mrdoge/http` | API key |
+
+## Don't see your framework?
+
+The SDK is framework-agnostic — every guide here is a thin wrapper around
+the same `new MrDoge(...)` (or `createHttpClient(...)` for edge runtimes).
+Anything that runs JavaScript can use the SDK.
+[Open an issue on GitHub](https://github.com/mrdogeco/sdk/issues) if you'd
+like a guide for your stack.

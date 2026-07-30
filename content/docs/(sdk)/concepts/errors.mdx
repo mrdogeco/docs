@@ -1,0 +1,139 @@
+---
+title: Error handling
+description: Typed error classes, abort signals, and rate-limit recovery.
+---
+
+The SDK throws typed errors for everything the server can return, plus a
+few client-side ones (network failures, aborts). Catch them with
+`instanceof`.
+
+## Error classes
+
+Re-exported from `@mrdoge/node` and `@mrdoge/client`:
+
+| Class | Wire code | When |
+|-------|-----------|------|
+| `ValidationError` | `invalid_params` | Schema rejected your params |
+| `AuthEndpointError` | — | `@mrdoge/client` only — your token-mint route is down or returned non-2xx |
+| `UnauthorizedError` | `unauthorized` | Invalid/revoked key, expired JWT |
+| `ForbiddenError` | `forbidden` | Method not in your tier |
+| `NotFoundError` | `not_found` | Resource doesn't exist |
+| `RateLimitError` | `rate_limited` | Too many requests per minute |
+| `SubscriptionLimitError` | `subscription_limit_exceeded` | Too many concurrent subscriptions |
+| `ConnectionLimitError` | `connection_limit_exceeded` | Too many WebSocket connections |
+| `UnavailableError` | `unavailable` | Server temporarily down |
+| `InternalError` | `internal_error` | Server bug or transient failure |
+| `ProtocolError` | `invalid_request` / `method_not_found` | Frame-level violation |
+| `ConnectionError` | — | WebSocket couldn't connect |
+| `DisconnectedError` | — | Connection dropped mid-request |
+| `TimeoutError` | — | Request exceeded `requestTimeoutMs` (default 10s) |
+| `AbortError` | — | User aborted via `AbortSignal` |
+
+All classes extend `MrDogeError`, which extends `Error`.
+
+## Basic catch
+
+```ts
+import {
+  RateLimitError,
+  UnauthorizedError,
+  ForbiddenError,
+} from "@mrdoge/node";
+
+try {
+  const { data } = await mrdoge.ai.recommendations.list({ minEdge: 0.05 });
+} catch (err) {
+  if (err instanceof UnauthorizedError) {
+    // refresh token / re-auth
+  } else if (err instanceof ForbiddenError) {
+    // upgrade tier — err.data exposes method + tier context
+  } else if (err instanceof RateLimitError) {
+    // back off and retry
+  } else {
+    throw err;
+  }
+}
+```
+
+## Rate limits
+
+When you hit a limit, the server returns `rate_limited` with metadata. The
+SDK exposes it on the error's `data` field:
+
+```ts
+catch (err) {
+  if (err instanceof RateLimitError) {
+    console.log("Rate limited. Data:", err.data);
+    // wait and retry
+  }
+}
+```
+
+See [tiers & limits](/docs/concepts/tiers) for per-tier numbers.
+
+## Abort
+
+All methods accept `options.signal` for native abort support:
+
+```ts
+import { AbortError } from "@mrdoge/node";
+
+const controller = new AbortController();
+setTimeout(() => controller.abort(), 1000);
+
+try {
+  await mrdoge.matches.list(
+    { sports: ["soccer"] },
+    { signal: controller.signal },
+  );
+} catch (err) {
+  if (err instanceof AbortError || err.name === "AbortError") {
+    // user navigated away, request cancelled
+  }
+}
+```
+
+`AbortError` matches the fetch convention — `err.name === "AbortError"` is
+true.
+
+## Validation errors
+
+`ValidationError` is what the SDK throws when your params don't match the
+protocol schema:
+
+```ts
+catch (err) {
+  if (err instanceof ValidationError) {
+    console.log(err.message);
+    console.log(err.data); // array of validation issues
+  }
+}
+```
+
+In dev this usually means a typo or a wrong type. In prod, treat it as a
+bug — TypeScript types prevent most of these.
+
+## Subscription errors
+
+Subscriptions deliver errors via the `closed` event, not as thrown
+exceptions on `subscribeLive`:
+
+```ts
+const sub = await mrdoge.matches.subscribeLive({ sports: ["soccer"] });
+
+sub.on("closed", ({ reason, message }) => {
+  console.log("Subscription closed:", reason, message);
+  // "user_cancelled" | "rate_limited" | "internal_error" | "unauthorized" | ...
+});
+```
+
+If the subscription **never opens** (you're rate-limited at subscribe
+time), `subscribeLive` throws `SubscriptionLimitError` or similar — handle
+in the `try/catch` around `await mrdoge.matches.subscribeLive(...)`.
+
+## Next
+
+<Cards>
+  <Card href="/docs/concepts/tiers" title="Tiers & limits →" description="What each plan gates and limits." />
+  <Card href="/docs/reference/subscriptions" title="Subscriptions →" description="The closed event, reconnection, etc." />
+</Cards>

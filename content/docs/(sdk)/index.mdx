@@ -1,0 +1,119 @@
+---
+title: Welcome
+description: The Mr. Doge SDK gives you live odds, AI picks, and market data across every major sport. One typed client, two transports, every framework.
+---
+
+import {
+  Radio,
+  Brain,
+  Cable,
+  CircleCheck,
+  Server,
+  Globe,
+  Zap,
+  FileType,
+  PackagePlus,
+  KeyRound,
+  Rocket,
+  BookOpen,
+} from "lucide-react";
+
+The Mr. Doge SDK powers the Mr. Doge app — live odds across every major
+sport, AI picks with reasoning attached, and market data you can build
+on. These docs walk you through installation, authentication, and every
+method the SDK exposes.
+
+## What's in the box
+
+<Cards>
+  <Card icon={<Radio />} title="Live matches & odds" description="Hundreds of leagues across soccer, basketball, tennis, volleyball, baseball, hockey, and football. Real-time deltas over WebSocket." />
+  <Card icon={<Brain />} title="AI picks with reasoning" description="Every pick exposes confidence, edge percentage, and the model's rationale." />
+  <Card icon={<Cable />} title="Dual transport" description="WebSocket for live subscriptions, HTTP for one-shot reads. Same typed client picks the right path." />
+  <Card icon={<CircleCheck />} title="Typed end to end" description="Schemas validate every request server-side and ship as TypeScript types to your client. Autocomplete from the first call to the last." />
+</Cards>
+
+## Four packages, one surface
+
+<Cards>
+  <Card icon={<Server />} href="/docs/installation" title="@mrdoge/node" description="Server-side SDK. Authenticates with sk_live_… API keys. HTTP + WebSocket." />
+  <Card icon={<Globe />} href="/docs/installation" title="@mrdoge/client" description="Browser + React Native. Auths via short-lived JWTs your backend mints with @mrdoge/node." />
+  <Card icon={<Zap />} href="/docs/installation" title="@mrdoge/http" description="Zero-dep HTTP-only client. Works on Lambda, Workers, Vercel Edge. No WebSocket overhead." />
+  <Card icon={<FileType />} href="/docs/installation" title="@mrdoge/protocol" description="Schemas and TypeScript types. Source of truth for every method, param, and response." />
+</Cards>
+
+## 30-second taste
+
+Pick your runtime — Node, Next.js, or any edge runtime. Same SDK, same data.
+
+<Tabs items={["Node", "Next.js", "Edge"]}>
+  <Tab value="Node">
+```ts
+import { MrDoge } from "@mrdoge/node";
+
+const mrdoge = new MrDoge({
+  apiKey: process.env.MRDOGE_API_KEY!,
+});
+
+// stream live matches
+const sub = await mrdoge.matches.subscribeLive({
+  sports: ["soccer"],
+});
+
+sub.on("match.upd", (match) => {
+  // live scores, corners, cards, etc.
+  console.log(match.stats);
+});
+
+// or pull today's AI picks
+const { data } = await mrdoge.ai.recommendations.list({
+  limit: 10,
+  minOdds: 1.5,
+});
+```
+  </Tab>
+  <Tab value="Next.js">
+```ts title="app/api/recommendations/route.ts"
+import { MrDoge } from "@mrdoge/node";
+
+const mrdoge = new MrDoge({
+  apiKey: process.env.MRDOGE_API_KEY!,
+});
+
+export async function GET() {
+  const { data } = await mrdoge.ai.recommendations.list({
+    minEdge: 0.05,
+    confidence: "High",
+    limit: 10,
+  });
+
+  return Response.json(data);
+}
+```
+  </Tab>
+  <Tab value="Edge">
+```ts
+// Cloudflare Workers / Vercel Edge / Lambda
+import { createHttpClient } from "@mrdoge/http";
+
+export default {
+  async fetch(req, env) {
+    const mrdoge = createHttpClient({
+      apiKey: env.MRDOGE_API_KEY,
+    });
+
+    const matches = await mrdoge.call("matches.trending", { limit: 5 });
+    return Response.json(matches);
+  },
+};
+```
+  </Tab>
+</Tabs>
+
+## Where to go next
+
+<Cards>
+  <Card icon={<PackagePlus />} href="/docs/installation" title="Installation" description="Pick a package, install, and import." />
+  <Card icon={<KeyRound />} href="/docs/authentication" title="Authentication" description="API keys for servers, JWTs for browsers." />
+  <Card icon={<Rocket />} href="/docs/quickstart" title="Quickstart" description="From zero to your first live match in 5 minutes." />
+  <Card icon={<BookOpen />} href="/docs/guides" title="Framework guides" description="Next.js, Node, Express, Nest, React Native." />
+</Cards>
