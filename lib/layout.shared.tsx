@@ -9,12 +9,12 @@ export function baseOptions(): BaseLayoutProps {
     githubUrl: "https://github.com/mrdogeco/sdk",
     links: [
       {
-        text: "Documentation",
-        url: "/docs",
+        text: "Developers",
+        url: "/",
       },
       {
-        text: "UI",
-        url: "/ui",
+        text: "Pricing",
+        url: "/#pricing",
       },
     ],
   }

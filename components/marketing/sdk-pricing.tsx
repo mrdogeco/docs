@@ -87,7 +87,7 @@ export function SdkPricing() {
   const isMonthly = frequency === "monthly"
 
   return (
-    <section className="mx-auto w-full max-w-5xl px-6 py-16">
+    <section id="pricing" className="mx-auto w-full max-w-5xl px-6 py-16">
       <div className="flex flex-col gap-3 text-center">
         <span className="text-sm font-medium tracking-wide text-muted-foreground uppercase">
           Pricing
