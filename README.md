@@ -1,14 +1,9 @@
-# mrdoge-ui
+# mrdoge-co
 
-Open-source React components for sports betting apps: event cards, odds
-selectors, bet slips, match timelines, and related building blocks. MIT
-licensed.
-
-Components are distributed as source code through a
-[shadcn/ui](https://ui.shadcn.com)-compatible registry, not as an installable
-package. Each component is copied into your project, so you own the
-resulting code and can modify it freely. There is no dependency on any
-particular data provider — every component takes plain props.
+The mrdoge.co codebase: Mr. Doge SDK docs and marketing, mrdoge-ui's docs and
+showcase, and the developer dashboard. Private — the public-facing component
+source lives in the separate `mrdoge-ui` repo and is mirrored here for the
+registry build (see below).
 
 ## Installation
 
@@ -58,7 +53,3 @@ mrdoge-ui components accept plain props, so they work with any data source.
 They pair directly with [`@mrdoge/client`](https://mrdoge.ai), which provides
 typed, real-time sports data over HTTP and WebSocket. See `/docs` for an
 example.
-
-## License
-
-MIT — see [LICENSE](./LICENSE).

@@ -1,17 +1,8 @@
 {
-  "name": "mrdoge-ui",
+  "name": "mrdoge-co",
   "version": "0.1.0",
   "private": true,
-  "description": "Open-source React components for sports betting apps.",
-  "license": "MIT",
-  "homepage": "https://github.com/mrdogeco/ui",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/mrdogeco/ui.git"
-  },
-  "bugs": {
-    "url": "https://github.com/mrdogeco/ui/issues"
-  },
+  "description": "mrdoge.co — Mr. Doge SDK + mrdoge-ui docs, marketing, and developer dashboard.",
   "scripts": {
     "dev": "next dev -p 3002",
     "build": "next build",
