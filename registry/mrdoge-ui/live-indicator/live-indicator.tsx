@@ -1,15 +1,24 @@
-import { Clock } from "lucide-react"
+import { Clock, Pause } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 
-export type LiveIndicatorStatus = "scheduled" | "live" | "finished"
+export type LiveIndicatorStatus =
+  | "scheduled"
+  | "live"
+  | "paused"
+  | "intermission"
+  | "interrupted"
+  | "finished"
 
 export interface LiveIndicatorProps {
   status: LiveIndicatorStatus
   /** Kickoff time, shown when status is "scheduled". */
   kickoff?: Date | string
-  /** Elapsed match clock (e.g. "67'"), shown when status is "live". */
+  /**
+   * Elapsed match clock, shown when status is "live", "paused",
+   * "intermission", or "interrupted" (e.g. "67'", "HT").
+   */
   elapsed?: string
   className?: string
 }
@@ -22,9 +31,12 @@ function formatKickoff(kickoff: Date | string) {
   })
 }
 
-// Only 3 states are representable here because that's all the underlying
-// event data reliably distinguishes — don't add a "postponed"/"delayed"
-// variant without a data source that can actually back it.
+const stoppedPlayLabel: Record<"paused" | "intermission" | "interrupted", string> = {
+  paused: "Paused",
+  intermission: "Intermission",
+  interrupted: "Interrupted",
+}
+
 export function LiveIndicator({
   status,
   kickoff,
@@ -42,6 +54,21 @@ export function LiveIndicator({
           <span className="relative inline-flex size-1.5 rounded-full bg-destructive-foreground" />
         </span>
         {elapsed ?? "LIVE"}
+      </Badge>
+    )
+  }
+
+  if (status === "paused" || status === "intermission" || status === "interrupted") {
+    return (
+      <Badge
+        variant="outline"
+        className={cn(
+          "gap-1.5 border-transparent bg-amber-500/15 text-amber-600 dark:text-amber-400",
+          className
+        )}
+      >
+        <Pause className="size-3" />
+        {elapsed ?? stoppedPlayLabel[status]}
       </Badge>
     )
   }

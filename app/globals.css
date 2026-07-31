@@ -131,9 +131,62 @@
   }
 }
 
-/* Glass effect on the home/docs header — Fumadocs' NavOptions has no
-   className hook for this element, so override its own utility classes
-   directly. #nd-nav is stable across fumadocs-ui versions. */
+/* Glass effect + taller header on the home/docs nav — Fumadocs' NavOptions
+   has no className hook for this element, so override its own utility
+   classes directly. #nd-nav is stable across fumadocs-ui versions. Both
+   the outer header and the inner <nav> row hardcode h-14, so both need
+   overriding to stay in sync. Horizontal padding is px-4 everywhere
+   (header, footer, docs content) — the sidebar's transform/fixed-width
+   children don't cooperate with padding, so px-4 (its natural default)
+   is what everything else matches instead of forcing it up to px-6.
+   Height bumped a few px past h-14 so the logo's vertical position lines
+   up with where it sits in the sidebar's own nav-title row (p-4 pb-2). */
+#nd-nav,
+#nd-nav nav {
+  @apply h-[62px]!;
+}
+#nd-nav nav {
+  @apply px-4!;
+}
 #nd-nav > div {
-  @apply bg-fd-background/50 backdrop-blur-2xl;
+  @apply bg-fd-background/50! backdrop-blur-2xl! border-0!;
+}
+
+/* #nd-subnav is a separate mobile-only (md:hidden) bar inside DocsLayout,
+   distinct from the shared #nd-nav header — it hardcodes its own border-b. */
+#nd-subnav {
+  @apply border-0!;
+}
+
+/* #nd-sidebar hardcodes border-e (right border in LTR), separating the
+   docs sidebar from main content. No horizontal padding override here —
+   its absolute positioning + *:w-(--fd-sidebar-width) children fight it. */
+#nd-sidebar {
+  @apply border-0!;
+}
+
+/* Docs content container (#nd-page, stable ID) hardcodes responsive
+   horizontal padding (px-4 / md:px-6 / xl:px-8) — flattened to a
+   consistent px-4 at every breakpoint. */
+#nd-page {
+  @apply px-4!;
+}
+
+/* Sidebar footer icon links (GitHub/Reddit/X/LinkedIn/Instagram) render
+   through Fumadocs' own button component with size="icon-sm", which sets
+   [&_svg]:size-4.5 on the wrapping <a> — a class+descendant selector,
+   which always outranks a plain class on the <svg> itself regardless of
+   source order. Setting a size in lib/layout.shared.tsx's className has
+   no effect because of this; sizes have to be reasserted here instead,
+   matched by each icon's href. Keep these in sync with layout.shared.tsx. */
+#nd-sidebar a[href*="x.com"] svg {
+  @apply size-3.5!;
+}
+#nd-sidebar a[href*="linkedin.com"] svg {
+  @apply size-5!;
+}
+#nd-sidebar a[href*="github.com"] svg,
+#nd-sidebar a[href*="reddit.com"] svg,
+#nd-sidebar a[href*="instagram.com"] svg {
+  @apply size-4!;
 }

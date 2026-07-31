@@ -1,8 +1,8 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
+import { EntityImage } from "@/registry/mrdoge-ui/entity-image/entity-image"
 import {
   LiveIndicator,
   type LiveIndicatorStatus,
@@ -44,10 +44,7 @@ function TeamRow({
   return (
     <div className="flex items-center justify-between">
       <div className="flex min-w-0 items-center gap-2">
-        <Avatar size="sm" className="bg-muted">
-          <AvatarImage src={team.logoUrl} alt={team.name} />
-          <AvatarFallback>{team.name.slice(0, 2).toUpperCase()}</AvatarFallback>
-        </Avatar>
+        <EntityImage src={team.logoUrl} name={team.name} size="sm" className="bg-muted" />
         <span className="truncate text-sm font-medium">{team.name}</span>
       </div>
       {showScore ? (

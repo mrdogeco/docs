@@ -1,0 +1,70 @@
+---
+title: Entity Image
+description: Team or region logo with an initials fallback.
+---
+
+import { EntityImage } from "@/registry/mrdoge-ui/entity-image/entity-image"
+import { InstallTabs } from "@/components/docs/install-tabs"
+
+<ComponentPreview>
+  <div className="flex items-center gap-4">
+    <EntityImage name="Palmeiras" size="sm" />
+    <EntityImage name="Flamengo" />
+    <EntityImage name="Corinthians" size="lg" />
+  </div>
+</ComponentPreview>
+
+## Installation
+
+<InstallTabs name="entity-image" />
+
+## Usage
+
+```tsx
+import { EntityImage } from "@/components/entity-image"
+
+<EntityImage src="https://api.mrdoge.co/images/teams/1.png" name="Palmeiras" />
+```
+
+When `src` is missing or fails to load, it falls back to the entity's
+initials — shown above, since these demo entities have no real logo URL.
+
+## Use with the Mr. Doge SDK
+
+Team and region logos are served from a stable public CDN — no SDK call,
+no auth, just the entity's `id`:
+
+```ts
+export function teamLogo(id: number) {
+  return `https://api.mrdoge.co/images/teams/${id}.png`
+}
+
+export function regionFlag(id: number) {
+  return `https://api.mrdoge.co/images/regions/${id}.png`
+}
+```
+
+See [Images](/docs/reference/images) for the full CDN reference (caching,
+response codes).
+
+## Props
+
+<TypeTable
+  type={{
+    src: {
+      description: "Falls back to initials when missing or when the image fails to load.",
+      type: "string | null",
+    },
+    name: {
+      description: "Used for the alt text and the initials fallback.",
+      type: "string",
+      required: true,
+    },
+    size: {
+      type: '"sm" | "default" | "lg"',
+    },
+    className: {
+      type: "string",
+    },
+  }}
+/>

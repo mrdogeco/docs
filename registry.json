@@ -20,7 +20,8 @@
       "name": "team-form-indicator",
       "type": "registry:component",
       "title": "Team Form Indicator",
-      "description": "Row of recent match results (W/D/L) for a team.",
+      "description": "Row of recent match results (W/D/L/U) for a team, with optional per-match tooltip detail.",
+      "registryDependencies": ["tooltip"],
       "files": [
         {
           "path": "registry/mrdoge-ui/team-form-indicator/team-form-indicator.tsx",
@@ -55,6 +56,49 @@
       ]
     },
     {
+      "name": "entity-image",
+      "type": "registry:component",
+      "title": "Entity Image",
+      "description": "Team or region logo with an initials fallback.",
+      "registryDependencies": ["avatar"],
+      "files": [
+        {
+          "path": "registry/mrdoge-ui/entity-image/entity-image.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "settlement-badge",
+      "type": "registry:component",
+      "title": "Settlement Badge",
+      "description": "Post-settlement outcome badge: won, lost, or push.",
+      "registryDependencies": ["badge"],
+      "files": [
+        {
+          "path": "registry/mrdoge-ui/settlement-badge/settlement-badge.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "ai-recommendation-card",
+      "type": "registry:component",
+      "title": "AI Recommendation Card",
+      "description": "AI-generated pick with confidence, edge, rationale, and risk factors.",
+      "registryDependencies": ["badge", "card"],
+      "files": [
+        {
+          "path": "registry/mrdoge-ui/ai-recommendation-card/ai-recommendation-card.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/mrdoge-ui/settlement-badge/settlement-badge.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
       "name": "event-card",
       "type": "registry:component",
       "title": "Event Card",
@@ -71,6 +115,53 @@
         },
         {
           "path": "registry/mrdoge-ui/odds-selector/odds-selector.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/mrdoge-ui/entity-image/entity-image.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "odds-board",
+      "type": "registry:component",
+      "title": "Odds Board",
+      "description": "Every market for a match at once, each with its own Odds Selector.",
+      "registryDependencies": ["button"],
+      "files": [
+        {
+          "path": "registry/mrdoge-ui/odds-board/odds-board.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/mrdoge-ui/odds-selector/odds-selector.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "sport-picker",
+      "type": "registry:component",
+      "title": "Sport Picker",
+      "description": "Icon-based sport filter.",
+      "registryDependencies": ["button"],
+      "files": [
+        {
+          "path": "registry/mrdoge-ui/sport-picker/sport-picker.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "region-accordion",
+      "type": "registry:component",
+      "title": "Region Accordion",
+      "description": "Collapsible region list, grouped by competition, with event counts.",
+      "registryDependencies": ["accordion"],
+      "files": [
+        {
+          "path": "registry/mrdoge-ui/region-accordion/region-accordion.tsx",
           "type": "registry:component"
         }
       ]

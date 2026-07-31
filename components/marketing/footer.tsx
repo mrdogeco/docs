@@ -1,7 +1,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import { SiGithub, SiReddit, SiX, SiInstagram } from "react-icons/si"
-import { FaLinkedin } from "react-icons/fa"
+import { FaLinkedin, } from "react-icons/fa"
 
 const LINK_GROUPS = [
   {
@@ -22,17 +22,17 @@ const LINK_GROUPS = [
 ]
 
 const SOCIAL_LINKS = [
-  { label: "X", url: "https://x.com/mrdogeapp", icon: SiX },
-  { label: "Instagram", url: "https://www.instagram.com/mrdoge.ai/", icon: SiInstagram },
-  { label: "LinkedIn", url: "https://www.linkedin.com/company/mrdoge/", icon: FaLinkedin },
-  { label: "Reddit", url: "https://www.reddit.com/r/mrdoge/", icon: SiReddit },
   { label: "GitHub", url: "https://github.com/mrdogeco", icon: SiGithub },
+  { label: "Reddit", url: "https://www.reddit.com/r/mrdoge/", icon: SiReddit },
+  { label: "X", url: "https://x.com/mrdogeapp", icon: SiX, size: "size-3.5" },
+  { label: "LinkedIn", url: "https://www.linkedin.com/company/mrdoge/", icon: FaLinkedin, size: "size-5" },
+  { label: "Instagram", url: "https://www.instagram.com/mrdoge.ai/", icon: SiInstagram },
 ]
 
 export function Footer() {
   return (
     <footer className="mt-24 border-t">
-      <div className="mx-auto max-w-(--fd-layout-width) px-6 pt-16">
+      <div className="mx-auto max-w-(--fd-layout-width) px-4 pt-16">
         <div className="grid gap-12 md:grid-cols-5">
           <div className="md:col-span-2">
             <Link href="/" aria-label="Home" className="block size-fit">
@@ -75,14 +75,14 @@ export function Footer() {
         </div>
       </div>
 
-      <div className="mx-auto max-w-(--fd-layout-width) px-6">
+      <div className="mx-auto max-w-(--fd-layout-width) px-4">
         <div className="my-6 flex flex-wrap items-center justify-between gap-6 border-t py-6">
           <span className="text-sm text-muted-foreground">
             © {new Date().getFullYear()} Mr. Doge
           </span>
 
           <div className="flex items-center gap-4">
-            {SOCIAL_LINKS.map(({ label, url, icon: Icon }) => (
+            {SOCIAL_LINKS.map(({ label, url, icon: Icon, size = "size-4" }) => (
               <Link
                 key={label}
                 href={url}
@@ -91,14 +91,14 @@ export function Footer() {
                 aria-label={label}
                 className="text-muted-foreground hover:text-foreground"
               >
-                <Icon className="size-4" />
+                <Icon className={size} />
               </Link>
             ))}
           </div>
         </div>
       </div>
 
-      <div className="mx-auto max-w-(--fd-layout-width) space-y-3 px-6 pb-12">
+      <div className="mx-auto max-w-(--fd-layout-width) space-y-3 px-4 pb-12">
         <p className="text-xs leading-relaxed text-muted-foreground/70">
           The Mr. Doge SDK provides sports data, odds, and AI-generated
           recommendations as statistical output — not guarantees of any

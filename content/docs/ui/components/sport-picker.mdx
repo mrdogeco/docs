@@ -1,0 +1,97 @@
+---
+title: Sport Picker
+description: Icon-based sport filter.
+---
+
+import { SportPicker } from "@/registry/mrdoge-ui/sport-picker/sport-picker"
+import { InstallTabs } from "@/components/docs/install-tabs"
+import { allSportOptions } from "@/lib/sdk-adapters/sport-picker"
+
+<ComponentPreview>
+  <SportPicker sports={allSportOptions} selected="soccer" />
+</ComponentPreview>
+
+## Installation
+
+<InstallTabs name="sport-picker" />
+
+## Usage
+
+```tsx
+import { SportPicker } from "@/components/sport-picker"
+
+<SportPicker
+  sports={[
+    { id: "soccer", label: "Soccer" },
+    { id: "basketball", label: "Basketball" },
+    { id: "tennis", label: "Tennis" },
+  ]}
+  selected="soccer"
+  onSelect={(sportId) => console.log(sportId)}
+/>
+```
+
+## Use with the Mr. Doge SDK
+
+The SDK's `SportName` enum is `snake_case` on the wire
+(`"american_football"`, `"ice_hockey"`) — this component's own `Sport` id
+is `kebab-case` instead, matching this registry's convention elsewhere
+(e.g. Match Timeline's `"yellow-card"`). The conversion table is keyed by
+the real enum, so a new sport added to the SDK shows up as a real type
+error here instead of silently missing an icon:
+
+```tsx
+import type { SportName } from "@mrdoge/protocol"
+import type { SportOption } from "@/components/sport-picker"
+
+const SPORT_LABELS: Record<SportName, SportOption> = {
+  soccer: { id: "soccer", label: "Soccer" },
+  basketball: { id: "basketball", label: "Basketball" },
+  american_football: { id: "american-football", label: "American Football" },
+  baseball: { id: "baseball", label: "Baseball" },
+  ice_hockey: { id: "ice-hockey", label: "Ice Hockey" },
+  volleyball: { id: "volleyball", label: "Volleyball" },
+  handball: { id: "handball", label: "Handball" },
+  tennis: { id: "tennis", label: "Tennis" },
+}
+
+function sportNamesToOptions(sports: SportName[]): SportOption[] {
+  return sports.map((sport) => SPORT_LABELS[sport])
+}
+```
+
+## Props
+
+<TypeTable
+  type={{
+    sports: {
+      type: "SportOption[]",
+      required: true,
+    },
+    selected: {
+      type: "string",
+    },
+    onSelect: {
+      type: "(sportId: string) => void",
+    },
+    className: {
+      type: "string",
+    },
+  }}
+/>
+
+### SportOption
+
+<TypeTable
+  type={{
+    id: {
+      description: 'Kebab-case sport id, e.g. "soccer", "american-football", "ice-hockey".',
+      type: "string",
+      required: true,
+    },
+    label: {
+      type: "string",
+      required: true,
+    },
+  }}
+/>

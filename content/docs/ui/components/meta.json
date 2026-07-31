@@ -1,11 +1,17 @@
 {
   "pages": [
     "event-card",
+    "ai-recommendation-card",
+    "settlement-badge",
     "odds-selector",
     "live-indicator",
     "bet-slip",
     "match-timeline",
     "team-form-indicator",
-    "competition-header"
+    "competition-header",
+    "entity-image",
+    "odds-board",
+    "sport-picker",
+    "region-accordion"
   ]
 }

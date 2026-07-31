@@ -49,14 +49,14 @@ const OTHER_SOCIAL_LINKS: NonNullable<BaseLayoutProps["links"]> = [
   {
     text: "X",
     url: "https://x.com/mrdogeapp",
-    icon: <SiX className="size-4" />,
+    icon: <SiX className="size-3.5" />,
     type: "icon",
     external: true,
   },
   {
     text: "LinkedIn",
     url: "https://www.linkedin.com/company/mrdoge/",
-    icon: <FaLinkedin className="size-4" />,
+    icon: <FaLinkedin className="size-5" />,
     type: "icon",
     external: true,
   },

@@ -35,6 +35,66 @@ import { EventCard } from "@/components/event-card"
 />
 ```
 
+## Use with the Mr. Doge SDK
+
+EventCard takes plain props, so it works with any data source. Mapping a
+real `matches.get()` (plus a market from `odds.list()`) response onto those
+props is a small, pure function — type-checked against the actual SDK
+response shape, so a schema change fails to compile instead of silently
+going stale:
+
+```tsx
+import type { MatchDetail, Market } from "@mrdoge/protocol"
+import type { EventCardProps } from "@/components/event-card"
+import type { LiveIndicatorStatus } from "@/components/live-indicator"
+import type { OddsOption } from "@/components/odds-selector"
+
+// Clock.state uses the same vocabulary as LiveIndicatorStatus, so it
+// passes straight through when present — falls back to the coarser
+// match.status for matches with no stats yet.
+function toLiveIndicatorStatus(match: MatchDetail): LiveIndicatorStatus {
+  const clockState = match.stats?.clock?.state
+  if (clockState) return clockState
+
+  switch (match.status) {
+    case "upcoming":
+      return "scheduled"
+    case "live":
+      return "live"
+    case "completed":
+      return "finished"
+  }
+}
+
+function toOddsOptions(market?: Market): OddsOption[] {
+  if (!market) return []
+  return market.betItems.map((item) => ({
+    id: item.id,
+    label: item.caption ?? item.code,
+    price: item.price.toFixed(2),
+    suspended: !item.isAvailable,
+  }))
+}
+
+function matchToEventCardProps(match: MatchDetail, market?: Market): EventCardProps {
+  return {
+    competition: match.competition.name,
+    status: toLiveIndicatorStatus(match),
+    kickoff: match.startTime,
+    elapsed: match.stats?.clock?.display ?? undefined,
+    home: { name: match.homeTeam.name },
+    away: { name: match.awayTeam.name },
+    homeScore: match.stats?.homeScore,
+    awayScore: match.stats?.awayScore,
+    odds: toOddsOptions(market),
+  }
+}
+```
+
+The live preview above renders through exactly this pattern — the demo
+data is declared as a real `satisfies MatchDetail` / `satisfies Market`
+object, not a free-form one.
+
 ## Props
 
 <TypeTable
@@ -46,7 +106,7 @@ import { EventCard } from "@/components/event-card"
     },
     status: {
       description: "See Live Indicator.",
-      type: '"scheduled" | "live" | "finished"',
+      type: '"scheduled" | "live" | "paused" | "intermission" | "interrupted" | "finished"',
       required: true,
     },
     kickoff: {

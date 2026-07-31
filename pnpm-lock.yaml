@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@mrdoge/protocol':
+        specifier: ^0.4.1
+        version: 0.4.1
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -657,6 +660,9 @@ packages:
     peerDependenciesMeta:
       '@cfworker/json-schema':
         optional: true
+
+  '@mrdoge/protocol@0.4.1':
+    resolution: {integrity: sha512-G8JZnuWN5Nda4J8UacLhpGxk346MDdTNrzKlFg0eSGSj1fEfyL1Uc9GN19Ha0GxAcKkOq0MZSKkrA8UV+othmw==}
 
   '@napi-rs/wasm-runtime@1.2.0':
     resolution: {integrity: sha512-kDoONqMa+VnZ4vvvu/ZUurpJ4gkZU57e7g69qpNgWhYcZFPUHZM2CEMKm+cG6ufDVALbjMvfmMjFVqaK7uEMnA==}
@@ -5117,6 +5123,10 @@ snapshots:
       zod-to-json-schema: 3.25.2(zod@3.25.76)
     transitivePeerDependencies:
       - supports-color
+
+  '@mrdoge/protocol@0.4.1':
+    dependencies:
+      zod: 3.25.76
 
   '@napi-rs/wasm-runtime@1.2.0(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)':
     dependencies:

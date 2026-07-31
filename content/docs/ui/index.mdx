@@ -45,7 +45,7 @@ This copies the component and its dependencies into your project under
 ## Components
 
 Event Card, Odds Selector, Live Indicator, Bet Slip, Match Timeline, Team
-Form Indicator, and Competition Header. See [Components](/docs/components)
+Form Indicator, and Competition Header. See [Components](/docs/ui/components)
 for a live preview, props, and the install command for each.
 
 ## Use with the Mr. Doge SDK
@@ -53,34 +53,8 @@ for a live preview, props, and the install command for each.
 mrdoge-ui components accept plain props, so they work with any data
 source. They pair directly with
 [`@mrdoge/client`](https://mrdoge.ai), which provides typed, real-time
-sports data over HTTP and WebSocket:
-
-```tsx
-import { MrDoge } from "@mrdoge/client"
-import { EventCard } from "@/components/event-card"
-
-const mrdoge = new MrDoge({ authEndpoint: "/api/mrdoge/token" })
-
-const match = await mrdoge.matches.get({ id: matchId })
-const [market] = await mrdoge.odds.list({ matchId })
-
-// mrdoge-ui uses generic status labels so it has no dependency on the
-// SDK's vocabulary — map the SDK's three states to the component's three.
-const status = { upcoming: "scheduled", live: "live", completed: "finished" }[
-  match.status
-]
-
-<EventCard
-  competition={match.competition.name}
-  status={status}
-  kickoff={match.startTime}
-  home={{ name: match.homeTeam.name }}
-  away={{ name: match.awayTeam.name }}
-  odds={market.betItems.map((item) => ({
-    id: item.id,
-    label: item.code,
-    price: item.price.toFixed(2),
-    suspended: !item.isAvailable,
-  }))}
-/>
-```
+sports data over HTTP and WebSocket — each component's own page has a
+"Use with the Mr. Doge SDK" section showing the actual mapping function
+from a real SDK response to that component's props, type-checked against
+`@mrdoge/protocol` rather than hand-typed. See [Event Card](/docs/ui/components/event-card#use-with-the-mr-doge-sdk)
+for the first one.
