@@ -88,8 +88,8 @@ function marketsToOddsBoardProps(markets: Market[]): OddsBoardProps {
       required: true,
     },
     onSelectOption: {
-      description: "Called with (marketId, optionId) when an odds button is pressed.",
-      type: "(marketId: string, optionId: string) => void",
+      description: "Called with (marketId, optionId) when an odds button is pressed, or (marketId, undefined) when pressing the already-selected option deselects it.",
+      type: "(marketId: string, optionId: string | undefined) => void",
     },
     className: {
       type: "string",

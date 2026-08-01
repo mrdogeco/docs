@@ -113,7 +113,7 @@ export function HomeGallery() {
             away={{ name: "Flamengo" }}
             homeScore={2}
             awayScore={1}
-            odds={sampleOdds}
+            odds={{ market: "Match Result", options: sampleOdds }}
             selectedOddsId={selectedOddsId}
             onSelectOdds={setSelectedOddsId}
           />

@@ -55,9 +55,13 @@ for a live preview, props, and the install command for each.
 [`useLiveMatch`](/docs/ui/hooks/use-live-match) and
 [`useLiveOdds`](/docs/ui/hooks/use-live-odds) subscribe to a real match (and
 its odds) over WebSocket, so a component like Match Card can show live data
-with no glue code of your own. They pull in `@mrdoge/client` / `@mrdoge/node`
-directly and need a `MRDOGE_ODDS_API_KEY` — see each hook's own page for
-setup.
+with no glue code of your own. [`useTrendingMatches`](/docs/ui/hooks/use-trending-matches)
+resolves *which* match — today's most-viewed, ranked server-side. These
+three pull in `@mrdoge/client` / `@mrdoge/node` directly and need a
+`MRDOGE_ODDS_API_KEY` — see each hook's own page for setup.
+[`useOddsMovement`](/docs/ui/hooks/use-odds-movement) is different: no SDK
+setup at all, just a pure diff over whatever market
+`useLiveOdds` gives you, to drive Odds Selector's up/down indicators.
 
 ## Use with the Mr. Doge SDK
 

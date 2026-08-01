@@ -1,0 +1,78 @@
+---
+title: useOddsMovement
+description: Diffs each bet item's price against its previous snapshot, so an Odds Selector can show up/down movement indicators as live odds change.
+---
+
+import { MatchCardLiveWithOddsDemo } from "@/components/docs/demos/match-card-live-with-odds-demo"
+import { InstallTabs } from "@/components/docs/install-tabs"
+
+<ExampleSection file="components/docs/demos/match-card-live-with-odds-demo.tsx">
+  <MatchCardLiveWithOddsDemo />
+</ExampleSection>
+
+Movement isn't something the SDK computes or sends — `odds.subscribe`
+pushes a full replace-in-place snapshot on every change (see
+[useLiveOdds](/docs/ui/hooks/use-live-odds)), with no "this went up" flag
+attached. This hook remembers the previous snapshot's prices itself and
+diffs against the new one, entirely client-side.
+
+## Installation
+
+<InstallTabs name="use-odds-movement" />
+
+Pairs with [useLiveOdds](/docs/ui/hooks/use-live-odds) — pass it the same
+market. No extra SDK setup beyond what useLiveOdds already needs.
+
+## Usage
+
+```tsx
+import { useLiveOdds } from "@/hooks/use-live-odds"
+import { useOddsMovement } from "@/hooks/use-odds-movement"
+import { OddsSelector } from "@/components/odds-selector"
+
+function Market({ matchId }: { matchId: string }) {
+  const market = useLiveOdds({ matchId, betTypes: ["SOCCER_MATCH_RESULT"] })
+  const movementById = useOddsMovement(market)
+
+  if (!market) return null
+
+  return (
+    <OddsSelector
+      options={market.betItems.map((item) => ({
+        id: item.id,
+        label: item.code,
+        price: item.price.toFixed(2),
+        suspended: !item.isAvailable,
+        movement: movementById[item.id],
+      }))}
+    />
+  )
+}
+```
+
+This is exactly what [Match Card](/docs/ui/components/match-card)'s own
+SDK adapter does — `matchToMatchCardProps(match, market, movementById)`
+takes the result as an optional third argument.
+
+## Parameters
+
+<TypeTable
+  type={{
+    market: {
+      description: "The current market snapshot, e.g. from useLiveOdds. Pass undefined/null while loading or unavailable — the hook just returns an empty object.",
+      type: "Market | null | undefined",
+      required: true,
+    },
+  }}
+/>
+
+## Returns
+
+`Record<string, "up" | "down" | "flat">` — keyed by bet item id. In
+practice only `"up"` and `"down"` are ever produced; `"flat"` exists on
+the type (`OddsMovement`, from Odds Selector) but this hook never emits
+it. A bet item only gets an entry once there's a previous price to compare
+against — the first snapshot ever seen for a given id has nothing to
+diff, and an unchanged price isn't given an entry either. A color that
+never goes away would just be noise; ids missing from the result should
+render with the default price color.

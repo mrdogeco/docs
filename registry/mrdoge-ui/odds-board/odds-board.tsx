@@ -16,7 +16,8 @@ export interface OddsBoardMarket {
 
 export interface OddsBoardProps {
   markets: OddsBoardMarket[]
-  onSelectOption?: (marketId: string, optionId: string) => void
+  /** Called with the pressed option's id, or `undefined` when pressing the already-selected option deselects it. */
+  onSelectOption?: (marketId: string, optionId: string | undefined) => void
   className?: string
 }
 
@@ -28,16 +29,13 @@ export function OddsBoard({
   return (
     <div className={cn("flex flex-col gap-4", className)}>
       {markets.map((market) => (
-        <div key={market.id} className="flex flex-col gap-1.5">
-          <span className="text-xs font-medium text-muted-foreground">
-            {market.label}
-          </span>
-          <OddsSelector
-            options={market.options}
-            selectedId={market.selectedOptionId}
-            onSelect={(optionId) => onSelectOption?.(market.id, optionId)}
-          />
-        </div>
+        <OddsSelector
+          key={market.id}
+          label={market.label}
+          options={market.options}
+          selectedId={market.selectedOptionId}
+          onSelect={(optionId) => onSelectOption?.(market.id, optionId)}
+        />
       ))}
     </div>
   )

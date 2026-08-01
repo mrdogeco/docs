@@ -1,0 +1,78 @@
+---
+title: useTrendingMatches
+description: Today's most-viewed matches, ranked server-side by views. One-shot, not a subscription.
+---
+
+import { TrendingMatchesDemo } from "@/components/docs/demos/trending-matches-demo"
+import { InstallTabs } from "@/components/docs/install-tabs"
+
+<ExampleSection file="components/docs/demos/trending-matches-demo.tsx">
+  <TrendingMatchesDemo />
+</ExampleSection>
+
+This is the real ranking behind `matches.trending()` — today's matches with
+`views > 0`, ordered by views descending. Not a placeholder or a curated
+list.
+
+## Installation
+
+<InstallTabs name="use-trending-matches" />
+
+## Usage
+
+```tsx
+import { useTrendingMatches } from "@/hooks/use-trending-matches"
+
+function Trending() {
+  const matches = useTrendingMatches({ sports: ["soccer"], limit: 5 })
+
+  if (matches === undefined) return <p>Loading…</p>
+  if (matches === null) return <p>Couldn't load trending matches.</p>
+
+  return matches.map((m) => <p key={m.id}>{m.homeTeam.name} vs {m.awayTeam.name}</p>)
+}
+```
+
+Takes a single options object, like every real SDK method it wraps
+(`matches.trending(params)`) — not positional arguments.
+
+## Parameters
+
+<TypeTable
+  type={{
+    sports: {
+      description: 'Restrict to specific sports, e.g. ["soccer"]. Omit for all sports.',
+      type: "string[]",
+    },
+    limit: {
+      description: "Result count. Server default 5, capped at 50.",
+      type: "number",
+    },
+  }}
+/>
+
+## Returns
+
+`Match[] | null | undefined` — `undefined` while the request is in flight,
+`null` if it failed (no fallback data), otherwise the ranked list. One-shot:
+this doesn't push live updates the way `useLiveMatch`/`useLiveOdds` do —
+call it again (or remount) to refresh.
+
+## Composing with useLiveMatch
+
+`useTrendingMatches` only resolves *which* match — pair it with
+[useLiveMatch](/docs/ui/hooks/use-live-match) to actually subscribe to one:
+
+```tsx
+const trending = useTrendingMatches({ sports: ["soccer"], limit: 1 })
+const matchId = trending?.[0]?.id
+const match = useLiveMatch({ matchId })
+```
+
+This is close to the pattern behind the "With odds" example on
+[Match Card](/docs/ui/components/match-card): one card there prefers the
+first result that isn't live yet (pre-match odds boards are complete and
+stable, where in-play markets suspend/change constantly), and the other
+deliberately prefers a live one instead, to show the row variant with real
+in-play state — score, elapsed clock, red cards. Same trending list, two
+different candidates picked out of it.

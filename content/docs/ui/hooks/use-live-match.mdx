@@ -29,8 +29,8 @@ sees the raw key.
 ```tsx
 import { useLiveMatch } from "@/hooks/use-live-match"
 
-function Match({ matchId }: { matchId: string }) {
-  const match = useLiveMatch(matchId)
+function Match({ matchId }: { matchId: string | undefined }) {
+  const match = useLiveMatch({ matchId })
 
   if (match === undefined) return <p>Loading…</p>
   if (match === null) return <p>Couldn't load this match.</p>
@@ -39,13 +39,16 @@ function Match({ matchId }: { matchId: string }) {
 }
 ```
 
+Takes a single options object, like every real SDK method it wraps
+(`matches.subscribe(params)`) — not positional arguments.
+
 ## Parameters
 
 <TypeTable
   type={{
     matchId: {
-      description: "The match to subscribe to.",
-      type: "string",
+      description: "The match to subscribe to. Pass undefined to skip subscribing — e.g. while some other lookup is still resolving which match to show.",
+      type: "string | undefined",
       required: true,
     },
   }}
@@ -53,10 +56,10 @@ function Match({ matchId }: { matchId: string }) {
 
 ## Returns
 
-`MatchDetail | null | undefined` — `undefined` while the initial subscribe
-is in flight, `null` if it failed (no fallback data — an honest empty state
-beats a fake one), otherwise the current snapshot, updated in place as
-`stats.upd` / `status.upd` events arrive.
+`MatchDetail | null | undefined` — `undefined` while loading (or while
+`matchId` is `undefined`), `null` if the subscribe failed (no fallback data
+— an honest empty state beats a fake one), otherwise the current snapshot,
+updated in place as `stats.upd` / `status.upd` events arrive.
 
 ## Why a hook, not just the component
 

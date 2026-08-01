@@ -1,18 +1,6 @@
 import type { Market } from "@mrdoge/protocol"
 import type { OddsBoardProps } from "@/registry/mrdoge-ui/odds-board/odds-board"
-import { toOddsOptions } from "@/lib/sdk-adapters/match-card"
-
-// Market.betType is a raw sysname on the wire (e.g. "SOCCER_MATCH_RESULT"),
-// not a display label — a real name lookup table is out of scope here, so
-// this falls back to a light cleanup (underscores to spaces, title case)
-// rather than the raw sysname or a fabricated name.
-function toMarketLabel(betType: string): string {
-  return betType
-    .toLowerCase()
-    .split("_")
-    .map((word) => word[0].toUpperCase() + word.slice(1))
-    .join(" ")
-}
+import { toOddsOptions, toMarketLabel } from "@/lib/sdk-adapters/match-card"
 
 /**
  * Maps a real `odds.list({ matchId })` response (every market for a match

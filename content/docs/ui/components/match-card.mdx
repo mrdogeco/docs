@@ -5,6 +5,7 @@ description: Compact match row with teams, score or kickoff time, status, and an
 
 import { MatchCardLiveDemo } from "@/components/docs/demos/match-card-live-demo"
 import { MatchCardLiveWithOddsDemo } from "@/components/docs/demos/match-card-live-with-odds-demo"
+import { MatchCardLoadingDemo } from "@/components/docs/demos/match-card-loading-demo"
 import { InstallTabs } from "@/components/docs/install-tabs"
 
 <ExampleSection file="components/docs/demos/match-card-live-demo.tsx">
@@ -13,13 +14,53 @@ import { InstallTabs } from "@/components/docs/install-tabs"
 
 ## With odds
 
-Pass `odds` to render a compact odds row below the match, using the same
-options as [Odds Selector](/docs/ui/components/odds-selector). This example
-subscribes to live odds too (Business tier) — if none are available, the row
+Pass `odds` to render an odds row using the same options as
+[Odds Selector](/docs/ui/components/odds-selector) — options are labeled
+"1" / "X" / "2" here rather than team names, since the odds row has to stay
+narrow. Set `oddsPosition="right"` to keep it beside the match instead of
+below — a single wide row, suited to desktop/wide layouts (shown second
+below, on a live match to show off the row variant with real live state —
+score, elapsed clock, red cards). This example subscribes to live odds too
+(Business tier) — if none are available for a given match, that card's row
 just doesn't render.
 
 <ExampleSection file="components/docs/demos/match-card-live-with-odds-demo.tsx">
   <MatchCardLiveWithOddsDemo />
+</ExampleSection>
+
+### Selecting an option
+
+Odds selection is controlled, the same pattern as
+[Odds Selector](/docs/ui/components/odds-selector#props) itself — Match
+Card has no internal state for it. Track the selected id yourself and pass
+it back in:
+
+```tsx
+const [selectedOddsId, setSelectedOddsId] = useState<string>()
+
+<MatchCard
+  {...matchCardProps}
+  selectedOddsId={selectedOddsId}
+  onSelectOdds={setSelectedOddsId}
+/>
+```
+
+Omit both and the row stays fully clickable, but nothing will ever render
+as selected — there's no fallback state to fall back to. Pressing the
+already-selected option deselects it — `onSelectOdds` fires with
+`undefined` — so `setSelectedOddsId` above is really all the logic this
+needs; there's no toggle to write yourself. The example above tracks
+`selectedOddsId` independently per card, since each is showing a different
+match.
+
+## Loading
+
+Pass `loading` on its own — no other prop is needed — to render a skeleton
+with the exact same dimensions, so nothing shifts once real data arrives.
+Both examples above already use this while their subscription connects.
+
+<ExampleSection file="components/docs/demos/match-card-loading-demo.tsx">
+  <MatchCardLoadingDemo />
 </ExampleSection>
 
 ## Installation
@@ -36,9 +77,9 @@ going stale:
 
 ```tsx
 import type { MatchDetail, Market } from "@mrdoge/protocol"
-import type { MatchCardProps } from "@/components/match-card"
+import type { MatchCardDataProps, MatchCardOdds } from "@/components/match-card"
 import type { LiveIndicatorStatus } from "@/components/live-indicator"
-import type { OddsOption } from "@/components/odds-selector"
+import type { OddsOption, OddsMovement } from "@/components/odds-selector"
 
 // match.status is authoritative and always fresh. Clock.state adds
 // paused/intermission/interrupted, but comes from the live-stats feed,
@@ -50,14 +91,54 @@ function toLiveIndicatorStatus(match: MatchDetail): LiveIndicatorStatus {
   return match.stats?.clock?.state ?? "live"
 }
 
-function toOddsOptions(market?: Market): OddsOption[] {
+// Outcome order (1/X/2 left-to-right, Over before Under, ...) is decided
+// server-side — the SDK gateway orders every market's betItems before
+// they're ever returned, so there's nothing to sort here.
+//
+// Match Card's odds row is narrow, so it asks for "code" (1/X/2) instead
+// of the default team-name caption — short, and never needs truncating.
+function toOddsOptions(
+  market?: Market,
+  {
+    labelFrom = "caption",
+    movementById,
+  }: {
+    labelFrom?: "caption" | "code"
+    /** From useOddsMovement(market) — id -> "up" | "down" since the previous snapshot. */
+    movementById?: Record<string, OddsMovement>
+  } = {}
+): OddsOption[] {
   if (!market) return []
   return market.betItems.map((item) => ({
     id: item.id,
-    label: item.caption ?? item.code,
+    label: labelFrom === "code" ? item.code : (item.caption ?? item.code),
     price: item.price.toFixed(2),
     suspended: !item.isAvailable,
+    movement: movementById?.[item.id],
   }))
+}
+
+// Market.betType is a raw sysname on the wire (e.g. "SOCCER_MATCH_RESULT"),
+// not a display label — a real name lookup table is out of scope here, so
+// this falls back to a light cleanup (underscores to spaces, title case)
+// rather than the raw sysname or a fabricated name.
+function toMarketLabel(betType: string): string {
+  return betType
+    .toLowerCase()
+    .split("_")
+    .map((word) => word[0].toUpperCase() + word.slice(1))
+    .join(" ")
+}
+
+function toMatchCardOdds(
+  market?: Market,
+  movementById?: Record<string, OddsMovement>
+): MatchCardOdds | undefined {
+  if (!market) return undefined
+  return {
+    market: toMarketLabel(market.betType),
+    options: toOddsOptions(market, { labelFrom: "code", movementById }),
+  }
 }
 
 // Public, unauthenticated, cached CDN — not part of the Team shape itself.
@@ -66,7 +147,11 @@ function teamLogoUrl(teamId: number) {
   return `https://api.mrdoge.co/images/teams/${teamId}.png`
 }
 
-function matchToMatchCardProps(match: MatchDetail, market?: Market): MatchCardProps {
+function matchToMatchCardProps(
+  match: MatchDetail,
+  market?: Market,
+  movementById?: Record<string, OddsMovement>,
+): MatchCardDataProps {
   // Red cards are soccer-specific — MatchStats is a discriminated union per
   // sport, so narrow before reading homeRedCards/awayRedCards.
   const stats = match.stats?.sport === "soccer" ? match.stats : undefined
@@ -89,20 +174,33 @@ function matchToMatchCardProps(match: MatchDetail, market?: Market): MatchCardPr
     },
     homeScore: match.stats?.homeScore,
     awayScore: match.stats?.awayScore,
-    odds: toOddsOptions(market),
+    odds: toMatchCardOdds(market, movementById),
   }
 }
 ```
 
-Both examples above render through exactly this pattern — they're wired to a
-real, live `matches.subscribe()` connection (see the example source via
+`movementById` is optional throughout — pass
+[useOddsMovement](/docs/ui/hooks/use-odds-movement)`(market)`'s result to
+show up/down indicators on options as prices change, or omit it entirely
+and options just render without one.
+
+Both examples above render through exactly this pattern — they're wired to
+a real, live `matches.subscribe()` connection (see the example source via
 "View Code"), and this same function maps each push straight into
 `MatchCard`'s props.
 
 ## Props
 
+`loading: true` is mutually exclusive with every other prop — see
+[Loading](#loading) above. Everything below applies when `loading` is
+omitted or `false`.
+
 <TypeTable
   type={{
+    loading: {
+      description: 'Renders a skeleton instead, with no other prop required. See MatchCardSkeleton below.',
+      type: "boolean",
+    },
     status: {
       description: "See Live Indicator.",
       type: '"scheduled" | "live" | "paused" | "intermission" | "interrupted" | "finished"',
@@ -115,6 +213,10 @@ real, live `matches.subscribe()` connection (see the example source via
     elapsed: {
       description: 'Elapsed match clock (e.g. "67\'"), shown when status is "live".',
       type: "string",
+    },
+    timeFormat: {
+      description: 'Clock format for the kickoff time. Defaults to "24h".',
+      type: '"12h" | "24h"',
     },
     home: {
       description: "Home team. See MatchCardTeam below.",
@@ -139,16 +241,20 @@ real, live `matches.subscribe()` connection (see the example source via
       type: '"left" | "right"',
     },
     odds: {
-      description: "Renders a compact odds row below the match when provided.",
-      type: "OddsOption[]",
+      description: "Renders an odds row when provided. See MatchCardOdds below.",
+      type: "MatchCardOdds",
+    },
+    oddsPosition: {
+      description: 'Where the odds card renders: "bottom" (default, stacked) or "right" (stays a single row — better for wide/desktop layouts).',
+      type: '"bottom" | "right"',
     },
     selectedOddsId: {
       description: "Id of the currently selected odds option.",
       type: "string",
     },
     onSelectOdds: {
-      description: "Called with the option id when an odds button is pressed.",
-      type: "(id: string) => void",
+      description: "Called with the option id when an odds button is pressed, or undefined when pressing the already-selected option deselects it.",
+      type: "(id: string | undefined) => void",
     },
     className: {
       type: "string",
@@ -173,3 +279,27 @@ real, live `matches.subscribe()` connection (see the example source via
     },
   }}
 />
+
+### MatchCardOdds
+
+<TypeTable
+  type={{
+    market: {
+      description: 'Market name, e.g. "Match Result". Not rendered — kept on the type in case a future layout has room for it.',
+      type: "string",
+      required: true,
+    },
+    options: {
+      description: "See OddsOption on the Odds Selector page.",
+      type: "OddsOption[]",
+      required: true,
+    },
+  }}
+/>
+
+### MatchCardSkeleton
+
+`<MatchCard loading />` renders this internally, but it's also exported on
+its own — `import { MatchCardSkeleton } from "@/components/match-card"` —
+for a loading list of several cards before any of them have data yet.
+Takes only `className`.

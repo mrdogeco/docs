@@ -1,14 +1,13 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
-  "name": "odds-board",
-  "title": "Odds Board",
-  "description": "Every market for a match at once, each with its own Odds Selector.",
-  "registryDependencies": [],
+  "name": "use-odds-movement",
+  "title": "useOddsMovement",
+  "description": "Diffs each bet item's price against its previous snapshot, so an Odds Selector can show up/down movement indicators as live odds change.",
   "files": [
     {
-      "path": "registry/mrdoge-ui/odds-board/odds-board.tsx",
-      "content": "\"use client\"\n\nimport { cn } from \"@/lib/utils\"\nimport {\n  OddsSelector,\n  type OddsOption,\n} from \"@/registry/mrdoge-ui/odds-selector/odds-selector\"\n\nexport interface OddsBoardMarket {\n  id: string\n  /** Human-readable market name, e.g. \"Match Winner\", \"Total Goals\". */\n  label: string\n  options: OddsOption[]\n  selectedOptionId?: string\n}\n\nexport interface OddsBoardProps {\n  markets: OddsBoardMarket[]\n  /** Called with the pressed option's id, or `undefined` when pressing the already-selected option deselects it. */\n  onSelectOption?: (marketId: string, optionId: string | undefined) => void\n  className?: string\n}\n\nexport function OddsBoard({\n  markets,\n  onSelectOption,\n  className,\n}: OddsBoardProps) {\n  return (\n    <div className={cn(\"flex flex-col gap-4\", className)}>\n      {markets.map((market) => (\n        <OddsSelector\n          key={market.id}\n          label={market.label}\n          options={market.options}\n          selectedId={market.selectedOptionId}\n          onSelect={(optionId) => onSelectOption?.(market.id, optionId)}\n        />\n      ))}\n    </div>\n  )\n}\n",
-      "type": "registry:component"
+      "path": "registry/mrdoge-ui/use-odds-movement/use-odds-movement.ts",
+      "content": "\"use client\"\n\nimport { useMemo, useRef } from \"react\"\nimport type { Market } from \"@mrdoge/protocol\"\nimport type { OddsMovement } from \"@/registry/mrdoge-ui/odds-selector/odds-selector\"\n\n/**\n * Diffs each bet item's price against the price it had the last time this\n * hook saw a market for the same match, so an Odds Selector can show\n * up/down indicators as live odds change. Movement isn't something the SDK\n * computes or sends — `odds.subscribe` pushes a full replace-in-place\n * snapshot on every change (see useLiveOdds), so this hook remembers the\n * previous snapshot's prices itself and compares.\n *\n * A bet item with no prior snapshot to compare against (first time seen,\n * or the match/market just changed) has no entry in the result — nothing\n * to compare yet, not a \"flat\" tick. An unchanged price also has no entry,\n * on purpose: an indicator that never goes away would just be noise.\n */\nexport function useOddsMovement(\n  market: Market | null | undefined\n): Record<string, OddsMovement> {\n  const previousPrices = useRef<Map<string, number>>(new Map())\n\n  return useMemo(() => {\n    if (!market) return {}\n\n    const movement: Record<string, OddsMovement> = {}\n    const nextPrices = new Map<string, number>()\n\n    for (const item of market.betItems) {\n      const previous = previousPrices.current.get(item.id)\n      if (previous !== undefined && item.price !== previous) {\n        movement[item.id] = item.price > previous ? \"up\" : \"down\"\n      }\n      nextPrices.set(item.id, item.price)\n    }\n\n    previousPrices.current = nextPrices\n    return movement\n  }, [market])\n}\n",
+      "type": "registry:hook"
     },
     {
       "path": "registry/mrdoge-ui/odds-selector/odds-selector.tsx",
@@ -16,5 +15,5 @@
       "type": "registry:component"
     }
   ],
-  "type": "registry:component"
+  "type": "registry:hook"
 }

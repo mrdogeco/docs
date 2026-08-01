@@ -31,13 +31,24 @@ import { useLiveMatch } from "@/hooks/use-live-match"
 import { useLiveOdds } from "@/hooks/use-live-odds"
 
 function Match({ matchId }: { matchId: string }) {
-  const match = useLiveMatch(matchId)
-  const market = useLiveOdds(match?.id)
+  const match = useLiveMatch({ matchId })
+  const market = useLiveOdds({
+    matchId: match?.id,
+    betTypes: ["SOCCER_MATCH_RESULT", "SOCCER_MATCH_RESULT_PRELIVE"],
+  })
 
   // market is undefined while loading, null if unavailable
   // (wrong tier, or no live market on this match right now)
 }
 ```
+
+Takes a single options object, like every real SDK method it wraps
+(`odds.subscribe(params)`) — not positional arguments.
+
+Some markets use a different sysname before kickoff — the standard 1X2
+line above is `SOCCER_MATCH_RESULT_PRELIVE` up until the match goes live,
+then `SOCCER_MATCH_RESULT`. A given match only ever has one of the two at
+a time, so filtering on both gets the market regardless of match state.
 
 ## Parameters
 
@@ -47,6 +58,10 @@ function Match({ matchId }: { matchId: string }) {
       description: "The match to subscribe odds for. Pass undefined to skip subscribing (e.g. while the match itself is still loading).",
       type: "string | undefined",
       required: true,
+    },
+    betTypes: {
+      description: 'Restrict (and make deterministic) which market comes back. Omit to get every live market — this hook always returns just the first one, so without a filter that first one is whatever order the server sends. Some markets split by sysname across match state, e.g. ["SOCCER_MATCH_RESULT", "SOCCER_MATCH_RESULT_PRELIVE"] for the standard 1X2 line regardless of live/not-live.',
+      type: "string[]",
     },
   }}
 />

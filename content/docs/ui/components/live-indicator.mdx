@@ -31,26 +31,21 @@ import { LiveIndicator } from "@/components/live-indicator"
 
 ## Use with the Mr. Doge SDK
 
-`status` mirrors the real SDK's `Clock.state` vocabulary directly — no
-translation needed when that field is present:
+`status` mostly mirrors the real SDK's `Clock.state` vocabulary directly,
+but `match.status` (upcoming/live/completed) is the authoritative field,
+always kept fresh by the server — `clock.state` comes from the live-stats
+feed, which can stop updating once a match ends (frozen on "live" instead
+of ever reaching "finished"). So `match.status` decides the coarse bucket
+first; `clock.state` only refines *within* "live":
 
 ```tsx
 import type { MatchDetail } from "@mrdoge/protocol"
 import type { LiveIndicatorStatus } from "@/components/live-indicator"
 
 function toLiveIndicatorStatus(match: MatchDetail): LiveIndicatorStatus {
-  const clockState = match.stats?.clock?.state
-  if (clockState) return clockState
-
-  // Falls back to the coarser match.status for matches with no stats yet.
-  switch (match.status) {
-    case "upcoming":
-      return "scheduled"
-    case "live":
-      return "live"
-    case "completed":
-      return "finished"
-  }
+  if (match.status === "upcoming") return "scheduled"
+  if (match.status === "completed") return "finished"
+  return match.stats?.clock?.state ?? "live"
 }
 ```
 
@@ -63,12 +58,20 @@ function toLiveIndicatorStatus(match: MatchDetail): LiveIndicatorStatus {
       required: true,
     },
     kickoff: {
-      description: 'Kickoff time, shown when status is "scheduled".',
+      description: 'Kickoff time, shown when status is "scheduled" or "finished" (as the match date).',
       type: "Date | string",
     },
     elapsed: {
       description: 'Elapsed match clock (e.g. "67\'"), shown for every non-scheduled, non-finished status.',
       type: "string",
+    },
+    variant: {
+      description: '"badge" (default) renders a filled pill, for standalone use. "plain" renders just the colored label with no background, for dense layouts like Match Card\'s status column.',
+      type: '"badge" | "plain"',
+    },
+    timeFormat: {
+      description: 'Clock format for the kickoff time. Defaults to "24h".',
+      type: '"12h" | "24h"',
     },
     className: {
       type: "string",

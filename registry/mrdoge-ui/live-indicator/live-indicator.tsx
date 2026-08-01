@@ -26,14 +26,21 @@ export interface LiveIndicatorProps {
    * like Match Card's status column.
    */
   variant?: "badge" | "plain"
+  /**
+   * Clock format for the kickoff time.
+   *
+   * @defaultValue "24h"
+   */
+  timeFormat?: "12h" | "24h"
   className?: string
 }
 
-function formatKickoff(kickoff: Date | string) {
+function formatKickoff(kickoff: Date | string, timeFormat: "12h" | "24h" = "24h") {
   const date = typeof kickoff === "string" ? new Date(kickoff) : kickoff
   return date.toLocaleTimeString(undefined, {
     hour: "numeric",
     minute: "2-digit",
+    hour12: timeFormat === "12h",
   })
 }
 
@@ -56,6 +63,7 @@ export function LiveIndicator({
   kickoff,
   elapsed,
   variant = "badge",
+  timeFormat = "24h",
   className,
 }: LiveIndicatorProps) {
   if (variant === "plain") {
@@ -82,7 +90,7 @@ export function LiveIndicator({
 
     if (status === "finished") {
       return (
-        <div className={cn("flex flex-col items-center gap-px", className)}>
+        <div className={cn("flex flex-col items-center gap-1", className)}>
           <span className="text-xs font-bold leading-tight text-muted-foreground tabular-nums">
             {elapsed ?? "FT"}
           </span>
@@ -97,7 +105,7 @@ export function LiveIndicator({
 
     return (
       <span className={cn("text-xs font-medium leading-tight text-muted-foreground tabular-nums", className)}>
-        {kickoff ? formatKickoff(kickoff) : "—"}
+        {kickoff ? formatKickoff(kickoff, timeFormat) : "—"}
       </span>
     )
   }
@@ -143,7 +151,7 @@ export function LiveIndicator({
   return (
     <Badge variant="outline" className={cn("gap-1", className)}>
       <Clock className="size-3" />
-      {kickoff ? formatKickoff(kickoff) : "Scheduled"}
+      {kickoff ? formatKickoff(kickoff, timeFormat) : "Scheduled"}
     </Badge>
   )
 }

@@ -4,15 +4,15 @@
   "private": true,
   "description": "mrdoge.co — Mr. Doge SDK docs and marketing, mrdoge-ui component registry, docs, and showcase.",
   "scripts": {
-    "dev": "next dev -p 3002",
+    "dev": "next dev -p 3001",
     "build": "next build",
-    "start": "next start -p 3002",
+    "start": "next start -p 3001",
     "lint": "eslint"
   },
   "dependencies": {
-    "@mrdoge/client": "^0.4.1",
-    "@mrdoge/node": "^0.4.1",
-    "@mrdoge/protocol": "^0.4.1",
+    "@mrdoge/client": "^0.4.2",
+    "@mrdoge/node": "^0.4.2",
+    "@mrdoge/protocol": "^0.4.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "fumadocs-core": "^16.8.11",

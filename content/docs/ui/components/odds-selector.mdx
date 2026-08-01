@@ -1,6 +1,6 @@
 ---
 title: Odds Selector
-description: Selectable price buttons for a market, with price movement and suspended states.
+description: Labeled odds card for a market — selectable options with price movement and suspended states.
 ---
 
 import { OddsSelectorDemo } from "@/components/docs/demos/odds-selector-demo"
@@ -20,10 +20,11 @@ import { InstallTabs } from "@/components/docs/install-tabs"
 import { OddsSelector } from "@/components/odds-selector"
 
 <OddsSelector
+  label="Match Result"
   options={[
-    { id: "home", label: "1", price: "1.85", movement: "up" },
-    { id: "draw", label: "X", price: "3.40", movement: "flat" },
-    { id: "away", label: "2", price: "4.20", movement: "down", suspended: true },
+    { id: "home", label: "PSG", price: "2.50" },
+    { id: "draw", label: "Draw", price: "3.35" },
+    { id: "away", label: "Arsenal", price: "3.10" },
   ]}
   selectedId={selectedId}
   onSelect={setSelectedId}
@@ -34,6 +35,10 @@ import { OddsSelector } from "@/components/odds-selector"
 
 <TypeTable
   type={{
+    label: {
+      description: 'Market name shown as a header, e.g. "Match Result". Omit to render just the options.',
+      type: "string",
+    },
     options: {
       description: "The market's selections. See OddsOption below.",
       type: "OddsOption[]",
@@ -44,8 +49,12 @@ import { OddsSelector } from "@/components/odds-selector"
       type: "string",
     },
     onSelect: {
-      description: "Called with an option's id when it's pressed.",
-      type: "(id: string) => void",
+      description: "Called with an option's id when it's pressed, or undefined when pressing the already-selected option deselects it.",
+      type: "(id: string | undefined) => void",
+    },
+    variant: {
+      description: '"card" (default) renders its own border/background, for standalone use. "bare" drops that chrome — for embedding inside another card (e.g. Match Card\'s odds row) without a card-in-a-card look.',
+      type: '"card" | "bare"',
     },
     className: {
       type: "string",
@@ -62,7 +71,7 @@ import { OddsSelector } from "@/components/odds-selector"
       required: true,
     },
     label: {
-      description: 'Selection label, e.g. "1", "X", "2" or "Home", "Away".',
+      description: 'Selection label, e.g. "1", "X", "2" or a team name / "Draw".',
       type: "string",
       required: true,
     },
@@ -72,6 +81,7 @@ import { OddsSelector } from "@/components/odds-selector"
       required: true,
     },
     movement: {
+      description: 'Colors the price — "down" (shortening, more likely) green, "up" (drifting, less likely) red, "flat" or omitted stays the default color. Static here — for live data, see useOddsMovement below.',
       type: '"up" | "down" | "flat"',
     },
     suspended: {
@@ -80,3 +90,16 @@ import { OddsSelector } from "@/components/odds-selector"
     },
   }}
 />
+
+## useOddsMovement
+
+`movement` isn't something you'd normally compute by hand — pair
+[useLiveOdds](/docs/ui/hooks/use-live-odds) with
+[useOddsMovement](/docs/ui/hooks/use-odds-movement) to derive it from real
+price changes as they happen:
+
+```tsx
+const market = useLiveOdds({ matchId, betTypes: ["SOCCER_MATCH_RESULT"] })
+const movementById = useOddsMovement(market)
+// movementById[item.id] is "up" | "down" | undefined
+```

@@ -6,11 +6,7 @@ import { useLiveMatch } from "@/registry/mrdoge-ui/use-live-match/use-live-match
 import { DEMO_MATCH_ID } from "@/components/docs/sample-data"
 
 export function MatchCardLiveDemo() {
-  const match = useLiveMatch(DEMO_MATCH_ID)
-
-  if (match === undefined) {
-    return <p className="text-sm text-fd-muted-foreground">Loading…</p>
-  }
+  const match = useLiveMatch({ matchId: DEMO_MATCH_ID })
 
   if (match === null) {
     return <p className="text-sm text-fd-muted-foreground">Couldn't load this match right now.</p>
@@ -18,7 +14,7 @@ export function MatchCardLiveDemo() {
 
   return (
     <div className="w-full max-w-sm">
-      <MatchCard {...matchToMatchCardProps(match)} />
+      {match === undefined ? <MatchCard loading /> : <MatchCard {...matchToMatchCardProps(match)} />}
     </div>
   )
 }

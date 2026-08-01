@@ -46,8 +46,8 @@
       "name": "odds-selector",
       "type": "registry:component",
       "title": "Odds Selector",
-      "description": "Selectable price buttons for a market, with price movement and suspended states.",
-      "registryDependencies": ["button"],
+      "description": "Labeled odds card for a market: selectable options with price movement and suspended states.",
+      "registryDependencies": [],
       "files": [
         {
           "path": "registry/mrdoge-ui/odds-selector/odds-selector.tsx",
@@ -103,7 +103,7 @@
       "type": "registry:component",
       "title": "Match Card",
       "description": "Compact match row with teams, score or kickoff time, status, and an optional odds row.",
-      "registryDependencies": ["badge", "button"],
+      "registryDependencies": ["badge"],
       "files": [
         {
           "path": "registry/mrdoge-ui/match-card/match-card.tsx",
@@ -128,7 +128,7 @@
       "type": "registry:component",
       "title": "Odds Board",
       "description": "Every market for a match at once, each with its own Odds Selector.",
-      "registryDependencies": ["button"],
+      "registryDependencies": [],
       "files": [
         {
           "path": "registry/mrdoge-ui/odds-board/odds-board.tsx",
@@ -259,6 +259,47 @@
       "files": [
         {
           "path": "registry/mrdoge-ui/use-live-odds/use-live-odds.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/mrdoge-ui/mrdoge-client/mrdoge-client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/mrdoge-ui/mrdoge-token-route/route.ts",
+          "type": "registry:page",
+          "target": "app/api/mrdoge/token/route.ts"
+        }
+      ]
+    },
+    {
+      "name": "use-odds-movement",
+      "type": "registry:hook",
+      "title": "useOddsMovement",
+      "description": "Diffs each bet item's price against its previous snapshot, so an Odds Selector can show up/down movement indicators as live odds change.",
+      "files": [
+        {
+          "path": "registry/mrdoge-ui/use-odds-movement/use-odds-movement.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/mrdoge-ui/odds-selector/odds-selector.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "use-trending-matches",
+      "type": "registry:hook",
+      "title": "useTrendingMatches",
+      "description": "Today's most-viewed matches, ranked server-side by views. One-shot, not a subscription.",
+      "dependencies": ["@mrdoge/client", "@mrdoge/node", "server-only"],
+      "envVars": {
+        "MRDOGE_ODDS_API_KEY": ""
+      },
+      "files": [
+        {
+          "path": "registry/mrdoge-ui/use-trending-matches/use-trending-matches.ts",
           "type": "registry:hook"
         },
         {

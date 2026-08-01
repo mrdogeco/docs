@@ -128,6 +128,20 @@ re-broadcast filtered-out market updates to the customer over the wire.
 A subscription scoped to two market types receives only those markets'
 deltas; the others are dropped server-side.
 
+<Callout type="warn">
+  Some markets use a different `betType` sysname before kickoff than they
+  do once live. The standard 1X2 line, for example, is
+  `SOCCER_MATCH_RESULT_PRELIVE` up until the match goes live, then
+  `SOCCER_MATCH_RESULT` — a match only ever has one of the two at a time.
+  Filtering on `SOCCER_MATCH_RESULT` alone returns nothing for a match
+  that hasn't started yet. If you want the market regardless of match
+  state, filter on both:
+
+  ```ts
+  betTypes: ["SOCCER_MATCH_RESULT", "SOCCER_MATCH_RESULT_PRELIVE"]
+  ```
+</Callout>
+
 ## Localization
 
 `code` is the same identifier across every locale. `caption` is the
@@ -163,7 +177,12 @@ terminal because there's nothing live left to stream.
 ```ts
 const sub = await mrdoge.odds.subscribe({
   matchId,
-  betTypes: ["SOCCER_MATCH_RESULT", "SOCCER_UNDER_OVER", "SOCCER_BOTH_TEAMS_TO_SCORE"],
+  betTypes: [
+    "SOCCER_MATCH_RESULT",
+    "SOCCER_MATCH_RESULT_PRELIVE", // headline market pre-kickoff — see the betTypes note above
+    "SOCCER_UNDER_OVER",
+    "SOCCER_BOTH_TEAMS_TO_SCORE",
+  ],
   locale: "en",
   select: {
     id: true,

@@ -7,7 +7,7 @@ import type { FormResult } from "@/registry/mrdoge-ui/team-form-indicator/team-f
 // A specific, curated real match — not "whatever's live right now" — so the
 // live demo pages (see registry/mrdoge-ui/use-live-match/use-live-match.ts)
 // are predictable.
-export const DEMO_MATCH_ID = "47253069"
+export const DEMO_MATCH_ID = "45293428"
 
 // Typed against the real SDK response shape (satisfies Market[]/TimelineEvent[]/etc),
 // so a schema change in @mrdoge/protocol shows up here as a build failure
@@ -17,6 +17,7 @@ export const sampleMarkets = [
   {
     id: "market-1",
     betType: "SOCCER_MATCH_RESULT",
+    displayName: "Match Result",
     betItems: [
       { id: "home", code: "1", caption: null, price: 1.85, isAvailable: true },
       { id: "draw", code: "X", caption: null, price: 3.4, isAvailable: true },
@@ -26,6 +27,7 @@ export const sampleMarkets = [
   {
     id: "market-2",
     betType: "SOCCER_UNDER_OVER",
+    displayName: "Over/Under 2.5",
     betItems: [
       { id: "over", code: "O2.5", caption: "Over 2.5", price: 1.95, isAvailable: true },
       { id: "under", code: "U2.5", caption: "Under 2.5", price: 1.85, isAvailable: true },
@@ -34,6 +36,7 @@ export const sampleMarkets = [
   {
     id: "market-3",
     betType: "SOCCER_BOTH_TEAMS_TO_SCORE",
+    displayName: "Both Teams to Score",
     betItems: [
       { id: "yes", code: "GG", caption: "Yes", price: 1.72, isAvailable: true },
       { id: "no", code: "NG", caption: "No", price: 2.05, isAvailable: true },
@@ -42,9 +45,9 @@ export const sampleMarkets = [
 ] satisfies Market[]
 
 export const sampleOdds: OddsOption[] = [
-  { id: "home", label: "1", price: "1.85", movement: "up" },
-  { id: "draw", label: "X", price: "3.40", movement: "flat" },
-  { id: "away", label: "2", price: "4.20", movement: "down", suspended: true },
+  { id: "home", label: "Palmeiras", price: "1.85", movement: "up" },
+  { id: "draw", label: "Draw", price: "3.40", movement: "flat" },
+  { id: "away", label: "Flamengo", price: "4.20", movement: "down", suspended: true },
 ]
 
 export const sampleTimeline: MatchTimelineEntry[] = [
