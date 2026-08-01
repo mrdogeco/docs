@@ -7,6 +7,7 @@ import {
 } from "fumadocs-ui/layouts/docs/page"
 import { notFound } from "next/navigation"
 import { getMDXComponents } from "@/components/mdx"
+import { PageActions } from "@/components/docs/page-actions"
 import type { Metadata } from "next"
 import { createRelativeLink } from "fumadocs-ui/mdx"
 
@@ -23,7 +24,10 @@ export default async function Page(props: PageProps) {
 
   return (
     <DocsPage toc={page.data.toc} full={page.data.full}>
-      <DocsTitle>{page.data.title}</DocsTitle>
+      <div className="flex items-start justify-between gap-4">
+        <DocsTitle>{page.data.title}</DocsTitle>
+        <PageActions slug={page.slugs} />
+      </div>
       <DocsDescription>{page.data.description}</DocsDescription>
       <DocsBody>
         <MDX

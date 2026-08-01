@@ -1,0 +1,33 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "use-live-odds",
+  "title": "useLiveOdds",
+  "description": "Subscribes to a single match's live odds over WebSocket (Business tier) — the full latest markets array pushes on every change.",
+  "dependencies": [
+    "@mrdoge/client",
+    "@mrdoge/node",
+    "server-only"
+  ],
+  "files": [
+    {
+      "path": "registry/mrdoge-ui/use-live-odds/use-live-odds.ts",
+      "content": "\"use client\"\n\nimport { useEffect, useState } from \"react\"\nimport type { Market } from \"@mrdoge/protocol\"\nimport { getMrDogeClient } from \"@/registry/mrdoge-ui/mrdoge-client/mrdoge-client\"\n\n/**\n * undefined = loading, null = no live odds for this match (Business tier\n * only — no fallback, that's an honest empty state, not a fictional one).\n */\nexport function useLiveOdds(matchId: string | undefined) {\n  const [market, setMarket] = useState<Market | null | undefined>(undefined)\n\n  useEffect(() => {\n    if (!matchId) {\n      setMarket(undefined)\n      return\n    }\n\n    let cancelled = false\n    let subscription: { cancel: () => Promise<void> } | null = null\n\n    getMrDogeClient()\n      .odds.subscribe({ matchId })\n      .then((sub) => {\n        if (cancelled) {\n          sub.cancel()\n          return\n        }\n        subscription = sub\n        setMarket(sub.snapshot[0] ?? null)\n        sub.on(\"snapshot\", (markets) => setMarket(markets[0] ?? null))\n        sub.on(\"odds.upd\", (markets) => setMarket(markets[0] ?? null))\n      })\n      .catch(() => {\n        if (!cancelled) setMarket(null)\n      })\n\n    return () => {\n      cancelled = true\n      subscription?.cancel()\n    }\n  }, [matchId])\n\n  return market\n}\n",
+      "type": "registry:hook"
+    },
+    {
+      "path": "registry/mrdoge-ui/mrdoge-client/mrdoge-client.ts",
+      "content": "import { MrDoge } from \"@mrdoge/client\"\n\nlet client: MrDoge | null = null\n\n/** Browser-only — the SDK authenticates via short-lived tokens minted at /api/mrdoge/token, never a raw API key. */\nexport function getMrDogeClient() {\n  if (typeof window === \"undefined\") {\n    throw new Error(\"getMrDogeClient() must be called in the browser\")\n  }\n  if (!client) {\n    client = new MrDoge({ authEndpoint: \"/api/mrdoge/token\" })\n  }\n  return client\n}\n",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/mrdoge-ui/mrdoge-token-route/route.ts",
+      "content": "import \"server-only\"\nimport { NextResponse } from \"next/server\"\nimport { MrDoge } from \"@mrdoge/node\"\n\nlet client: MrDoge | null = null\n\nfunction getClient() {\n  if (!client) {\n    client = new MrDoge({ apiKey: process.env.MRDOGE_ODDS_API_KEY! })\n  }\n  return client\n}\n\nexport async function POST() {\n  const { token, expiresAt } = await getClient().tokens.create()\n  return NextResponse.json({ token, expiresAt })\n}\n",
+      "type": "registry:page",
+      "target": "app/api/mrdoge/token/route.ts"
+    }
+  ],
+  "envVars": {
+    "MRDOGE_ODDS_API_KEY": ""
+  },
+  "type": "registry:hook"
+}

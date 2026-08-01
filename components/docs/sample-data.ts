@@ -1,53 +1,18 @@
-import type { MatchDetail, Market, TimelineEvent, TeamForm, Recommendation, Region, Competition } from "@mrdoge/protocol"
+import type { Market, TimelineEvent, TeamForm, Recommendation, Region, Competition } from "@mrdoge/protocol"
 import type { OddsOption } from "@/registry/mrdoge-ui/odds-selector/odds-selector"
 import type { MatchTimelineEntry } from "@/registry/mrdoge-ui/match-timeline/match-timeline"
 import type { BetSlipPick } from "@/registry/mrdoge-ui/bet-slip/bet-slip"
 import type { FormResult } from "@/registry/mrdoge-ui/team-form-indicator/team-form-indicator"
 
-// Typed against the real SDK response shape (satisfies MatchDetail/Market),
+// A specific, curated real match — not "whatever's live right now" — so the
+// live demo pages (see registry/mrdoge-ui/use-live-match/use-live-match.ts)
+// are predictable.
+export const DEMO_MATCH_ID = "47253069"
+
+// Typed against the real SDK response shape (satisfies Market[]/TimelineEvent[]/etc),
 // so a schema change in @mrdoge/protocol shows up here as a build failure
 // instead of a silent inaccuracy. Content is still hand-picked for a good
 // demo — only the shape is compiler-verified.
-export const sampleMatch = {
-  id: "match-1",
-  startTime: "2026-07-30T21:00:00Z",
-  status: "live",
-  homeTeam: { id: 1, name: "Palmeiras" },
-  awayTeam: { id: 2, name: "Flamengo" },
-  sport: { id: 1, name: "Soccer" },
-  competition: { id: 1, name: "Brasileirão Série A" },
-  region: { id: 1, name: "Brazil" },
-  stats: {
-    sport: "soccer",
-    clock: {
-      phase: "SOCCER_MATCH_SECOND_HALF",
-      state: "live",
-      display: "63'",
-      displayLong: null,
-      elapsedSeconds: 3780,
-      remainingSeconds: null,
-      periodDurationSeconds: 2700,
-      minute: 63,
-      stoppage: null,
-      referenceTime: "2026-07-30T22:03:00Z",
-    },
-    homeScore: 2,
-    awayScore: 1,
-  },
-  timeline: [],
-  views: 1200,
-} satisfies MatchDetail
-
-export const sampleMarket = {
-  id: "market-1",
-  betType: "SOCCER_MATCH_RESULT",
-  betItems: [
-    { id: "home", code: "1", caption: null, price: 1.85, isAvailable: true },
-    { id: "draw", code: "X", caption: null, price: 3.4, isAvailable: true },
-    { id: "away", code: "2", caption: null, price: 4.2, isAvailable: false },
-  ],
-} satisfies Market
-
 export const sampleMarkets = [
   {
     id: "market-1",

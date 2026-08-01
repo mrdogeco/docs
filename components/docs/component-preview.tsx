@@ -10,7 +10,7 @@ export function ComponentPreview({
   return (
     <div
       className={cn(
-        "not-prose flex items-center justify-center rounded-lg border bg-zinc-50 p-8 dark:bg-zinc-900/40",
+        "not-prose flex items-center justify-center rounded-lg border bg-background p-8",
         className
       )}
     >

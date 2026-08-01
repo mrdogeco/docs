@@ -1,0 +1,22 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "odds-board",
+  "title": "Odds Board",
+  "description": "Every market for a match at once, each with its own Odds Selector.",
+  "registryDependencies": [
+    "button"
+  ],
+  "files": [
+    {
+      "path": "registry/mrdoge-ui/odds-board/odds-board.tsx",
+      "content": "\"use client\"\n\nimport { cn } from \"@/lib/utils\"\nimport {\n  OddsSelector,\n  type OddsOption,\n} from \"@/registry/mrdoge-ui/odds-selector/odds-selector\"\n\nexport interface OddsBoardMarket {\n  id: string\n  /** Human-readable market name, e.g. \"Match Winner\", \"Total Goals\". */\n  label: string\n  options: OddsOption[]\n  selectedOptionId?: string\n}\n\nexport interface OddsBoardProps {\n  markets: OddsBoardMarket[]\n  onSelectOption?: (marketId: string, optionId: string) => void\n  className?: string\n}\n\nexport function OddsBoard({\n  markets,\n  onSelectOption,\n  className,\n}: OddsBoardProps) {\n  return (\n    <div className={cn(\"flex flex-col gap-4\", className)}>\n      {markets.map((market) => (\n        <div key={market.id} className=\"flex flex-col gap-1.5\">\n          <span className=\"text-xs font-medium text-muted-foreground\">\n            {market.label}\n          </span>\n          <OddsSelector\n            options={market.options}\n            selectedId={market.selectedOptionId}\n            onSelect={(optionId) => onSelectOption?.(market.id, optionId)}\n          />\n        </div>\n      ))}\n    </div>\n  )\n}\n",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/mrdoge-ui/odds-selector/odds-selector.tsx",
+      "content": "\"use client\"\n\nimport type { ComponentType } from \"react\"\nimport { Minus, TrendingDown, TrendingUp } from \"lucide-react\"\n\nimport { cn } from \"@/lib/utils\"\nimport { Button } from \"@/components/ui/button\"\n\nexport type OddsMovement = \"up\" | \"down\" | \"flat\"\n\nexport interface OddsOption {\n  id: string\n  /** Selection label, e.g. \"1\", \"X\", \"2\" or \"Home\", \"Away\". */\n  label: string\n  /** Formatted price, e.g. \"1.85\". */\n  price: string\n  movement?: OddsMovement\n  suspended?: boolean\n}\n\nexport interface OddsSelectorProps {\n  options: OddsOption[]\n  selectedId?: string\n  onSelect?: (id: string) => void\n  className?: string\n}\n\nconst movementIcon: Record<OddsMovement, ComponentType<{ className?: string }>> = {\n  up: TrendingUp,\n  down: TrendingDown,\n  flat: Minus,\n}\n\nconst movementColor: Record<OddsMovement, string> = {\n  up: \"text-emerald-600 dark:text-emerald-500\",\n  down: \"text-destructive\",\n  flat: \"text-muted-foreground\",\n}\n\nexport function OddsSelector({\n  options,\n  selectedId,\n  onSelect,\n  className,\n}: OddsSelectorProps) {\n  return (\n    <div className={cn(\"grid auto-cols-fr grid-flow-col gap-2\", className)}>\n      {options.map((option) => {\n        const MovementIcon = option.movement\n          ? movementIcon[option.movement]\n          : null\n        const selected = option.id === selectedId\n\n        return (\n          <Button\n            key={option.id}\n            type=\"button\"\n            variant={selected ? \"default\" : \"outline\"}\n            disabled={option.suspended}\n            onClick={() => onSelect?.(option.id)}\n            className=\"h-auto flex-col gap-0.5 py-1.5\"\n          >\n            <span className=\"text-xs font-normal opacity-80\">\n              {option.label}\n            </span>\n            <span className=\"flex items-center gap-1 text-sm font-semibold\">\n              {option.suspended ? \"—\" : option.price}\n              {MovementIcon && !option.suspended ? (\n                <MovementIcon\n                  className={cn(\n                    \"size-3\",\n                    selected ? \"opacity-90\" : movementColor[option.movement!]\n                  )}\n                />\n              ) : null}\n            </span>\n          </Button>\n        )\n      })}\n    </div>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ],
+  "type": "registry:component"
+}

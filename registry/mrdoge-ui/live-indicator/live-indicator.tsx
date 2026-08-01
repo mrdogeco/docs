@@ -20,6 +20,12 @@ export interface LiveIndicatorProps {
    * "intermission", or "interrupted" (e.g. "67'", "HT").
    */
   elapsed?: string
+  /**
+   * "badge" (default) renders a filled pill, for standalone use. "plain"
+   * renders just the colored label with no background, for dense layouts
+   * like Match Card's status column.
+   */
+  variant?: "badge" | "plain"
   className?: string
 }
 
@@ -28,6 +34,14 @@ function formatKickoff(kickoff: Date | string) {
   return date.toLocaleTimeString(undefined, {
     hour: "numeric",
     minute: "2-digit",
+  })
+}
+
+function formatKickoffDate(kickoff: Date | string) {
+  const date = typeof kickoff === "string" ? new Date(kickoff) : kickoff
+  return date.toLocaleDateString(undefined, {
+    day: "2-digit",
+    month: "2-digit",
   })
 }
 
@@ -41,8 +55,53 @@ export function LiveIndicator({
   status,
   kickoff,
   elapsed,
+  variant = "badge",
   className,
 }: LiveIndicatorProps) {
+  if (variant === "plain") {
+    if (status === "live") {
+      return (
+        <span className={cn("text-xs font-bold leading-tight text-destructive tabular-nums", className)}>
+          {elapsed ?? "LIVE"}
+        </span>
+      )
+    }
+
+    if (status === "paused" || status === "intermission" || status === "interrupted") {
+      return (
+        <span
+          className={cn(
+            "text-xs font-bold leading-tight text-amber-600 tabular-nums dark:text-amber-400",
+            className
+          )}
+        >
+          {elapsed ?? stoppedPlayLabel[status]}
+        </span>
+      )
+    }
+
+    if (status === "finished") {
+      return (
+        <div className={cn("flex flex-col items-center gap-px", className)}>
+          <span className="text-xs font-bold leading-tight text-muted-foreground tabular-nums">
+            {elapsed ?? "FT"}
+          </span>
+          {kickoff ? (
+            <span className="text-xs leading-tight text-muted-foreground tabular-nums">
+              {formatKickoffDate(kickoff)}
+            </span>
+          ) : null}
+        </div>
+      )
+    }
+
+    return (
+      <span className={cn("text-xs font-medium leading-tight text-muted-foreground tabular-nums", className)}>
+        {kickoff ? formatKickoff(kickoff) : "—"}
+      </span>
+    )
+  }
+
   if (status === "live") {
     return (
       <Badge

@@ -1,0 +1,33 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "use-live-match",
+  "title": "useLiveMatch",
+  "description": "Subscribes to a single match over WebSocket — score, status, and clock update in real time as the match progresses.",
+  "dependencies": [
+    "@mrdoge/client",
+    "@mrdoge/node",
+    "server-only"
+  ],
+  "files": [
+    {
+      "path": "registry/mrdoge-ui/use-live-match/use-live-match.ts",
+      "content": "\"use client\"\n\nimport { useEffect, useState } from \"react\"\nimport type { MatchDetail } from \"@mrdoge/protocol\"\nimport { getMrDogeClient } from \"@/registry/mrdoge-ui/mrdoge-client/mrdoge-client\"\n\n/** undefined = loading, null = subscribe failed (no fallback — that's an honest empty state). */\nexport function useLiveMatch(matchId: string) {\n  const [match, setMatch] = useState<MatchDetail | null | undefined>(undefined)\n\n  useEffect(() => {\n    let cancelled = false\n    let subscription: { cancel: () => Promise<void> } | null = null\n\n    async function run() {\n      const sub = await getMrDogeClient().matches.subscribe({ matchId })\n      if (cancelled) {\n        sub.cancel()\n        return\n      }\n      subscription = sub\n\n      setMatch(sub.snapshot)\n      sub.on(\"snapshot\", (snapshot) => setMatch(snapshot))\n      sub.on(\"stats.upd\", (stats) => setMatch((prev) => (prev ? { ...prev, stats } : prev)))\n      sub.on(\"status.upd\", ({ status }) => setMatch((prev) => (prev ? { ...prev, status } : prev)))\n    }\n\n    run().catch(() => {\n      if (!cancelled) setMatch(null)\n    })\n\n    return () => {\n      cancelled = true\n      subscription?.cancel()\n    }\n  }, [matchId])\n\n  return match\n}\n",
+      "type": "registry:hook"
+    },
+    {
+      "path": "registry/mrdoge-ui/mrdoge-client/mrdoge-client.ts",
+      "content": "import { MrDoge } from \"@mrdoge/client\"\n\nlet client: MrDoge | null = null\n\n/** Browser-only — the SDK authenticates via short-lived tokens minted at /api/mrdoge/token, never a raw API key. */\nexport function getMrDogeClient() {\n  if (typeof window === \"undefined\") {\n    throw new Error(\"getMrDogeClient() must be called in the browser\")\n  }\n  if (!client) {\n    client = new MrDoge({ authEndpoint: \"/api/mrdoge/token\" })\n  }\n  return client\n}\n",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/mrdoge-ui/mrdoge-token-route/route.ts",
+      "content": "import \"server-only\"\nimport { NextResponse } from \"next/server\"\nimport { MrDoge } from \"@mrdoge/node\"\n\nlet client: MrDoge | null = null\n\nfunction getClient() {\n  if (!client) {\n    client = new MrDoge({ apiKey: process.env.MRDOGE_ODDS_API_KEY! })\n  }\n  return client\n}\n\nexport async function POST() {\n  const { token, expiresAt } = await getClient().tokens.create()\n  return NextResponse.json({ token, expiresAt })\n}\n",
+      "type": "registry:page",
+      "target": "app/api/mrdoge/token/route.ts"
+    }
+  ],
+  "envVars": {
+    "MRDOGE_ODDS_API_KEY": ""
+  },
+  "type": "registry:hook"
+}

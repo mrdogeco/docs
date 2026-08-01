@@ -7,7 +7,7 @@ import { Check, Copy } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { BetSlip } from "@/registry/mrdoge-ui/bet-slip/bet-slip"
 import { CompetitionHeader } from "@/registry/mrdoge-ui/competition-header/competition-header"
-import { EventCard } from "@/registry/mrdoge-ui/event-card/event-card"
+import { MatchCard } from "@/registry/mrdoge-ui/match-card/match-card"
 import { LiveIndicator } from "@/registry/mrdoge-ui/live-indicator/live-indicator"
 import { MatchTimeline } from "@/registry/mrdoge-ui/match-timeline/match-timeline"
 import { OddsSelector } from "@/registry/mrdoge-ui/odds-selector/odds-selector"
@@ -59,7 +59,7 @@ function ShowcaseItem({
   return (
     <section className="flex flex-col gap-4 rounded-xl ring-1 ring-foreground/10 p-6">
       <div className="flex flex-col gap-1">
-        <Link href={`/docs/components/${name}`} className="w-fit">
+        <Link href={`/docs/ui/components/${name}`} className="w-fit">
           <h2 className="text-base font-medium underline-offset-4 hover:underline">
             {title}
           </h2>
@@ -102,12 +102,11 @@ export function HomeGallery() {
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <ShowcaseItem
-          name="event-card"
-          title="Event Card"
-          description="Match card with teams, live status, and a primary odds row."
+          name="match-card"
+          title="Match Card"
+          description="Compact match row with teams, live status, and an optional odds row."
         >
-          <EventCard
-            competition="Brasileirão Série A"
+          <MatchCard
             status="live"
             elapsed="63'"
             home={{ name: "Palmeiras" }}

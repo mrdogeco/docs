@@ -8,6 +8,12 @@ importers:
 
   .:
     dependencies:
+      '@mrdoge/client':
+        specifier: ^0.4.1
+        version: 0.4.1
+      '@mrdoge/node':
+        specifier: ^0.4.1
+        version: 0.4.1
       '@mrdoge/protocol':
         specifier: ^0.4.1
         version: 0.4.1
@@ -47,6 +53,9 @@ importers:
       react-icons:
         specifier: ^5.5.0
         version: 5.7.0(react@19.2.4)
+      server-only:
+        specifier: ^0.0.1
+        version: 0.0.1
       shadcn:
         specifier: ^4.16.0
         version: 4.16.0(typescript@5.9.3)
@@ -660,6 +669,16 @@ packages:
     peerDependenciesMeta:
       '@cfworker/json-schema':
         optional: true
+
+  '@mrdoge/client@0.4.1':
+    resolution: {integrity: sha512-dvSIw5XIDVQ0Kyjo8R8sWLHRulOvfSZrOjNSzPUTbzJgQx/NzTDbKu/hFfp9NT2NDGn33yMzOS1RbVO6CeziLA==}
+
+  '@mrdoge/http@0.4.1':
+    resolution: {integrity: sha512-C6fTEnMhyBpukXm2j655dszjvHywR6GIUiBhksj7eYgDOPL0r/t7LPSYarfExdwA6zpOZY8vjUXI/thcVVdn2Q==}
+
+  '@mrdoge/node@0.4.1':
+    resolution: {integrity: sha512-X6nznuv71CGtZ06CH8ZKkrISnCAoR3m1B31sNXvbxMGTZU2yFbGM9QBnY5xy00RY82Ja/aOG7Lz8v0yLjgSTmA==}
+    engines: {node: '>=18'}
 
   '@mrdoge/protocol@0.4.1':
     resolution: {integrity: sha512-G8JZnuWN5Nda4J8UacLhpGxk346MDdTNrzKlFg0eSGSj1fEfyL1Uc9GN19Ha0GxAcKkOq0MZSKkrA8UV+othmw==}
@@ -4091,6 +4110,9 @@ packages:
     resolution: {integrity: sha512-xRXBn0pPqQTVQiC8wyQrKs2MOlX24zQ0POGaj0kultvoOCstBQM5yvOhAVSUwOMjQtTvsPWoNCHfPGwaaQJhTw==}
     engines: {node: '>= 18'}
 
+  server-only@0.0.1:
+    resolution: {integrity: sha512-qepMx2JxAa5jjfzxG79yPPq+8BuFToHd1hm7kI+Z4zAq1ftQiP7HcxMhDDItrbtwVeLg/cY2JnKnrcFkmiswNA==}
+
   set-function-length@1.2.2:
     resolution: {integrity: sha512-pgRc4hJ4/sNjWCSS9AmnS40x3bNMDTknHgL5UaMBTMyJnU90EgWh1Rz+MC9eFu4BuN/UwZjKQuY/1v3rM7HMfg==}
     engines: {node: '>= 0.4'}
@@ -4501,6 +4523,18 @@ packages:
 
   wrappy@1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
+
+  ws@8.21.1:
+    resolution: {integrity: sha512-+0NTnW77fFN/DjQi6k/Sq/Yvk4Sgajw7urW8V+asjXnRgDs9gyGkdb7EzgfhA4goXsRIZKE28fzIXBHEzhuiWw==}
+    engines: {node: '>=10.0.0'}
+    peerDependencies:
+      bufferutil: ^4.0.1
+      utf-8-validate: '>=5.0.2'
+    peerDependenciesMeta:
+      bufferutil:
+        optional: true
+      utf-8-validate:
+        optional: true
 
   wsl-utils@0.3.1:
     resolution: {integrity: sha512-g/eziiSUNBSsdDJtCLB8bdYEUMj4jR7AGeUo96p/3dTafgjHhpF4RiCFPiRILwjQoDXx5MqkBr4fwWtR3Ky4Wg==}
@@ -5123,6 +5157,25 @@ snapshots:
       zod-to-json-schema: 3.25.2(zod@3.25.76)
     transitivePeerDependencies:
       - supports-color
+
+  '@mrdoge/client@0.4.1':
+    dependencies:
+      '@mrdoge/http': 0.4.1
+      '@mrdoge/protocol': 0.4.1
+
+  '@mrdoge/http@0.4.1':
+    dependencies:
+      '@mrdoge/protocol': 0.4.1
+
+  '@mrdoge/node@0.4.1':
+    dependencies:
+      '@mrdoge/http': 0.4.1
+      '@mrdoge/protocol': 0.4.1
+      ws: 8.21.1
+      zod: 3.25.76
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
 
   '@mrdoge/protocol@0.4.1':
     dependencies:
@@ -9138,6 +9191,8 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  server-only@0.0.1: {}
+
   set-function-length@1.2.2:
     dependencies:
       define-data-property: 1.1.4
@@ -9704,6 +9759,8 @@ snapshots:
   word-wrap@1.2.5: {}
 
   wrappy@1.0.2: {}
+
+  ws@8.21.1: {}
 
   wsl-utils@0.3.1:
     dependencies:

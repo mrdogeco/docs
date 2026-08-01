@@ -1,0 +1,175 @@
+---
+title: Match Card
+description: Compact match row with teams, score or kickoff time, status, and an optional odds row.
+---
+
+import { MatchCardLiveDemo } from "@/components/docs/demos/match-card-live-demo"
+import { MatchCardLiveWithOddsDemo } from "@/components/docs/demos/match-card-live-with-odds-demo"
+import { InstallTabs } from "@/components/docs/install-tabs"
+
+<ExampleSection file="components/docs/demos/match-card-live-demo.tsx">
+  <MatchCardLiveDemo />
+</ExampleSection>
+
+## With odds
+
+Pass `odds` to render a compact odds row below the match, using the same
+options as [Odds Selector](/docs/ui/components/odds-selector). This example
+subscribes to live odds too (Business tier) — if none are available, the row
+just doesn't render.
+
+<ExampleSection file="components/docs/demos/match-card-live-with-odds-demo.tsx">
+  <MatchCardLiveWithOddsDemo />
+</ExampleSection>
+
+## Installation
+
+<InstallTabs name="match-card" />
+
+## Use with the Mr. Doge SDK
+
+MatchCard takes plain props, so it works with any data source. Mapping a
+real `matches.get()` (plus a market from `odds.list()`) response onto those
+props is a small, pure function — type-checked against the actual SDK
+response shape, so a schema change fails to compile instead of silently
+going stale:
+
+```tsx
+import type { MatchDetail, Market } from "@mrdoge/protocol"
+import type { MatchCardProps } from "@/components/match-card"
+import type { LiveIndicatorStatus } from "@/components/live-indicator"
+import type { OddsOption } from "@/components/odds-selector"
+
+// match.status is authoritative and always fresh. Clock.state adds
+// paused/intermission/interrupted, but comes from the live-stats feed,
+// which can stop updating once a match ends — so match.status decides
+// the coarse bucket first; clock.state only refines *within* "live".
+function toLiveIndicatorStatus(match: MatchDetail): LiveIndicatorStatus {
+  if (match.status === "upcoming") return "scheduled"
+  if (match.status === "completed") return "finished"
+  return match.stats?.clock?.state ?? "live"
+}
+
+function toOddsOptions(market?: Market): OddsOption[] {
+  if (!market) return []
+  return market.betItems.map((item) => ({
+    id: item.id,
+    label: item.caption ?? item.code,
+    price: item.price.toFixed(2),
+    suspended: !item.isAvailable,
+  }))
+}
+
+// Public, unauthenticated, cached CDN — not part of the Team shape itself.
+// See /docs/reference/images.
+function teamLogoUrl(teamId: number) {
+  return `https://api.mrdoge.co/images/teams/${teamId}.png`
+}
+
+function matchToMatchCardProps(match: MatchDetail, market?: Market): MatchCardProps {
+  // Red cards are soccer-specific — MatchStats is a discriminated union per
+  // sport, so narrow before reading homeRedCards/awayRedCards.
+  const stats = match.stats?.sport === "soccer" ? match.stats : undefined
+
+  return {
+    status: toLiveIndicatorStatus(match),
+    kickoff: match.startTime,
+    // Only meaningful while in progress — once completed, drop the frozen
+    // clock display and let LiveIndicator show its own "FT" label.
+    elapsed: match.status === "live" ? (match.stats?.clock?.display ?? undefined) : undefined,
+    home: {
+      name: match.homeTeam.name,
+      logoUrl: teamLogoUrl(match.homeTeam.id),
+      redCards: stats?.homeRedCards,
+    },
+    away: {
+      name: match.awayTeam.name,
+      logoUrl: teamLogoUrl(match.awayTeam.id),
+      redCards: stats?.awayRedCards,
+    },
+    homeScore: match.stats?.homeScore,
+    awayScore: match.stats?.awayScore,
+    odds: toOddsOptions(market),
+  }
+}
+```
+
+Both examples above render through exactly this pattern — they're wired to a
+real, live `matches.subscribe()` connection (see the example source via
+"View Code"), and this same function maps each push straight into
+`MatchCard`'s props.
+
+## Props
+
+<TypeTable
+  type={{
+    status: {
+      description: "See Live Indicator.",
+      type: '"scheduled" | "live" | "paused" | "intermission" | "interrupted" | "finished"',
+      required: true,
+    },
+    kickoff: {
+      description: 'Kickoff time, shown when status is "scheduled".',
+      type: "Date | string",
+    },
+    elapsed: {
+      description: 'Elapsed match clock (e.g. "67\'"), shown when status is "live".',
+      type: "string",
+    },
+    home: {
+      description: "Home team. See MatchCardTeam below.",
+      type: "MatchCardTeam",
+      required: true,
+    },
+    away: {
+      description: "Away team. See MatchCardTeam below.",
+      type: "MatchCardTeam",
+      required: true,
+    },
+    homeScore: {
+      description: 'Shown when status is not "scheduled".',
+      type: "number",
+    },
+    awayScore: {
+      description: 'Shown when status is not "scheduled".',
+      type: "number",
+    },
+    redCardPosition: {
+      description: 'Where each team\'s red-card marker renders: "left" (next to the name) or "right" (next to the score). Defaults to "right".',
+      type: '"left" | "right"',
+    },
+    odds: {
+      description: "Renders a compact odds row below the match when provided.",
+      type: "OddsOption[]",
+    },
+    selectedOddsId: {
+      description: "Id of the currently selected odds option.",
+      type: "string",
+    },
+    onSelectOdds: {
+      description: "Called with the option id when an odds button is pressed.",
+      type: "(id: string) => void",
+    },
+    className: {
+      type: "string",
+    },
+  }}
+/>
+
+### MatchCardTeam
+
+<TypeTable
+  type={{
+    name: {
+      type: "string",
+      required: true,
+    },
+    logoUrl: {
+      type: "string",
+    },
+    redCards: {
+      description: "Shown as a small red-card marker (position set by MatchCardProps.redCardPosition) once the match is live or finished.",
+      type: "number",
+    },
+  }}
+/>

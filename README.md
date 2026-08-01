@@ -1,9 +1,15 @@
-# mrdoge-co
+# mrdoge-docs
 
-The mrdoge.co codebase: Mr. Doge SDK docs and marketing, mrdoge-ui's docs and
-showcase, and the developer dashboard. Private — the public-facing component
-source lives in the separate `mrdoge-ui` repo and is mirrored here for the
-registry build (see below).
+The mrdoge.co codebase: Mr. Doge SDK docs and marketing, and mrdoge-ui — a
+free, open-source component library for sports betting apps, distributed
+as source code through a shadcn/ui-compatible registry. Components take
+plain props — no dependency on any particular data provider. Hooks are
+the one exception: they're a real, opinionated integration with the Mr.
+Doge SDK specifically, for anyone who wants live data working out of the
+box instead of wiring their own.
+
+The developer dashboard (auth, billing, API keys) is not part of this
+repo — it stays private, wherever it currently lives.
 
 ## Installation
 
@@ -11,29 +17,52 @@ Requires a project with Tailwind CSS and the shadcn/ui CLI configured
 (`npx shadcn@latest init`). Then install a component with:
 
 ```bash
-npx shadcn@latest add https://mrdoge.co/r/event-card.json
+npx shadcn@latest add https://mrdoge.co/r/match-card.json
 ```
 
 ## Components
 
 | Component | Description |
 | --- | --- |
-| `event-card` | Match card with teams, live status, and a primary odds row |
-| `odds-selector` | Selectable price buttons with movement and suspended states |
-| `live-indicator` | Status pill: scheduled, live, or finished |
-| `bet-slip` | Selected picks, stake input, and computed potential payout |
+| `match-card` | Compact match row with teams, score or kickoff time, status, and an optional odds row |
+| `odds-selector` | Selectable price buttons for a market, with price movement and suspended states |
+| `odds-board` | Every market for a match at once, each with its own Odds Selector |
+| `live-indicator` | Status pill for a match: scheduled, live, paused, intermission, interrupted, or finished |
+| `bet-slip` | Panel for selected picks with stake input and computed potential payout |
 | `match-timeline` | Chronological feed of match events |
-| `team-form-indicator` | Recent match results for a team |
+| `team-form-indicator` | Recent match results for a team, with optional per-match detail |
 | `competition-header` | Banner for a competition: name, region, and stage |
+| `entity-image` | Team or region logo, unstyled — falls back to initials when the image is missing |
+| `settlement-badge` | Post-settlement outcome badge: won, lost, or push |
+| `ai-recommendation-card` | AI-generated pick with confidence, edge, rationale, and risk factors |
+| `sport-picker` | Icon-based sport filter |
+| `region-accordion` | Collapsible region list, grouped by competition, with event counts |
 
-See `/docs` in the showcase app for full usage, or `registry/mrdoge-ui/`
-for the component source.
+See [mrdoge.co/ui](https://mrdoge.co/ui) for live previews, full usage,
+and props for every component, or browse the source directly under
+`registry/mrdoge-ui/`.
+
+## Hooks
+
+Real, working WebSocket integration with the Mr. Doge SDK — not
+illustrative snippets. Unlike components, these depend on `@mrdoge/client`
+/ `@mrdoge/node` directly and need a `MRDOGE_ODDS_API_KEY` set server-side.
+
+| Hook | Description |
+| --- | --- |
+| `use-live-match` | Subscribes to a single match over WebSocket — score, status, and clock update in real time |
+| `use-live-odds` | Subscribes to a single match's live odds over WebSocket (Business tier) |
+
+Installing either pulls in `mrdoge-client` (the browser SDK client
+singleton) and `mrdoge-token-route` (a Next.js route that mints short-lived
+tokens using `@mrdoge/node` — the browser never sees the raw API key)
+automatically.
 
 ## Development
 
 ```bash
 pnpm install
-pnpm dev       # showcase app at localhost:3000
+pnpm dev       # localhost:3002
 pnpm build     # production build
 ```
 
@@ -49,7 +78,10 @@ Run this after adding or editing a component so the built output in
 
 ## Use with the Mr. Doge SDK
 
-mrdoge-ui components accept plain props, so they work with any data source.
-They pair directly with [`@mrdoge/client`](https://mrdoge.ai), which provides
-typed, real-time sports data over HTTP and WebSocket. See `/docs` for an
-example.
+mrdoge-ui components accept plain props, so they work with any data
+source. Real integration code lives in `lib/sdk-adapters/` — one pure
+mapper function per component, taking an actual `@mrdoge/protocol` type
+and returning that component's props. If the SDK's response shape
+changes, the adapter fails to compile instead of silently going stale.
+Each component's own doc page has a "Use with the Mr. Doge SDK" section
+showing its adapter as a live example.

@@ -1,6 +1,6 @@
 import type { Market } from "@mrdoge/protocol"
 import type { OddsBoardProps } from "@/registry/mrdoge-ui/odds-board/odds-board"
-import { toOddsOptions } from "@/lib/sdk-adapters/event-card"
+import { toOddsOptions } from "@/lib/sdk-adapters/match-card"
 
 // Market.betType is a raw sysname on the wire (e.g. "SOCCER_MATCH_RESULT"),
 // not a display label — a real name lookup table is out of scope here, so

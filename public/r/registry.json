@@ -7,7 +7,7 @@
       "name": "live-indicator",
       "type": "registry:component",
       "title": "Live Indicator",
-      "description": "Status pill for a match: scheduled, live, or finished.",
+      "description": "Status pill for a match: scheduled, live, paused, intermission, interrupted, or finished.",
       "registryDependencies": ["badge"],
       "files": [
         {
@@ -20,7 +20,8 @@
       "name": "team-form-indicator",
       "type": "registry:component",
       "title": "Team Form Indicator",
-      "description": "Row of recent match results (W/D/L) for a team.",
+      "description": "Row of recent match results (W/D/L/U) for a team, with optional per-match tooltip detail.",
+      "registryDependencies": ["tooltip"],
       "files": [
         {
           "path": "registry/mrdoge-ui/team-form-indicator/team-form-indicator.tsx",
@@ -55,14 +56,57 @@
       ]
     },
     {
-      "name": "event-card",
+      "name": "entity-image",
       "type": "registry:component",
-      "title": "Event Card",
-      "description": "Match card with teams, score or kickoff time, status, and a primary odds row.",
-      "registryDependencies": ["avatar", "card"],
+      "title": "Entity Image",
+      "description": "Team or region logo, unstyled — falls back to initials when the image is missing.",
+      "registryDependencies": [],
       "files": [
         {
-          "path": "registry/mrdoge-ui/event-card/event-card.tsx",
+          "path": "registry/mrdoge-ui/entity-image/entity-image.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "settlement-badge",
+      "type": "registry:component",
+      "title": "Settlement Badge",
+      "description": "Post-settlement outcome badge: won, lost, or push.",
+      "registryDependencies": ["badge"],
+      "files": [
+        {
+          "path": "registry/mrdoge-ui/settlement-badge/settlement-badge.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "ai-recommendation-card",
+      "type": "registry:component",
+      "title": "AI Recommendation Card",
+      "description": "AI-generated pick with confidence, edge, rationale, and risk factors.",
+      "registryDependencies": ["badge", "card"],
+      "files": [
+        {
+          "path": "registry/mrdoge-ui/ai-recommendation-card/ai-recommendation-card.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/mrdoge-ui/settlement-badge/settlement-badge.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "match-card",
+      "type": "registry:component",
+      "title": "Match Card",
+      "description": "Compact match row with teams, score or kickoff time, status, and an optional odds row.",
+      "registryDependencies": ["badge", "button"],
+      "files": [
+        {
+          "path": "registry/mrdoge-ui/match-card/match-card.tsx",
           "type": "registry:component"
         },
         {
@@ -72,6 +116,53 @@
         {
           "path": "registry/mrdoge-ui/odds-selector/odds-selector.tsx",
           "type": "registry:component"
+        },
+        {
+          "path": "registry/mrdoge-ui/entity-image/entity-image.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "odds-board",
+      "type": "registry:component",
+      "title": "Odds Board",
+      "description": "Every market for a match at once, each with its own Odds Selector.",
+      "registryDependencies": ["button"],
+      "files": [
+        {
+          "path": "registry/mrdoge-ui/odds-board/odds-board.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/mrdoge-ui/odds-selector/odds-selector.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "sport-picker",
+      "type": "registry:component",
+      "title": "Sport Picker",
+      "description": "Icon-based sport filter.",
+      "registryDependencies": ["button"],
+      "files": [
+        {
+          "path": "registry/mrdoge-ui/sport-picker/sport-picker.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "region-accordion",
+      "type": "registry:component",
+      "title": "Region Accordion",
+      "description": "Collapsible region list, grouped by competition, with event counts.",
+      "registryDependencies": ["accordion"],
+      "files": [
+        {
+          "path": "registry/mrdoge-ui/region-accordion/region-accordion.tsx",
+          "type": "registry:component"
         }
       ]
     },
@@ -80,6 +171,7 @@
       "type": "registry:component",
       "title": "Match Timeline",
       "description": "Chronological feed of match events (goals, cards, substitutions).",
+      "registryDependencies": [],
       "files": [
         {
           "path": "registry/mrdoge-ui/match-timeline/match-timeline.tsx",
@@ -97,6 +189,86 @@
         {
           "path": "registry/mrdoge-ui/bet-slip/bet-slip.tsx",
           "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "mrdoge-client",
+      "type": "registry:lib",
+      "title": "Mr. Doge Client",
+      "description": "Browser SDK client singleton, authenticated via short-lived tokens minted by your own backend — never a raw API key.",
+      "dependencies": ["@mrdoge/client"],
+      "files": [
+        {
+          "path": "registry/mrdoge-ui/mrdoge-client/mrdoge-client.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "mrdoge-token-route",
+      "type": "registry:item",
+      "title": "Mr. Doge Token Route",
+      "description": "Server route that mints short-lived SDK tokens for the browser client, using @mrdoge/node and your MRDOGE_ODDS_API_KEY.",
+      "dependencies": ["@mrdoge/node", "server-only"],
+      "envVars": {
+        "MRDOGE_ODDS_API_KEY": ""
+      },
+      "files": [
+        {
+          "path": "registry/mrdoge-ui/mrdoge-token-route/route.ts",
+          "type": "registry:page",
+          "target": "app/api/mrdoge/token/route.ts"
+        }
+      ]
+    },
+    {
+      "name": "use-live-match",
+      "type": "registry:hook",
+      "title": "useLiveMatch",
+      "description": "Subscribes to a single match over WebSocket — score, status, and clock update in real time as the match progresses.",
+      "dependencies": ["@mrdoge/client", "@mrdoge/node", "server-only"],
+      "envVars": {
+        "MRDOGE_ODDS_API_KEY": ""
+      },
+      "files": [
+        {
+          "path": "registry/mrdoge-ui/use-live-match/use-live-match.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/mrdoge-ui/mrdoge-client/mrdoge-client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/mrdoge-ui/mrdoge-token-route/route.ts",
+          "type": "registry:page",
+          "target": "app/api/mrdoge/token/route.ts"
+        }
+      ]
+    },
+    {
+      "name": "use-live-odds",
+      "type": "registry:hook",
+      "title": "useLiveOdds",
+      "description": "Subscribes to a single match's live odds over WebSocket (Business tier) — the full latest markets array pushes on every change.",
+      "dependencies": ["@mrdoge/client", "@mrdoge/node", "server-only"],
+      "envVars": {
+        "MRDOGE_ODDS_API_KEY": ""
+      },
+      "files": [
+        {
+          "path": "registry/mrdoge-ui/use-live-odds/use-live-odds.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/mrdoge-ui/mrdoge-client/mrdoge-client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/mrdoge-ui/mrdoge-token-route/route.ts",
+          "type": "registry:page",
+          "target": "app/api/mrdoge/token/route.ts"
         }
       ]
     }

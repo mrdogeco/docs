@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "region-accordion",
+  "title": "Region Accordion",
+  "description": "Collapsible region list, grouped by competition, with event counts.",
+  "registryDependencies": [
+    "accordion"
+  ],
+  "files": [
+    {
+      "path": "registry/mrdoge-ui/region-accordion/region-accordion.tsx",
+      "content": "\"use client\"\n\nimport { cn } from \"@/lib/utils\"\nimport {\n  Accordion,\n  AccordionContent,\n  AccordionItem,\n  AccordionTrigger,\n} from \"@/components/ui/accordion\"\n\nexport interface RegionAccordionCompetition {\n  id: string\n  name: string\n  eventCount?: number\n}\n\nexport interface RegionAccordionRegion {\n  id: string\n  name: string\n  eventCount?: number\n  competitions: RegionAccordionCompetition[]\n}\n\nexport interface RegionAccordionProps {\n  regions: RegionAccordionRegion[]\n  onSelectCompetition?: (regionId: string, competitionId: string) => void\n  className?: string\n}\n\nexport function RegionAccordion({\n  regions,\n  onSelectCompetition,\n  className,\n}: RegionAccordionProps) {\n  return (\n    <Accordion type=\"multiple\" className={cn(className)}>\n      {regions.map((region) => (\n        <AccordionItem key={region.id} value={region.id}>\n          <AccordionTrigger>\n            <span className=\"flex w-full items-center justify-between gap-2 pr-2\">\n              <span>{region.name}</span>\n              {region.eventCount !== undefined && (\n                <span className=\"text-xs text-muted-foreground\">\n                  {region.eventCount}\n                </span>\n              )}\n            </span>\n          </AccordionTrigger>\n          <AccordionContent>\n            <ul className=\"flex flex-col gap-1\">\n              {region.competitions.map((competition) => (\n                <li key={competition.id}>\n                  <button\n                    type=\"button\"\n                    onClick={() =>\n                      onSelectCompetition?.(region.id, competition.id)\n                    }\n                    className=\"flex w-full items-center justify-between gap-2 rounded-md px-2 py-1.5 text-left text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground\"\n                  >\n                    <span>{competition.name}</span>\n                    {competition.eventCount !== undefined && (\n                      <span className=\"text-xs\">{competition.eventCount}</span>\n                    )}\n                  </button>\n                </li>\n              ))}\n            </ul>\n          </AccordionContent>\n        </AccordionItem>\n      ))}\n    </Accordion>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ],
+  "type": "registry:component"
+}

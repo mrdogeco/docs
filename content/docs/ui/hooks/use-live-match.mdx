@@ -1,0 +1,68 @@
+---
+title: useLiveMatch
+description: Subscribes to a single match over WebSocket — score, status, and clock update in real time as the match progresses.
+---
+
+import { MatchCardLiveDemo } from "@/components/docs/demos/match-card-live-demo"
+import { InstallTabs } from "@/components/docs/install-tabs"
+
+<ExampleSection file="components/docs/demos/match-card-live-demo.tsx">
+  <MatchCardLiveDemo />
+</ExampleSection>
+
+This is the same live connection powering the default example on
+[Match Card](/docs/ui/components/match-card) — the code above is the whole
+implementation, hook included.
+
+## Installation
+
+<InstallTabs name="use-live-match" />
+
+Installing this pulls in three files: the hook itself, a browser SDK client
+singleton (`getMrDogeClient`), and a Next.js route at
+`app/api/mrdoge/token/route.ts` that mints short-lived tokens using
+`@mrdoge/node` and your own `MRDOGE_ODDS_API_KEY` — the browser client never
+sees the raw key.
+
+## Usage
+
+```tsx
+import { useLiveMatch } from "@/hooks/use-live-match"
+
+function Match({ matchId }: { matchId: string }) {
+  const match = useLiveMatch(matchId)
+
+  if (match === undefined) return <p>Loading…</p>
+  if (match === null) return <p>Couldn't load this match.</p>
+
+  return <p>{match.homeTeam.name} {match.stats?.homeScore} — {match.stats?.awayScore} {match.awayTeam.name}</p>
+}
+```
+
+## Parameters
+
+<TypeTable
+  type={{
+    matchId: {
+      description: "The match to subscribe to.",
+      type: "string",
+      required: true,
+    },
+  }}
+/>
+
+## Returns
+
+`MatchDetail | null | undefined` — `undefined` while the initial subscribe
+is in flight, `null` if it failed (no fallback data — an honest empty state
+beats a fake one), otherwise the current snapshot, updated in place as
+`stats.upd` / `status.upd` events arrive.
+
+## Why a hook, not just the component
+
+[Match Card](/docs/ui/components/match-card) takes plain props — it doesn't
+know where data comes from. `useLiveMatch` is the specific piece that
+subscribes to a real match and feeds those props via
+[`matchToMatchCardProps`](/docs/ui/components/match-card#use-with-the-mr-doge-sdk).
+Use it as shown, or as a reference for wiring `matches.subscribe()` into
+your own state management.

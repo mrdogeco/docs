@@ -1,6 +1,6 @@
 ---
 title: Entity Image
-description: Team or region logo with an initials fallback.
+description: Team or region logo, unstyled — falls back to initials when the image is missing.
 ---
 
 import { EntityImage } from "@/registry/mrdoge-ui/entity-image/entity-image"
@@ -26,8 +26,14 @@ import { EntityImage } from "@/components/entity-image"
 <EntityImage src="https://api.mrdoge.co/images/teams/1.png" name="Palmeiras" />
 ```
 
-When `src` is missing or fails to load, it falls back to the entity's
-initials — shown above, since these demo entities have no real logo URL.
+A loaded image has no background, border, or corner radius — it renders at
+its native shape, so team crests and region flags don't get forced into a
+circle. Pass a `size` (`sm` / `default` / `lg`) or a `className` like
+`size-6` to control dimensions — `className` wins if both are set.
+
+When `src` is missing or fails to load, it falls back to a small
+muted-background circle with the entity's initials — shown above, since
+these demo entities have no real logo URL.
 
 ## Use with the Mr. Doge SDK
 
@@ -61,9 +67,11 @@ response codes).
       required: true,
     },
     size: {
+      description: '"sm" (20px), "default" (32px), or "lg" (40px).',
       type: '"sm" | "default" | "lg"',
     },
     className: {
+      description: "Takes precedence over size — e.g. size-6 for a custom pixel size.",
       type: "string",
     },
   }}

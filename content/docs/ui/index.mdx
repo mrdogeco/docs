@@ -5,11 +5,13 @@ icon: BookOpen
 ---
 
 mrdoge-ui is a set of React components for building sports betting
-interfaces: event cards, odds selectors, bet slips, match timelines, and
+interfaces: match cards, odds selectors, bet slips, match timelines, and
 related building blocks. Components are distributed as source code through
 a shadcn/ui-compatible registry, not as an installable package. There is no
 dependency on any particular data provider — every component takes plain
-props.
+props. [Hooks](/docs/ui/hooks/use-live-match) are the one exception — a
+real, opinionated integration with the Mr. Doge SDK for live data out of
+the box.
 
 ## Installation
 
@@ -19,22 +21,22 @@ Install a component with:
 <Tabs items={["pnpm", "npm", "yarn", "bun"]}>
   <Tab value="pnpm">
     ```bash
-    pnpm dlx shadcn@latest add https://mrdoge.co/r/event-card.json
+    pnpm dlx shadcn@latest add https://mrdoge.co/r/match-card.json
     ```
   </Tab>
   <Tab value="npm">
     ```bash
-    npx shadcn@latest add https://mrdoge.co/r/event-card.json
+    npx shadcn@latest add https://mrdoge.co/r/match-card.json
     ```
   </Tab>
   <Tab value="yarn">
     ```bash
-    yarn dlx shadcn@latest add https://mrdoge.co/r/event-card.json
+    yarn dlx shadcn@latest add https://mrdoge.co/r/match-card.json
     ```
   </Tab>
   <Tab value="bun">
     ```bash
-    bunx shadcn@latest add https://mrdoge.co/r/event-card.json
+    bunx shadcn@latest add https://mrdoge.co/r/match-card.json
     ```
   </Tab>
 </Tabs>
@@ -44,9 +46,18 @@ This copies the component and its dependencies into your project under
 
 ## Components
 
-Event Card, Odds Selector, Live Indicator, Bet Slip, Match Timeline, Team
+Match Card, Odds Selector, Live Indicator, Bet Slip, Match Timeline, Team
 Form Indicator, and Competition Header. See [Components](/docs/ui/components)
 for a live preview, props, and the install command for each.
+
+## Hooks
+
+[`useLiveMatch`](/docs/ui/hooks/use-live-match) and
+[`useLiveOdds`](/docs/ui/hooks/use-live-odds) subscribe to a real match (and
+its odds) over WebSocket, so a component like Match Card can show live data
+with no glue code of your own. They pull in `@mrdoge/client` / `@mrdoge/node`
+directly and need a `MRDOGE_ODDS_API_KEY` — see each hook's own page for
+setup.
 
 ## Use with the Mr. Doge SDK
 
@@ -56,5 +67,5 @@ source. They pair directly with
 sports data over HTTP and WebSocket — each component's own page has a
 "Use with the Mr. Doge SDK" section showing the actual mapping function
 from a real SDK response to that component's props, type-checked against
-`@mrdoge/protocol` rather than hand-typed. See [Event Card](/docs/ui/components/event-card#use-with-the-mr-doge-sdk)
+`@mrdoge/protocol` rather than hand-typed. See [Match Card](/docs/ui/components/match-card#use-with-the-mr-doge-sdk)
 for the first one.
