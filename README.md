@@ -1,4 +1,20 @@
-# mrdoge-docs
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="public/logo/dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="public/logo/light.svg">
+    <img src="public/logo/light.svg" alt="Mr. Doge" width="240" />
+  </picture>
+</p>
+
+<p align="center">
+  Free, open-source UI components for sports betting apps — copy-paste via shadcn/ui, real Mr. Doge SDK integration built in.
+</p>
+
+<p align="center">
+  <a href="https://mrdoge.co">mrdoge.co</a> •
+  <a href="https://mrdoge.co/ui">Docs</a> •
+  <a href="https://x.com/mrdogeapp">@mrdogeapp</a>
+</p>
 
 The mrdoge.co codebase: Mr. Doge SDK docs and marketing, and mrdoge-ui — a
 free, open-source component library for sports betting apps, distributed
@@ -88,3 +104,11 @@ and returning that component's props. If the SDK's response shape
 changes, the adapter fails to compile instead of silently going stale.
 Each component's own doc page has a "Use with the Mr. Doge SDK" section
 showing its adapter as a live example.
+
+## Contributing
+
+Bug reports and pull requests welcome. See [CONTRIBUTING.md](./CONTRIBUTING.md).
+
+## License
+
+MIT — see [LICENSE](./LICENSE).
