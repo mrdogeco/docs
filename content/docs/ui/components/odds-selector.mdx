@@ -31,6 +31,10 @@ import { OddsSelector } from "@/components/odds-selector"
 />
 ```
 
+Option clicks stop event propagation, so Odds Selector (and anything
+built on it, like Match Card's odds row) can be nested inside a clickable
+row or `Link` without also triggering that outer click.
+
 ## Props
 
 <TypeTable

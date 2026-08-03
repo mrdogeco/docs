@@ -83,6 +83,13 @@ function teamLogoUrl(teamId: number) {
  * always has real data to show; callers render `<MatchCard loading />`
  * separately while that data is still in flight.
  *
+ * Whether the odds slot should show a skeleton while `market` is still
+ * loading isn't this function's call — a caller with no odds feature at
+ * all also has `market === undefined`, and this function can't tell the
+ * difference. Pass `oddsLoading` as a sibling prop at the call site
+ * instead, e.g. `oddsLoading={market === undefined}`, only when you're
+ * actually using useLiveOdds.
+ *
  * `movementById` is optional — pass `useOddsMovement(market)`'s result to
  * show up/down indicators as odds change; omit it and options just render
  * without one.

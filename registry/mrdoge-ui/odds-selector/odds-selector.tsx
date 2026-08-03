@@ -70,7 +70,10 @@ export function OddsSelector({
               key={option.id}
               type="button"
               disabled={option.suspended}
-              onClick={() => onSelect?.(selected ? undefined : option.id)}
+              onClick={(e) => {
+                e.stopPropagation()
+                onSelect?.(selected ? undefined : option.id)
+              }}
               className={cn(
                 "flex min-w-0 flex-col items-center justify-center gap-0.5 px-2 py-2.5 transition-colors",
                 selected ? "bg-primary text-primary-foreground" : "hover:bg-accent/50",

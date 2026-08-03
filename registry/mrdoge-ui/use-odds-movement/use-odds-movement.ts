@@ -6,16 +6,16 @@ import type { OddsMovement } from "@/registry/mrdoge-ui/odds-selector/odds-selec
 
 /**
  * Diffs each bet item's price against the price it had the last time this
- * hook saw a market for the same match, so an Odds Selector can show
- * up/down indicators as live odds change. Movement isn't something the SDK
- * computes or sends — `odds.subscribe` pushes a full replace-in-place
+ * hook saw a market for the same match, so an Odds Selector can color a
+ * price green or red as live odds change. Movement isn't something the
+ * SDK computes or sends — `odds.subscribe` pushes a full replace-in-place
  * snapshot on every change (see useLiveOdds), so this hook remembers the
  * previous snapshot's prices itself and compares.
  *
  * A bet item with no prior snapshot to compare against (first time seen,
  * or the match/market just changed) has no entry in the result — nothing
  * to compare yet, not a "flat" tick. An unchanged price also has no entry,
- * on purpose: an indicator that never goes away would just be noise.
+ * on purpose: a color that never goes away would just be noise.
  */
 export function useOddsMovement(
   market: Market | null | undefined

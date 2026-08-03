@@ -19,12 +19,7 @@ export interface MatchCardTeam {
 }
 
 export interface MatchCardOdds {
-  /**
-   * Market name, e.g. "Match Result". Not rendered — Match Card's odds
-   * area is narrow (especially the row variant), so there's no room for
-   * a header without pushing the card's height up. Kept on the type in
-   * case a future layout has space for it.
-   */
+  /** Market name, e.g. "Match Result". Not currently rendered. */
   market: string
   options: OddsOption[]
 }
@@ -56,9 +51,11 @@ export interface MatchCardDataProps {
    * Card doesn't care which one, it just needs a name and options.
    */
   odds?: MatchCardOdds
+  /** Shows a skeleton in the odds area while set. Ignored once `odds` is provided. */
+  oddsLoading?: boolean
   /**
-   * Where the odds card renders: "bottom" (default, stacked) or "right"
-   * (stays a single row — better for wide/desktop layouts).
+   * Where the odds card renders. Falls back to "bottom" below a `@lg`
+   * (32rem) container width.
    *
    * @defaultValue "bottom"
    */
@@ -72,6 +69,10 @@ export interface MatchCardDataProps {
 interface MatchCardLoadingProps {
   /** Renders a skeleton with the same dimensions instead — no other prop is needed. */
   loading: true
+  /** Reserves space for an odds row/column in the skeleton too. */
+  oddsLoading?: boolean
+  /** Same as MatchCardDataProps.oddsPosition. */
+  oddsPosition?: "bottom" | "right"
   className?: string
 }
 
@@ -147,22 +148,69 @@ function TeamRowSkeleton({ nameWidth }: { nameWidth: string }) {
   )
 }
 
+/** Same shape as OddsSelector's button grid, sized to match its real height. */
+function OddsSkeleton() {
+  return (
+    <div className="flex h-full flex-col">
+      <div className="grid flex-1 auto-cols-fr grid-flow-col divide-x">
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="flex flex-col items-center justify-center gap-0.5 px-2 py-2.5">
+            <div className="flex h-4 items-center">
+              <span className="h-2.5 w-4 animate-pulse rounded bg-muted" />
+            </div>
+            <div className="flex h-5 items-center">
+              <span className="h-3 w-10 animate-pulse rounded bg-muted" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 /**
  * Matches MatchCard's real dimensions exactly, so nothing shifts when
  * live data arrives. Exported separately too, for a loading list of
  * several cards before any of them have data yet.
  */
-export function MatchCardSkeleton({ className }: { className?: string }) {
+export function MatchCardSkeleton({
+  className,
+  oddsLoading,
+  oddsPosition = "bottom",
+}: {
+  className?: string
+  oddsLoading?: boolean
+  oddsPosition?: "bottom" | "right"
+}) {
+  const wantsRow = oddsLoading && oddsPosition === "right"
+
   return (
-    <div className={cn("w-full rounded-xl border bg-card text-card-foreground", className)}>
-      <div className="flex gap-3 px-3 py-3">
-        <div className="flex w-11 shrink-0 items-center justify-center border-r pr-3">
-          <span className="h-3 w-7 animate-pulse rounded bg-muted" />
+    <div
+      className={cn(
+        "@container w-full overflow-hidden rounded-xl border bg-card text-card-foreground",
+        className
+      )}
+    >
+      <div className={cn(wantsRow && "@lg:flex @lg:items-stretch")}>
+        <div className={cn("flex flex-1 gap-3 px-3 py-3", wantsRow && "@lg:min-w-0")}>
+          <div className="flex w-11 shrink-0 items-center justify-center border-r pr-3">
+            <span className="h-3 w-7 animate-pulse rounded bg-muted" />
+          </div>
+          <div className="flex min-w-0 flex-1 flex-col justify-center gap-2">
+            <TeamRowSkeleton nameWidth="w-24" />
+            <TeamRowSkeleton nameWidth="w-20" />
+          </div>
         </div>
-        <div className="flex min-w-0 flex-1 flex-col justify-center gap-2">
-          <TeamRowSkeleton nameWidth="w-24" />
-          <TeamRowSkeleton nameWidth="w-20" />
-        </div>
+        {oddsLoading ? (
+          <div
+            className={cn(
+              "border-t",
+              wantsRow && "@lg:w-64 @lg:shrink-0 @lg:border-t-0 @lg:border-l"
+            )}
+          >
+            <OddsSkeleton />
+          </div>
+        ) : null}
       </div>
     </div>
   )
@@ -170,7 +218,13 @@ export function MatchCardSkeleton({ className }: { className?: string }) {
 
 export function MatchCard(props: MatchCardProps) {
   if (props.loading) {
-    return <MatchCardSkeleton className={props.className} />
+    return (
+      <MatchCardSkeleton
+        className={props.className}
+        oddsLoading={props.oddsLoading}
+        oddsPosition={props.oddsPosition}
+      />
+    )
   }
 
   const {
@@ -184,6 +238,7 @@ export function MatchCard(props: MatchCardProps) {
     awayScore,
     redCardPosition = "right",
     odds,
+    oddsLoading,
     oddsPosition = "bottom",
     selectedOddsId,
     onSelectOdds,
@@ -198,7 +253,9 @@ export function MatchCard(props: MatchCardProps) {
   const homeLost = isFinished && hasScores && homeScore < awayScore
   const awayLost = isFinished && hasScores && awayScore < homeScore
   const hasOdds = Boolean(odds && odds.options.length > 0)
-  const isRow = hasOdds && oddsPosition === "right"
+  const showOddsSlot = hasOdds || (oddsLoading && !odds)
+  // @container below falls back to stacked under @lg regardless of oddsPosition.
+  const wantsRow = showOddsSlot && oddsPosition === "right"
 
   const oddsCard = hasOdds ? (
     <OddsSelector
@@ -208,54 +265,60 @@ export function MatchCard(props: MatchCardProps) {
       onSelect={onSelectOdds}
       className="w-full"
     />
+  ) : showOddsSlot ? (
+    <OddsSkeleton />
   ) : null
 
   return (
     <div
       className={cn(
-        "w-full overflow-hidden rounded-xl border bg-card text-card-foreground",
-        isRow && "flex items-stretch",
+        "@container w-full overflow-hidden rounded-xl border bg-card text-card-foreground",
         className
       )}
     >
-      <div className={cn("flex flex-1 gap-3 px-3 py-3", isRow && "min-w-0")}>
-        <div className="flex w-11 shrink-0 items-center justify-center border-r pr-3 text-center">
-          <LiveIndicator
-            variant="plain"
-            status={status}
-            kickoff={kickoff}
-            elapsed={elapsed}
-            timeFormat={timeFormat}
-          />
+      <div className={cn(wantsRow && "@lg:flex @lg:items-stretch")}>
+        <div className={cn("flex flex-1 gap-3 px-3 py-3", wantsRow && "@lg:min-w-0")}>
+          <div className="flex w-11 shrink-0 items-center justify-center border-r pr-3 text-center">
+            <LiveIndicator
+              variant="plain"
+              status={status}
+              kickoff={kickoff}
+              elapsed={elapsed}
+              timeFormat={timeFormat}
+            />
+          </div>
+          <div className="flex min-w-0 flex-1 flex-col justify-center gap-2">
+            <TeamRow
+              team={home}
+              score={homeScore}
+              showScore={showScore}
+              showRedCards={showRedCards}
+              redCardPosition={redCardPosition}
+              live={isLive}
+              dimmed={homeLost}
+            />
+            <TeamRow
+              team={away}
+              score={awayScore}
+              showScore={showScore}
+              showRedCards={showRedCards}
+              redCardPosition={redCardPosition}
+              live={isLive}
+              dimmed={awayLost}
+            />
+          </div>
         </div>
-        <div className="flex min-w-0 flex-1 flex-col justify-center gap-2">
-          <TeamRow
-            team={home}
-            score={homeScore}
-            showScore={showScore}
-            showRedCards={showRedCards}
-            redCardPosition={redCardPosition}
-            live={isLive}
-            dimmed={homeLost}
-          />
-          <TeamRow
-            team={away}
-            score={awayScore}
-            showScore={showScore}
-            showRedCards={showRedCards}
-            redCardPosition={redCardPosition}
-            live={isLive}
-            dimmed={awayLost}
-          />
-        </div>
+        {showOddsSlot ? (
+          <div
+            className={cn(
+              "border-t",
+              wantsRow && "@lg:w-64 @lg:shrink-0 @lg:border-t-0 @lg:border-l"
+            )}
+          >
+            {oddsCard}
+          </div>
+        ) : null}
       </div>
-      {hasOdds ? (
-        isRow ? (
-          <div className="flex w-64 shrink-0 border-l">{oddsCard}</div>
-        ) : (
-          <div className="border-t">{oddsCard}</div>
-        )
-      ) : null}
     </div>
   )
 }

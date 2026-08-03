@@ -1,6 +1,7 @@
 import fs from "node:fs"
 import path from "node:path"
-import { Tab, Tabs } from "fumadocs-ui/components/tabs"
+import { Tab, Tabs, TabsTrigger } from "fumadocs-ui/components/tabs"
+import { TabsList as RawTabsList } from "fumadocs-ui/components/ui/tabs"
 import { DynamicCodeBlock } from "fumadocs-ui/components/dynamic-codeblock"
 import registry from "@/registry.json"
 
@@ -24,7 +25,11 @@ export function InstallTabs({ name }: { name: string }) {
   const envVarNames = Object.keys(envVars)
 
   return (
-    <Tabs items={["Command", "Manual"]} className="my-0 rounded-none border-none bg-transparent p-0">
+    <Tabs defaultValue="command" className="my-0 rounded-none border-none bg-transparent p-0">
+      <RawTabsList className="flex gap-3.5 overflow-x-auto pr-4 text-fd-secondary-foreground not-prose">
+        <TabsTrigger value="command">Command</TabsTrigger>
+        <TabsTrigger value="manual">Manual</TabsTrigger>
+      </RawTabsList>
       <Tab value="Command" className="bg-transparent p-0">
         <div className="flex flex-col gap-3 pt-3">
           <Tabs items={RUNNERS.map((r) => r.value)} className="my-0">

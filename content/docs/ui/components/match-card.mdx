@@ -15,14 +15,16 @@ import { InstallTabs } from "@/components/docs/install-tabs"
 ## With odds
 
 Pass `odds` to render an odds row using the same options as
-[Odds Selector](/docs/ui/components/odds-selector) — options are labeled
-"1" / "X" / "2" here rather than team names, since the odds row has to stay
-narrow. Set `oddsPosition="right"` to keep it beside the match instead of
-below — a single wide row, suited to desktop/wide layouts (shown second
-below, on a live match to show off the row variant with real live state —
-score, elapsed clock, red cards). This example subscribes to live odds too
-(Business tier) — if none are available for a given match, that card's row
-just doesn't render.
+[Odds Selector](/docs/ui/components/odds-selector). Set
+`oddsPosition="right"` to place it beside the match instead of below
+(shown second below).
+
+`oddsPosition="right"` falls back to stacked below a `32rem` container
+width — a CSS container query, tracking the card's own width rather than
+the viewport. Resize your browser to see it switch on the row card above.
+
+This example subscribes to live odds (Business tier) — if none are
+available for a match, its odds row doesn't render.
 
 <ExampleSection file="components/docs/demos/match-card-live-with-odds-demo.tsx">
   <MatchCardLiveWithOddsDemo />
@@ -31,9 +33,9 @@ just doesn't render.
 ### Selecting an option
 
 Odds selection is controlled, the same pattern as
-[Odds Selector](/docs/ui/components/odds-selector#props) itself — Match
-Card has no internal state for it. Track the selected id yourself and pass
-it back in:
+[Odds Selector](/docs/ui/components/odds-selector#props) — Match Card
+holds no selection state itself. Track the selected id and pass it back
+in:
 
 ```tsx
 const [selectedOddsId, setSelectedOddsId] = useState<string>()
@@ -45,19 +47,36 @@ const [selectedOddsId, setSelectedOddsId] = useState<string>()
 />
 ```
 
-Omit both and the row stays fully clickable, but nothing will ever render
-as selected — there's no fallback state to fall back to. Pressing the
-already-selected option deselects it — `onSelectOdds` fires with
-`undefined` — so `setSelectedOddsId` above is really all the logic this
-needs; there's no toggle to write yourself. The example above tracks
-`selectedOddsId` independently per card, since each is showing a different
-match.
+Pressing the selected option again deselects it — `onSelectOdds` fires
+with `undefined`, so `setSelectedOddsId` needs no extra logic. Omit both
+props and the row stays clickable, but nothing renders as selected.
+
+### Odds loading state
+
+Odds typically resolve after the match itself, via a separate
+`odds.list`/`odds.subscribe` call. Pass `oddsLoading` while waiting to
+show a skeleton in the odds area instead of leaving it empty:
+
+```tsx
+const market = useLiveOdds({ matchId, betTypes })
+
+<MatchCard
+  {...matchCardProps}
+  oddsLoading={market === undefined}
+/>
+```
+
+Only set it on a card that actually uses odds — omit both `odds` and
+`oddsLoading` otherwise. `loading` (below) accepts the same
+`oddsLoading`/`oddsPosition`, so the skeleton can reserve odds space
+before the match itself has loaded.
 
 ## Loading
 
-Pass `loading` on its own — no other prop is needed — to render a skeleton
-with the exact same dimensions, so nothing shifts once real data arrives.
-Both examples above already use this while their subscription connects.
+Pass `loading` on its own to render a skeleton matching the card's real
+dimensions. Add `oddsLoading` (and `oddsPosition` for the row variant) to
+also reserve space for the odds row. Both examples above use this while
+their data loads.
 
 <ExampleSection file="components/docs/demos/match-card-loading-demo.tsx">
   <MatchCardLoadingDemo />
@@ -70,10 +89,11 @@ Both examples above already use this while their subscription connects.
 ## Use with the Mr. Doge SDK
 
 MatchCard takes plain props, so it works with any data source. Mapping a
-real `matches.get()` (plus a market from `odds.list()`) response onto those
-props is a small, pure function — type-checked against the actual SDK
-response shape, so a schema change fails to compile instead of silently
-going stale:
+real [`matches.get()`](/docs/reference/matches) response (plus a market
+from [`odds.list()`](/docs/reference/odds)) onto those props is a small,
+pure function — type-checked against the actual SDK response shape, so a
+schema change fails to compile instead of silently going stale. This is
+the real adapter behind both examples above:
 
 ```tsx
 import type { MatchDetail, Market } from "@mrdoge/protocol"
@@ -181,28 +201,25 @@ function matchToMatchCardProps(
 
 `movementById` is optional throughout — pass
 [useOddsMovement](/docs/ui/hooks/use-odds-movement)`(market)`'s result to
-show up/down indicators on options as prices change, or omit it entirely
-and options just render without one.
-
-Both examples above render through exactly this pattern — they're wired to
-a real, live `matches.subscribe()` connection (see the example source via
-"View Code"), and this same function maps each push straight into
-`MatchCard`'s props.
+color options as prices change (green/red), or omit it and options render
+without any color change. The hook's result is plain data
+(`Record<string, "up" | "down">`), so it works just as well for a custom
+rendering of your own.
 
 ## Props
 
-`loading: true` is mutually exclusive with every other prop — see
-[Loading](#loading) above. Everything below applies when `loading` is
-omitted or `false`.
+`loading: true` is mutually exclusive with every other prop except
+`oddsLoading` and `oddsPosition` — see [Loading](#loading) above.
+Everything below applies when `loading` is omitted or `false`.
 
 <TypeTable
   type={{
     loading: {
-      description: 'Renders a skeleton instead, with no other prop required. See MatchCardSkeleton below.',
+      description: <>Renders a skeleton instead, with no other prop required. See <a href="#matchcardskeleton">MatchCardSkeleton</a> below.</>,
       type: "boolean",
     },
     status: {
-      description: "See Live Indicator.",
+      description: <>See <a href="/docs/ui/components/live-indicator">Live Indicator</a>.</>,
       type: '"scheduled" | "live" | "paused" | "intermission" | "interrupted" | "finished"',
       required: true,
     },
@@ -219,12 +236,12 @@ omitted or `false`.
       type: '"12h" | "24h"',
     },
     home: {
-      description: "Home team. See MatchCardTeam below.",
+      description: <>Home team. See <a href="#matchcardteam">MatchCardTeam</a> below.</>,
       type: "MatchCardTeam",
       required: true,
     },
     away: {
-      description: "Away team. See MatchCardTeam below.",
+      description: <>Away team. See <a href="#matchcardteam">MatchCardTeam</a> below.</>,
       type: "MatchCardTeam",
       required: true,
     },
@@ -241,11 +258,15 @@ omitted or `false`.
       type: '"left" | "right"',
     },
     odds: {
-      description: "Renders an odds row when provided. See MatchCardOdds below.",
+      description: <>Renders an odds row when provided. See <a href="#matchcardodds">MatchCardOdds</a> below.</>,
       type: "MatchCardOdds",
     },
+    oddsLoading: {
+      description: "Shows a skeleton in the odds area while set. Ignored once odds is provided.",
+      type: "boolean",
+    },
     oddsPosition: {
-      description: 'Where the odds card renders: "bottom" (default, stacked) or "right" (stays a single row — better for wide/desktop layouts).',
+      description: '"bottom" (default, stacked) or "right" (single row, for wide layouts). Falls back to "bottom" below a 32rem container width.',
       type: '"bottom" | "right"',
     },
     selectedOddsId: {
@@ -285,12 +306,12 @@ omitted or `false`.
 <TypeTable
   type={{
     market: {
-      description: 'Market name, e.g. "Match Result". Not rendered — kept on the type in case a future layout has room for it.',
+      description: 'Market name, e.g. "Match Result". Not currently rendered.',
       type: "string",
       required: true,
     },
     options: {
-      description: "See OddsOption on the Odds Selector page.",
+      description: <>See <a href="/docs/ui/components/odds-selector#oddsoption">OddsOption</a> on the Odds Selector page.</>,
       type: "OddsOption[]",
       required: true,
     },
@@ -302,4 +323,5 @@ omitted or `false`.
 `<MatchCard loading />` renders this internally, but it's also exported on
 its own — `import { MatchCardSkeleton } from "@/components/match-card"` —
 for a loading list of several cards before any of them have data yet.
-Takes only `className`.
+Takes `className`, `oddsLoading`, and `oddsPosition` — same meaning as on
+`loading` above.

@@ -69,7 +69,7 @@ illustrative snippets. Unlike components, these depend on `@mrdoge/client`
 | `use-live-match` | Subscribes to a single match over WebSocket — score, status, and clock update in real time |
 | `use-live-odds` | Subscribes to a single match's live odds over WebSocket (Business tier) |
 | `use-trending-matches` | Today's most-viewed matches, ranked server-side by views. One-shot, not a subscription |
-| `use-odds-movement` | Diffs each bet item's price against its previous snapshot to drive Odds Selector's up/down indicators. No SDK setup — pure client-side diff over whatever market `use-live-odds` gives you |
+| `use-odds-movement` | Diffs each bet item's price against its previous snapshot to color Odds Selector's price green/red as it changes. No SDK setup — pure client-side diff over whatever market `use-live-odds` gives you |
 
 Installing any of the first three pulls in `mrdoge-client` (the browser SDK
 client singleton) and `mrdoge-token-route` (a Next.js route that mints
@@ -83,6 +83,7 @@ automatically.
 pnpm install
 pnpm dev       # localhost:3001
 pnpm build     # production build
+pnpm test      # unit tests (Vitest)
 ```
 
 Registry JSON (served from `public/r/`) is generated from `registry.json`

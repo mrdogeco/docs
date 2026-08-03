@@ -13,6 +13,7 @@ Thanks for considering a contribution.
 pnpm install
 pnpm dev       # localhost:3001
 pnpm build     # production build
+pnpm test      # unit tests (Vitest)
 ```
 
 ## Project layout
@@ -40,6 +41,8 @@ Run this after adding or editing anything under `registry/mrdoge-ui/` or
 ## Pull requests
 
 - One logical change per PR.
+- Add or update tests in `lib/sdk-adapters/` and hooks for any change to a
+  pure function's behavior (e.g. `toOddsOptions`, `useOddsMovement`).
 - Components take plain props — no dependency on any particular data
   provider. Hooks are the deliberate exception; keep new ones consistent
   with the existing convention (a single options object, matching the
