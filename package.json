@@ -11,9 +11,9 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@mrdoge/client": "^0.4.2",
-    "@mrdoge/node": "^0.4.2",
-    "@mrdoge/protocol": "^0.4.2",
+    "@mrdoge/client": "^0.4.3",
+    "@mrdoge/node": "^0.4.3",
+    "@mrdoge/protocol": "^0.4.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "fumadocs-core": "^16.8.11",

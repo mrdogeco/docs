@@ -18,7 +18,7 @@ export const sampleMarkets = [
     id: "market-1",
     betType: "SOCCER_MATCH_RESULT",
     displayName: "Match Result",
-    betItems: [
+    lines: [
       { id: "home", code: "1", caption: null, price: 1.85, isAvailable: true },
       { id: "draw", code: "X", caption: null, price: 3.4, isAvailable: true },
       { id: "away", code: "2", caption: null, price: 4.2, isAvailable: false },
@@ -28,7 +28,7 @@ export const sampleMarkets = [
     id: "market-2",
     betType: "SOCCER_UNDER_OVER",
     displayName: "Over/Under 2.5",
-    betItems: [
+    lines: [
       { id: "over", code: "O2.5", caption: "Over 2.5", price: 1.95, isAvailable: true },
       { id: "under", code: "U2.5", caption: "Under 2.5", price: 1.85, isAvailable: true },
     ],
@@ -37,7 +37,7 @@ export const sampleMarkets = [
     id: "market-3",
     betType: "SOCCER_BOTH_TEAMS_TO_SCORE",
     displayName: "Both Teams to Score",
-    betItems: [
+    lines: [
       { id: "yes", code: "GG", caption: "Yes", price: 1.72, isAvailable: true },
       { id: "no", code: "NG", caption: "No", price: 2.05, isAvailable: true },
     ],

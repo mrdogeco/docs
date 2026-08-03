@@ -1,0 +1,37 @@
+---
+title: Mr. Doge SDK
+description: Adapters mapping real Mr. Doge SDK responses onto mrdoge-ui component props.
+---
+
+import { InstallTabs } from "@/components/docs/install-tabs"
+
+Small, pure functions from a real `@mrdoge/protocol` response to a
+component's plain props — type-checked, so a schema change fails to
+compile instead of silently going stale. These are the ones used
+throughout every example on this site. Integrating a different data
+provider? A new page here, following the same pattern, is the way — PRs
+welcome.
+
+## Match Card
+
+Maps a real [`matches.get()`](/docs/reference/matches) response (plus a
+market from [`odds.list()`](/docs/reference/odds)) onto
+[Match Card](/docs/ui/components/match-card)'s props.
+
+<InstallTabs name="mrdoge-match-card-adapter" />
+
+`movementById` is optional throughout — pass
+[useOddsMovement](/docs/ui/hooks/use-odds-movement)`(market)`'s result to
+color options as prices change (green/red), or omit it and options render
+without any color change.
+
+## Odds Selector
+
+`SOCCER_UNDER_OVER` posts one market per threshold (0.5, 1.5, 2.5, ...)
+instead of one market total — `toOddsLines` pairs each into a row, sorted
+by threshold, for [Odds Selector](/docs/ui/components/odds-selector)'s
+`lines` prop. `pickMostBalancedMarket` picks the closest-to-even
+Over/Under pair as a single representative line, e.g. for the Odds Board
+example, instead of an arbitrary — often lopsided — first market.
+
+<InstallTabs name="mrdoge-odds-selector-adapter" />

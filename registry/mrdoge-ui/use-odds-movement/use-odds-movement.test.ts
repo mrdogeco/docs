@@ -8,7 +8,7 @@ function market(prices: Record<string, number>): Market {
     id: "market-1",
     betType: "SOCCER_MATCH_RESULT",
     displayName: "Match Result",
-    betItems: Object.entries(prices).map(([id, price]) => ({
+    lines: Object.entries(prices).map(([id, price]) => ({
       id,
       code: id,
       caption: null,

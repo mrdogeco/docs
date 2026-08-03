@@ -44,9 +44,21 @@ Takes a single options object, like every real SDK method it wraps
       description: 'Restrict to specific sports, e.g. ["soccer"]. Omit for all sports.',
       type: "string[]",
     },
+    status: {
+      description: 'Restrict to specific match statuses, e.g. ["upcoming"]. Omit for all statuses.',
+      type: '("upcoming" | "live" | "completed")[]',
+    },
     limit: {
       description: "Result count. Server default 5, capped at 50.",
       type: "number",
+    },
+    timezone: {
+      description: "IANA timezone for any timezone-dependent fields server-side.",
+      type: "string",
+    },
+    locale: {
+      description: "Locale for any localized fields server-side.",
+      type: "string",
     },
   }}
 />

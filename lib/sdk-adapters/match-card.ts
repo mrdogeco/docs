@@ -16,14 +16,12 @@ function toLiveIndicatorStatus(match: MatchDetail): LiveIndicatorStatus {
 }
 
 // Outcome order (1/X/2 left-to-right, Over before Under, ...) is decided
-// server-side now — the SDK gateway runs every market's betItems through
-// the same ordering rules before it ever reaches here. See
-// `orderBetItems` in mrdoge-odds-api's sdk/mappers.ts.
+// server-side — the SDK gateway orders every market's lines before they
+// ever reach here, so there's nothing to sort in this adapter.
 //
-// Exported so odds-board.ts can reuse it per market instead of
-// re-implementing the same BetItem -> OddsOption mapping. Odds Board has
-// room for real team names; Match Card is a lot narrower, so it asks for
-// "code" instead (1/X/2) — short and never needs truncating.
+// Odds Selector's own examples have room for real team names; Match
+// Card is a lot narrower, so it asks for "code" instead (1/X/2) — short
+// and never needs truncating.
 export function toOddsOptions(
   market?: Market,
   {
@@ -36,26 +34,13 @@ export function toOddsOptions(
   } = {}
 ): OddsOption[] {
   if (!market) return []
-  return market.betItems.map((item) => ({
-    id: item.id,
-    label: labelFrom === "code" ? item.code : (item.caption ?? item.code),
-    price: item.price.toFixed(2),
-    suspended: !item.isAvailable,
-    movement: movementById?.[item.id],
+  return market.lines.map((line) => ({
+    id: line.id,
+    label: labelFrom === "code" ? line.code : (line.caption ?? line.code),
+    price: line.price.toFixed(2),
+    suspended: !line.isAvailable,
+    movement: movementById?.[line.id],
   }))
-}
-
-// Market.betType is a raw sysname on the wire (e.g. "SOCCER_MATCH_RESULT"),
-// not a display label — a real name lookup table is out of scope here, so
-// this falls back to a light cleanup (underscores to spaces, title case)
-// rather than the raw sysname or a fabricated name. Exported so
-// odds-board.ts can reuse it instead of re-implementing the same mapping.
-export function toMarketLabel(betType: string): string {
-  return betType
-    .toLowerCase()
-    .split("_")
-    .map((word) => word[0].toUpperCase() + word.slice(1))
-    .join(" ")
 }
 
 function toMatchCardOdds(
@@ -64,7 +49,7 @@ function toMatchCardOdds(
 ): MatchCardOdds | undefined {
   if (!market) return undefined
   return {
-    market: toMarketLabel(market.betType),
+    market: market.displayName,
     options: toOddsOptions(market, { labelFrom: "code", movementById }),
   }
 }
@@ -91,8 +76,14 @@ function teamLogoUrl(teamId: number) {
  * actually using useLiveOdds.
  *
  * `movementById` is optional — pass `useOddsMovement(market)`'s result to
- * show up/down indicators as odds change; omit it and options just render
- * without one.
+ * color options as odds change; omit it and options render without any
+ * color change.
+ *
+ * Odds are dropped once the match is completed, regardless of what
+ * `market` holds — betting closes when a match ends, and a WS subscription
+ * has no reason to push another update once there's nothing left to
+ * change, so `market` would otherwise just sit frozen on its last live
+ * value forever.
  */
 export function matchToMatchCardProps(
   match: MatchDetail,
@@ -123,6 +114,6 @@ export function matchToMatchCardProps(
     },
     homeScore: match.stats?.homeScore,
     awayScore: match.stats?.awayScore,
-    odds: toMatchCardOdds(market, movementById),
+    odds: match.status === "completed" ? undefined : toMatchCardOdds(market, movementById),
   }
 }

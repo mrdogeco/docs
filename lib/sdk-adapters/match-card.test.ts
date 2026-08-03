@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 import type { Market, MatchDetail, SoccerStats } from "@mrdoge/protocol"
-import { matchToMatchCardProps, toMarketLabel, toOddsOptions } from "./match-card"
+import { matchToMatchCardProps, toOddsOptions } from "./match-card"
 
 function soccerStats(overrides: Partial<SoccerStats> = {}): SoccerStats {
   return {
@@ -31,7 +31,7 @@ function market(overrides: Partial<Market> = {}): Market {
     id: "market-1",
     betType: "SOCCER_MATCH_RESULT",
     displayName: "Match Result",
-    betItems: [
+    lines: [
       { id: "home", code: "1", caption: null, price: 1.85, isAvailable: true },
       { id: "draw", code: "X", caption: null, price: 3.4, isAvailable: true },
       { id: "away", code: "2", caption: "Flamengo", price: 4.2, isAvailable: false },
@@ -67,16 +67,6 @@ describe("toOddsOptions", () => {
   it("applies movementById per item id, leaving unlisted items undefined", () => {
     const options = toOddsOptions(market(), { movementById: { home: "up", draw: "down" } })
     expect(options.map((o) => o.movement)).toEqual(["up", "down", undefined])
-  })
-})
-
-describe("toMarketLabel", () => {
-  it("splits underscores and title-cases each word", () => {
-    expect(toMarketLabel("SOCCER_MATCH_RESULT")).toBe("Soccer Match Result")
-  })
-
-  it("title-cases a single word with no underscores", () => {
-    expect(toMarketLabel("HANDICAP")).toBe("Handicap")
   })
 })
 
@@ -147,7 +137,7 @@ describe("matchToMatchCardProps", () => {
     expect(withoutMarket.odds).toBeUndefined()
 
     const withMarket = matchToMatchCardProps(baseMatch(), market())
-    expect(withMarket.odds?.market).toBe("Soccer Match Result")
+    expect(withMarket.odds?.market).toBe("Match Result")
     expect(withMarket.odds?.options).toHaveLength(3)
   })
 })

@@ -3,10 +3,9 @@ title: Odds
 description: Live order books for a single match — one-shot snapshots or streaming deltas.
 ---
 
-The `odds` resource is dedicated to live betting markets. It replaces the
-old `match.stats.liveBetItems` field — markets are no longer nested
-inside the `Match` shape, so customers who only render scores and stats
-pay zero bandwidth for an order book they don't use.
+The `odds` resource is dedicated to live betting markets, kept separate
+from `Match` — customers who only render scores and stats pay zero
+bandwidth for an order book they don't use.
 
 <Callout type="info">
   Requires the **Business tier**. [Upgrade →](/dashboard/billing)
@@ -25,9 +24,9 @@ const markets = await mrdoge.odds.list({
 });
 
 for (const market of markets) {
-  console.log(market.betType, "—", market.betItems.length, "items");
-  for (const item of market.betItems) {
-    console.log(`  ${item.code} (${item.caption}) @ ${item.price}`);
+  console.log(market.betType, "—", market.lines.length, "lines");
+  for (const line of market.lines) {
+    console.log(`  ${line.code} (${line.caption}) @ ${line.price}`);
   }
 }
 ```
@@ -39,7 +38,7 @@ for (const market of markets) {
 | `matchId` | `string` | Required |
 | `betTypes` | `string[]` | Restrict to one or more market sysnames (e.g. `["SOCCER_MATCH_RESULT", "SOCCER_UNDER_OVER"]`) |
 | `select` | `MarketSelect` | Field selector — see [selectors](/docs/reference/matches#selectors) |
-| `locale` | `string` | Localizes each bet item's `caption` |
+| `locale` | `string` | Localizes each line's `caption` |
 
 **Returns:** `Market[]` — every available live market for the match.
 
@@ -77,7 +76,7 @@ await sub.cancel();
 | `matchId` | `string` | Required |
 | `betTypes` | `string[]` | Restrict pushes to specific market sysnames |
 | `select` | `MarketSelect` | Field selector applies to snapshot AND every push |
-| `locale` | `string` | Localizes each push's bet item captions |
+| `locale` | `string` | Localizes each push's line captions |
 
 **Returns:** `Subscription<"odds.subscribe">` — see
 [subscriptions](/docs/reference/subscriptions).
@@ -91,10 +90,10 @@ type Market = {
   id: string;
   /** Market sysname, e.g. "SOCCER_MATCH_RESULT", "SOCCER_UNDER_OVER". */
   betType: string;
-  betItems: BetItem[];
+  lines: Line[];
 };
 
-type BetItem = {
+type Line = {
   id: string;
   /** Stable outcome identifier (`"1"`, `"X"`, `"2"`, `"O2.5"`, etc.). Locale-independent. */
   code: string;
@@ -103,6 +102,8 @@ type BetItem = {
   /** Decimal odds (e.g. 2.10). */
   price: number;
   isAvailable: boolean;
+  /** ISO timestamp of the last odds update. Prelive: per-line DB write time. Live: feed ingestion time. */
+  updatedAt?: string;
 };
 ```
 
@@ -145,7 +146,7 @@ deltas; the others are dropped server-side.
 ## Localization
 
 `code` is the same identifier across every locale. `caption` is the
-formatted human-readable label of the bet item. Pass `locale` to choose
+formatted human-readable label of the line. Pass `locale` to choose
 the language; defaults to `"en"`.
 
 Resolution order:
@@ -187,7 +188,7 @@ const sub = await mrdoge.odds.subscribe({
   select: {
     id: true,
     betType: true,
-    betItems: { code: true, caption: true, price: true, isAvailable: true },
+    lines: { code: true, caption: true, price: true, isAvailable: true },
   },
 });
 

@@ -1,17 +1,19 @@
 {
+  "title": "Components",
+  "icon": "LayoutGrid",
   "pages": [
     "match-card",
-    "ai-recommendation-card",
-    "settlement-badge",
     "odds-selector",
-    "live-indicator",
     "bet-slip",
+    "match-highlight",
     "match-timeline",
+    "stats-list",
+    "ai-recommendation-card",
+    "region-accordion",
+    "live-indicator",
+    "settlement-badge",
     "team-form-indicator",
-    "competition-header",
-    "entity-image",
-    "odds-board",
     "sport-picker",
-    "region-accordion"
+    "entity-image"
   ]
 }

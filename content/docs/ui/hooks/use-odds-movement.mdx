@@ -1,6 +1,6 @@
 ---
 title: useOddsMovement
-description: Diffs each bet item's price against its previous snapshot, so an Odds Selector can color a price green or red as live odds change.
+description: Diffs each line's price against its previous snapshot, so an Odds Selector can color a price green or red as live odds change.
 ---
 
 import { MatchCardLiveWithOddsDemo } from "@/components/docs/demos/match-card-live-with-odds-demo"
@@ -31,19 +31,20 @@ import { useOddsMovement } from "@/hooks/use-odds-movement"
 import { OddsSelector } from "@/components/odds-selector"
 
 function Market({ matchId }: { matchId: string }) {
-  const market = useLiveOdds({ matchId, betTypes: ["SOCCER_MATCH_RESULT"] })
+  const markets = useLiveOdds({ matchId, betTypes: ["SOCCER_MATCH_RESULT"] })
+  const market = markets?.[0]
   const movementById = useOddsMovement(market)
 
   if (!market) return null
 
   return (
     <OddsSelector
-      options={market.betItems.map((item) => ({
-        id: item.id,
-        label: item.code,
-        price: item.price.toFixed(2),
-        suspended: !item.isAvailable,
-        movement: movementById[item.id],
+      options={market.lines.map((line) => ({
+        id: line.id,
+        label: line.code,
+        price: line.price.toFixed(2),
+        suspended: !line.isAvailable,
+        movement: movementById[line.id],
       }))}
     />
   )
@@ -68,10 +69,10 @@ takes the result as an optional third argument.
 
 ## Returns
 
-`Record<string, "up" | "down" | "flat">` — keyed by bet item id. In
+`Record<string, "up" | "down" | "flat">` — keyed by line id. In
 practice only `"up"` and `"down"` are ever produced; `"flat"` exists on
 the type (`OddsMovement`, from Odds Selector) but this hook never emits
-it. A bet item only gets an entry once there's a previous price to compare
+it. A line only gets an entry once there's a previous price to compare
 against — the first snapshot ever seen for a given id has nothing to
 diff, and an unchanged price isn't given an entry either. A color that
 never goes away would just be noise; ids missing from the result should

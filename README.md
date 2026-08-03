@@ -42,17 +42,15 @@ npx shadcn@latest add https://mrdoge.co/r/match-card.json
 | --- | --- |
 | `match-card` | Compact match row with teams, score or kickoff time, status, and an optional odds row |
 | `odds-selector` | Selectable price buttons for a market, with price movement and suspended states |
-| `odds-board` | Every market for a match at once, each with its own Odds Selector |
-| `live-indicator` | Status pill for a match: scheduled, live, paused, intermission, interrupted, or finished |
 | `bet-slip` | Panel for selected picks with stake input and computed potential payout |
 | `match-timeline` | Chronological feed of match events |
-| `team-form-indicator` | Recent match results for a team, with optional per-match detail |
-| `competition-header` | Banner for a competition: name, region, and stage |
-| `entity-image` | Team or region logo, unstyled — falls back to initials when the image is missing |
-| `settlement-badge` | Post-settlement outcome badge: won, lost, or push |
 | `ai-recommendation-card` | AI-generated pick with confidence, edge, rationale, and risk factors |
-| `sport-picker` | Icon-based sport filter |
 | `region-accordion` | Collapsible region list, grouped by competition, with event counts |
+| `live-indicator` | Status pill for a match: scheduled, live, paused, intermission, interrupted, or finished |
+| `settlement-badge` | Post-settlement outcome badge: won, lost, or push |
+| `team-form-indicator` | Recent match results for a team, with optional per-match detail |
+| `sport-picker` | Icon-based sport filter |
+| `entity-image` | Team or region logo, unstyled — falls back to initials when the image is missing |
 
 See [mrdoge.co/ui](https://mrdoge.co/ui) for live previews, full usage,
 and props for every component, or browse the source directly under
@@ -67,7 +65,7 @@ illustrative snippets. Unlike components, these depend on `@mrdoge/client`
 | Hook | Description |
 | --- | --- |
 | `use-live-match` | Subscribes to a single match over WebSocket — score, status, and clock update in real time |
-| `use-live-odds` | Subscribes to a single match's live odds over WebSocket (Business tier) |
+| `use-live-odds` | Subscribes to a single match's live odds over WebSocket (Business tier) — returns every matching market |
 | `use-trending-matches` | Today's most-viewed matches, ranked server-side by views. One-shot, not a subscription |
 | `use-odds-movement` | Diffs each bet item's price against its previous snapshot to color Odds Selector's price green/red as it changes. No SDK setup — pure client-side diff over whatever market `use-live-odds` gives you |
 
@@ -76,6 +74,20 @@ client singleton) and `mrdoge-token-route` (a Next.js route that mints
 short-lived tokens using `@mrdoge/node` — the browser never sees the raw
 API key)
 automatically.
+
+## Adapters
+
+| Adapter | Description |
+| --- | --- |
+| `mrdoge-match-card-adapter` | Maps a real `matches.get()`/`odds.list()` response onto Match Card's props |
+| `mrdoge-odds-selector-adapter` | Pairs Over/Under markets into `OddsLine[]` and picks a representative line |
+
+Mr. Doge SDK's own adapters — the ones used throughout every example on
+the docs site. Small, pure functions from a real `@mrdoge/protocol`
+response to a component's plain props, type-checked so a schema change
+fails to compile instead of silently going stale. Bringing a different
+data provider? Open a PR with your own — see
+[mrdoge.co/ui](https://mrdoge.co/ui) for the pattern.
 
 ## Development
 
@@ -95,16 +107,6 @@ pnpm dlx shadcn@latest build
 
 Run this after adding or editing a component so the built output in
 `public/r/` stays in sync with `registry.json`.
-
-## Use with the Mr. Doge SDK
-
-mrdoge-ui components accept plain props, so they work with any data
-source. Real integration code lives in `lib/sdk-adapters/` — one pure
-mapper function per component, taking an actual `@mrdoge/protocol` type
-and returning that component's props. If the SDK's response shape
-changes, the adapter fails to compile instead of silently going stale.
-Each component's own doc page has a "Use with the Mr. Doge SDK" section
-showing its adapter as a live example.
 
 ## Contributing
 

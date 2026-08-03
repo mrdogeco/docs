@@ -8,12 +8,16 @@ export interface UseLiveOddsOptions {
   /** The match to subscribe odds for. Pass undefined to skip subscribing. */
   matchId: string | undefined
   /**
-   * Restrict (and make deterministic) which market comes back. Omit to get
-   * every live market on the match; this hook always returns just the
-   * first one, so without a filter that first one is whatever order the
-   * server sends.
+   * Restrict which markets come back. Omit to get every live market on the
+   * match.
    *
-   * Some markets use a different sysname before kickoff — e.g. the
+   * Some bet types post one market per line instead of one market total —
+   * e.g. `SOCCER_UNDER_OVER` posts a separate market for each Over/Under
+   * threshold (0.5, 1.5, 2.5, ...). This hook always returns every market
+   * that matched, so filtering to a single-market bet type (like
+   * `SOCCER_MATCH_RESULT`) is what makes indexing `[0]` safe.
+   *
+   * Some markets also use a different sysname before kickoff — e.g. the
    * standard 1X2 line is `SOCCER_MATCH_RESULT_PRELIVE` up until the match
    * goes live, then `SOCCER_MATCH_RESULT`. Filter on both if you want the
    * market regardless of match state: `["SOCCER_MATCH_RESULT",
@@ -23,16 +27,17 @@ export interface UseLiveOddsOptions {
 }
 
 /**
- * undefined = loading, null = no live odds for this match (Business tier
- * only — no fallback, that's an honest empty state, not a fictional one).
+ * undefined = loading, null = no live markets match this filter for this
+ * match (Business tier only — no fallback, that's an honest empty state,
+ * not a fictional one).
  */
 export function useLiveOdds({ matchId, betTypes }: UseLiveOddsOptions) {
-  const [market, setMarket] = useState<Market | null | undefined>(undefined)
+  const [markets, setMarkets] = useState<Market[] | null | undefined>(undefined)
   const betTypesKey = betTypes?.join(",")
 
   useEffect(() => {
     if (!matchId) {
-      setMarket(undefined)
+      setMarkets(undefined)
       return
     }
 
@@ -47,12 +52,12 @@ export function useLiveOdds({ matchId, betTypes }: UseLiveOddsOptions) {
           return
         }
         subscription = sub
-        setMarket(sub.snapshot[0] ?? null)
-        sub.on("snapshot", (markets) => setMarket(markets[0] ?? null))
-        sub.on("odds.upd", (markets) => setMarket(markets[0] ?? null))
+        setMarkets(sub.snapshot.length > 0 ? sub.snapshot : null)
+        sub.on("snapshot", (next) => setMarkets(next.length > 0 ? next : null))
+        sub.on("odds.upd", (next) => setMarkets(next.length > 0 ? next : null))
       })
       .catch(() => {
-        if (!cancelled) setMarket(null)
+        if (!cancelled) setMarkets(null)
       })
 
     return () => {
@@ -62,5 +67,5 @@ export function useLiveOdds({ matchId, betTypes }: UseLiveOddsOptions) {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- betTypesKey is the stable form of betTypes
   }, [matchId, betTypesKey])
 
-  return market
+  return markets
 }

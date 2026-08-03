@@ -58,7 +58,8 @@ Odds typically resolve after the match itself, via a separate
 show a skeleton in the odds area instead of leaving it empty:
 
 ```tsx
-const market = useLiveOdds({ matchId, betTypes })
+const markets = useLiveOdds({ matchId, betTypes })
+const market = markets?.[0]
 
 <MatchCard
   {...matchCardProps}
@@ -88,123 +89,10 @@ their data loads.
 
 ## Use with the Mr. Doge SDK
 
-MatchCard takes plain props, so it works with any data source. Mapping a
-real [`matches.get()`](/docs/reference/matches) response (plus a market
-from [`odds.list()`](/docs/reference/odds)) onto those props is a small,
-pure function — type-checked against the actual SDK response shape, so a
-schema change fails to compile instead of silently going stale. This is
-the real adapter behind both examples above:
-
-```tsx
-import type { MatchDetail, Market } from "@mrdoge/protocol"
-import type { MatchCardDataProps, MatchCardOdds } from "@/components/match-card"
-import type { LiveIndicatorStatus } from "@/components/live-indicator"
-import type { OddsOption, OddsMovement } from "@/components/odds-selector"
-
-// match.status is authoritative and always fresh. Clock.state adds
-// paused/intermission/interrupted, but comes from the live-stats feed,
-// which can stop updating once a match ends — so match.status decides
-// the coarse bucket first; clock.state only refines *within* "live".
-function toLiveIndicatorStatus(match: MatchDetail): LiveIndicatorStatus {
-  if (match.status === "upcoming") return "scheduled"
-  if (match.status === "completed") return "finished"
-  return match.stats?.clock?.state ?? "live"
-}
-
-// Outcome order (1/X/2 left-to-right, Over before Under, ...) is decided
-// server-side — the SDK gateway orders every market's betItems before
-// they're ever returned, so there's nothing to sort here.
-//
-// Match Card's odds row is narrow, so it asks for "code" (1/X/2) instead
-// of the default team-name caption — short, and never needs truncating.
-function toOddsOptions(
-  market?: Market,
-  {
-    labelFrom = "caption",
-    movementById,
-  }: {
-    labelFrom?: "caption" | "code"
-    /** From useOddsMovement(market) — id -> "up" | "down" since the previous snapshot. */
-    movementById?: Record<string, OddsMovement>
-  } = {}
-): OddsOption[] {
-  if (!market) return []
-  return market.betItems.map((item) => ({
-    id: item.id,
-    label: labelFrom === "code" ? item.code : (item.caption ?? item.code),
-    price: item.price.toFixed(2),
-    suspended: !item.isAvailable,
-    movement: movementById?.[item.id],
-  }))
-}
-
-// Market.betType is a raw sysname on the wire (e.g. "SOCCER_MATCH_RESULT"),
-// not a display label — a real name lookup table is out of scope here, so
-// this falls back to a light cleanup (underscores to spaces, title case)
-// rather than the raw sysname or a fabricated name.
-function toMarketLabel(betType: string): string {
-  return betType
-    .toLowerCase()
-    .split("_")
-    .map((word) => word[0].toUpperCase() + word.slice(1))
-    .join(" ")
-}
-
-function toMatchCardOdds(
-  market?: Market,
-  movementById?: Record<string, OddsMovement>
-): MatchCardOdds | undefined {
-  if (!market) return undefined
-  return {
-    market: toMarketLabel(market.betType),
-    options: toOddsOptions(market, { labelFrom: "code", movementById }),
-  }
-}
-
-// Public, unauthenticated, cached CDN — not part of the Team shape itself.
-// See /docs/reference/images.
-function teamLogoUrl(teamId: number) {
-  return `https://api.mrdoge.co/images/teams/${teamId}.png`
-}
-
-function matchToMatchCardProps(
-  match: MatchDetail,
-  market?: Market,
-  movementById?: Record<string, OddsMovement>,
-): MatchCardDataProps {
-  // Red cards are soccer-specific — MatchStats is a discriminated union per
-  // sport, so narrow before reading homeRedCards/awayRedCards.
-  const stats = match.stats?.sport === "soccer" ? match.stats : undefined
-
-  return {
-    status: toLiveIndicatorStatus(match),
-    kickoff: match.startTime,
-    // Only meaningful while in progress — once completed, drop the frozen
-    // clock display and let LiveIndicator show its own "FT" label.
-    elapsed: match.status === "live" ? (match.stats?.clock?.display ?? undefined) : undefined,
-    home: {
-      name: match.homeTeam.name,
-      logoUrl: teamLogoUrl(match.homeTeam.id),
-      redCards: stats?.homeRedCards,
-    },
-    away: {
-      name: match.awayTeam.name,
-      logoUrl: teamLogoUrl(match.awayTeam.id),
-      redCards: stats?.awayRedCards,
-    },
-    homeScore: match.stats?.homeScore,
-    awayScore: match.stats?.awayScore,
-    odds: toMatchCardOdds(market, movementById),
-  }
-}
-```
-
-`movementById` is optional throughout — pass
-[useOddsMovement](/docs/ui/hooks/use-odds-movement)`(market)`'s result to
-color options as prices change (green/red), or omit it and options render
-without any color change. The hook's result is plain data
-(`Record<string, "up" | "down">`), so it works just as well for a custom
-rendering of your own.
+MatchCard takes plain props, so it works with any data source. See the
+[Match Card Adapter](/docs/ui/adapters/mrdoge-sdk#match-card) for the real function
+mapping a `matches.get()`/`odds.list()` response onto these props — the
+one behind both examples above.
 
 ## Props
 

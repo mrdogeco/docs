@@ -1,6 +1,6 @@
 ---
 title: useLiveOdds
-description: Subscribes to a single match's live odds over WebSocket (Business tier) — the full latest markets array pushes on every change.
+description: Subscribes to a single match's live odds over WebSocket (Business tier) — every matching market updates in place as odds change.
 ---
 
 import { MatchCardLiveWithOddsDemo } from "@/components/docs/demos/match-card-live-with-odds-demo"
@@ -32,12 +32,13 @@ import { useLiveOdds } from "@/hooks/use-live-odds"
 
 function Match({ matchId }: { matchId: string }) {
   const match = useLiveMatch({ matchId })
-  const market = useLiveOdds({
+  const markets = useLiveOdds({
     matchId: match?.id,
     betTypes: ["SOCCER_MATCH_RESULT", "SOCCER_MATCH_RESULT_PRELIVE"],
   })
+  const market = markets?.[0]
 
-  // market is undefined while loading, null if unavailable
+  // markets is undefined while loading, null if unavailable
   // (wrong tier, or no live market on this match right now)
 }
 ```
@@ -45,7 +46,14 @@ function Match({ matchId }: { matchId: string }) {
 Takes a single options object, like every real SDK method it wraps
 (`odds.subscribe(params)`) — not positional arguments.
 
-Some markets use a different sysname before kickoff — the standard 1X2
+A `betTypes` filter that only ever matches one market (like
+`SOCCER_MATCH_RESULT` above) makes indexing `markets?.[0]` safe. Some bet
+types post one market *per line* instead — see
+[Odds Selector's "Multiple Lines" example](/docs/ui/components/odds-selector#multiple-lines)
+for `SOCCER_UNDER_OVER`, which returns a separate market for every
+Over/Under threshold.
+
+Some markets also use a different sysname before kickoff — the standard 1X2
 line above is `SOCCER_MATCH_RESULT_PRELIVE` up until the match goes live,
 then `SOCCER_MATCH_RESULT`. A given match only ever has one of the two at
 a time, so filtering on both gets the market regardless of match state.
@@ -60,7 +68,7 @@ a time, so filtering on both gets the market regardless of match state.
       required: true,
     },
     betTypes: {
-      description: 'Restrict (and make deterministic) which market comes back. Omit to get every live market — this hook always returns just the first one, so without a filter that first one is whatever order the server sends. Some markets split by sysname across match state, e.g. ["SOCCER_MATCH_RESULT", "SOCCER_MATCH_RESULT_PRELIVE"] for the standard 1X2 line regardless of live/not-live.',
+      description: 'Restrict which markets come back. Omit to get every live market on the match. Some bet types split by sysname across match state, e.g. ["SOCCER_MATCH_RESULT", "SOCCER_MATCH_RESULT_PRELIVE"] for the standard 1X2 line regardless of live/not-live.',
       type: "string[]",
     },
   }}
@@ -68,9 +76,7 @@ a time, so filtering on both gets the market regardless of match state.
 
 ## Returns
 
-`Market | null | undefined` — `undefined` while loading or when `matchId` is
-`undefined`, `null` once loaded if there's no market (wrong tier, or none
-live right now), otherwise the primary market, updated in place as
-`odds.upd` events arrive. If a match has multiple markets, this always
-reflects the first one in the snapshot — subscribe directly if you need the
-full array.
+`Market[] | null | undefined` — `undefined` while loading or when `matchId`
+is `undefined`, `null` once loaded if no markets matched (wrong tier, or
+none live right now), otherwise every matching market, updated in place as
+`odds.upd` events arrive.

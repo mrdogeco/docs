@@ -66,6 +66,6 @@ updated in place as `stats.upd` / `status.upd` events arrive.
 [Match Card](/docs/ui/components/match-card) takes plain props — it doesn't
 know where data comes from. `useLiveMatch` is the specific piece that
 subscribes to a real match and feeds those props via
-[`matchToMatchCardProps`](/docs/ui/components/match-card#use-with-the-mr-doge-sdk).
+[`matchToMatchCardProps`](/docs/ui/adapters/mrdoge-sdk#match-card).
 Use it as shown, or as a reference for wiring `matches.subscribe()` into
 your own state management.

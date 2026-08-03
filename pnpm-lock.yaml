@@ -9,14 +9,14 @@ importers:
   .:
     dependencies:
       '@mrdoge/client':
-        specifier: ^0.4.2
-        version: 0.4.2
+        specifier: ^0.4.3
+        version: 0.4.3
       '@mrdoge/node':
-        specifier: ^0.4.2
-        version: 0.4.2
+        specifier: ^0.4.3
+        version: 0.4.3
       '@mrdoge/protocol':
-        specifier: ^0.4.2
-        version: 0.4.2
+        specifier: ^0.4.3
+        version: 0.4.3
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -740,18 +740,18 @@ packages:
       '@cfworker/json-schema':
         optional: true
 
-  '@mrdoge/client@0.4.2':
-    resolution: {integrity: sha512-SpeDihKrmI7KnmhON5PO7VJ802LPFCP5czDn5Tg6QSmLMqN5rI0OrwDS4BPq6ytWZsGre96dWA2cWzx0Zr4TIQ==}
+  '@mrdoge/client@0.4.3':
+    resolution: {integrity: sha512-Xyeu8KzHLzcPRjKEBCIqpeb5BEZlMD5Thr3+FCGiRhPY5rgUKEYpe+Wao6NOH8Ktxh6eP37RU8RI8EzfTo28jg==}
 
-  '@mrdoge/http@0.4.2':
-    resolution: {integrity: sha512-+zCqwWiPdSOFXvYOejBfEKqRFdXb/m3NF92uBUisjgH2g9lLX48s/KwqSgSqEMlDwJGwWt9HTzTJLxadv6/+2g==}
+  '@mrdoge/http@0.4.3':
+    resolution: {integrity: sha512-nGjv4rSvDO/MZh4RVsq2D2tqvNz7+HYlTIarW1JO+6fdaOgd7M7VzZQnGuYy7G9IVuqwmq+txj/jLW6UU6Zvhw==}
 
-  '@mrdoge/node@0.4.2':
-    resolution: {integrity: sha512-ypAny6AmLPOhASyONNEKkE4QMASJ+9uT90Ke+CoiQQQrULL/kKegcS2VNoOhaap0pX8vKAGwCgsgdYf7gIWDSA==}
+  '@mrdoge/node@0.4.3':
+    resolution: {integrity: sha512-Z4E+Mu6ESBj9cXhtjF6mmp4NrBJE5nXddDCVj4Ikp/GDupfAJHtXXsxMuydZqBkVNuVKcr8/+qrrkzAfAAfXMw==}
     engines: {node: '>=18'}
 
-  '@mrdoge/protocol@0.4.2':
-    resolution: {integrity: sha512-RDvC7kkgfLkxGy+OO8k7wObqX6+j2syHSdtbwtEIL3vWKPg3zCslHpzwPG7LqyrtC11NEiv3B4EztXKw1HoOLg==}
+  '@mrdoge/protocol@0.4.3':
+    resolution: {integrity: sha512-7D1ORoXXOtmDPIH+7bIEODOKQMfF7tumKz5wgcBfVFm14EoG4AhgKK3h9EoiHXO/Hn/cMF5jRvfVA+lLImxbVg==}
 
   '@napi-rs/wasm-runtime@1.2.0':
     resolution: {integrity: sha512-kDoONqMa+VnZ4vvvu/ZUurpJ4gkZU57e7g69qpNgWhYcZFPUHZM2CEMKm+cG6ufDVALbjMvfmMjFVqaK7uEMnA==}
@@ -5747,26 +5747,26 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@mrdoge/client@0.4.2':
+  '@mrdoge/client@0.4.3':
     dependencies:
-      '@mrdoge/http': 0.4.2
-      '@mrdoge/protocol': 0.4.2
+      '@mrdoge/http': 0.4.3
+      '@mrdoge/protocol': 0.4.3
 
-  '@mrdoge/http@0.4.2':
+  '@mrdoge/http@0.4.3':
     dependencies:
-      '@mrdoge/protocol': 0.4.2
+      '@mrdoge/protocol': 0.4.3
 
-  '@mrdoge/node@0.4.2':
+  '@mrdoge/node@0.4.3':
     dependencies:
-      '@mrdoge/http': 0.4.2
-      '@mrdoge/protocol': 0.4.2
+      '@mrdoge/http': 0.4.3
+      '@mrdoge/protocol': 0.4.3
       ws: 8.21.1
       zod: 3.25.76
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
 
-  '@mrdoge/protocol@0.4.2':
+  '@mrdoge/protocol@0.4.3':
     dependencies:
       zod: 3.25.76
 

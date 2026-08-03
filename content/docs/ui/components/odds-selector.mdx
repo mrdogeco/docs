@@ -4,36 +4,48 @@ description: Labeled odds card for a market — selectable options with price mo
 ---
 
 import { OddsSelectorDemo } from "@/components/docs/demos/odds-selector-demo"
+import { OddsSelectorBoardDemo } from "@/components/docs/demos/odds-selector-board-demo"
+import { OddsSelectorLinesDemo } from "@/components/docs/demos/odds-selector-lines-demo"
 import { InstallTabs } from "@/components/docs/install-tabs"
 
-<ComponentPreview>
+<ExampleSection file="components/docs/demos/odds-selector-demo.tsx">
   <OddsSelectorDemo />
-</ComponentPreview>
+</ExampleSection>
+
+## Odds Board
+
+Rendering several markets at once is just several Odds Selectors —
+there's no separate component for it. This example shows a match's Match
+Result and Total Goals lines stacked together, each with its own
+selection state and live price movement:
+
+<ExampleSection file="components/docs/demos/odds-selector-board-demo.tsx">
+  <OddsSelectorBoardDemo />
+</ExampleSection>
+
+## Multiple Lines
+
+Some bet types post one market per line instead of one market total —
+`SOCCER_UNDER_OVER` posts a separate market for each Over/Under threshold
+(0.5, 1.5, 2.5, ...). Pass all of them to the `lines` prop instead of
+`options`, and Odds Selector renders one row per market — Over on the
+left, Under on the right. `enableSliderView` adds a header toggle to
+browse them one at a time via a slider instead, and `collapsible` adds a
+toggle to collapse the whole thing down to just its header:
+
+<ExampleSection file="components/docs/demos/odds-selector-lines-demo.tsx">
+  <OddsSelectorLinesDemo />
+</ExampleSection>
 
 ## Installation
 
 <InstallTabs name="odds-selector" />
 
-## Usage
+## Use with the Mr. Doge SDK
 
-```tsx
-import { OddsSelector } from "@/components/odds-selector"
-
-<OddsSelector
-  label="Match Result"
-  options={[
-    { id: "home", label: "PSG", price: "2.50" },
-    { id: "draw", label: "Draw", price: "3.35" },
-    { id: "away", label: "Arsenal", price: "3.10" },
-  ]}
-  selectedId={selectedId}
-  onSelect={setSelectedId}
-/>
-```
-
-Option clicks stop event propagation, so Odds Selector (and anything
-built on it, like Match Card's odds row) can be nested inside a clickable
-row or `Link` without also triggering that outer click.
+Odds Selector takes plain props, so it works with any data source. See
+the [Odds Selector Adapter](/docs/ui/adapters/mrdoge-sdk#odds-selector) for the real
+functions behind the examples above.
 
 ## Props
 
@@ -44,20 +56,31 @@ row or `Link` without also triggering that outer click.
       type: "string",
     },
     options: {
-      description: "The market's selections. See OddsOption below.",
+      description: <>A single market's selections, laid out in one row. See <a href="#oddsoption">OddsOption</a> below. Ignored when lines is set.</>,
       type: "OddsOption[]",
-      required: true,
+    },
+    lines: {
+      description: <>Several markets, one per row — e.g. every Over/Under goal threshold stacked in one card. See <a href="#oddsline">OddsLine</a> below. Takes over options when set; still uses selectedId/onSelect.</>,
+      type: "OddsLine[]",
     },
     selectedId: {
-      description: "Id of the currently selected option.",
+      description: "Id of the currently selected option. Shared by options and lines — only one selection is possible across the whole table, even across different rows/markets.",
       type: "string",
     },
     onSelect: {
-      description: "Called with an option's id when it's pressed, or undefined when pressing the already-selected option deselects it.",
+      description: "Called with the pressed option's id, or undefined when pressing the already-selected option deselects it.",
       type: "(id: string | undefined) => void",
     },
+    enableSliderView: {
+      description: "Adds a header toggle to browse lines one at a time via a slider instead of a stacked list. No effect with fewer than 2 lines.",
+      type: "boolean",
+    },
+    collapsible: {
+      description: "Adds a header toggle to collapse the selector down to just its header.",
+      type: "boolean",
+    },
     variant: {
-      description: '"card" (default) renders its own border/background, for standalone use. "bare" drops that chrome — for embedding inside another card (e.g. Match Card\'s odds row) without a card-in-a-card look.',
+      description: <>"card" (default) renders its own border/background, for standalone use. "bare" drops that chrome — for embedding inside another card (e.g. <a href="/docs/ui/components/match-card#with-odds">Match Card's odds row</a>) without a card-in-a-card look.</>,
       type: '"card" | "bare"',
     },
     className: {
@@ -85,7 +108,7 @@ row or `Link` without also triggering that outer click.
       required: true,
     },
     movement: {
-      description: 'Colors the price — "down" (shortening, more likely) green, "up" (drifting, less likely) red, "flat" or omitted stays the default color. Static here — for live data, see useOddsMovement below.',
+      description: <>Colors the price — "down" (shortening, more likely) green, "up" (drifting, less likely) red, "flat" or omitted stays the default color. Static here — for live data, see <a href="/docs/ui/hooks/use-odds-movement">useOddsMovement</a>.</>,
       type: '"up" | "down" | "flat"',
     },
     suspended: {
@@ -95,15 +118,28 @@ row or `Link` without also triggering that outer click.
   }}
 />
 
-## useOddsMovement
+### OddsLine
 
-`movement` isn't something you'd normally compute by hand — pair
-[useLiveOdds](/docs/ui/hooks/use-live-odds) with
-[useOddsMovement](/docs/ui/hooks/use-odds-movement) to derive it from real
-price changes as they happen:
-
-```tsx
-const market = useLiveOdds({ matchId, betTypes: ["SOCCER_MATCH_RESULT"] })
-const movementById = useOddsMovement(market)
-// movementById[item.id] is "up" | "down" | undefined
-```
+<TypeTable
+  type={{
+    id: {
+      description: "The market's own id.",
+      type: "string",
+      required: true,
+    },
+    label: {
+      description: 'Short label for the line itself, e.g. "2.5" — shown above the slider in slider view. Omit if there\'s no natural short label.',
+      type: "string",
+    },
+    over: {
+      description: <>See <a href="#oddsoption">OddsOption</a> above.</>,
+      type: "OddsOption",
+      required: true,
+    },
+    under: {
+      description: <>See <a href="#oddsoption">OddsOption</a> above.</>,
+      type: "OddsOption",
+      required: true,
+    },
+  }}
+/>

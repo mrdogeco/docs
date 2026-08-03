@@ -46,9 +46,9 @@ This copies the component and its dependencies into your project under
 
 ## Components
 
-Match Card, Odds Selector, Live Indicator, Bet Slip, Match Timeline, Team
-Form Indicator, and Competition Header. See [Components](/docs/ui/components)
-for a live preview, props, and the install command for each.
+Match rows, odds boards, bet slips, timelines, and more. See
+[Components](/docs/ui/components) for a live preview, props, and the
+install command for each.
 
 ## Hooks
 
@@ -61,15 +61,13 @@ three pull in `@mrdoge/client` / `@mrdoge/node` directly and need a
 `MRDOGE_ODDS_API_KEY` — see each hook's own page for setup.
 [`useOddsMovement`](/docs/ui/hooks/use-odds-movement) is different: no SDK
 setup at all, just a pure diff over whatever market
-`useLiveOdds` gives you, to drive Odds Selector's up/down indicators.
+`useLiveOdds` gives you, to color Odds Selector's prices green/red.
 
-## Use with the Mr. Doge SDK
+## Adapters
 
 mrdoge-ui components accept plain props, so they work with any data
-source. They pair directly with
-[`@mrdoge/client`](https://mrdoge.ai), which provides typed, real-time
-sports data over HTTP and WebSocket — each component's own page has a
-"Use with the Mr. Doge SDK" section showing the actual mapping function
-from a real SDK response to that component's props, type-checked against
-`@mrdoge/protocol` rather than hand-typed. See [Match Card](/docs/ui/components/match-card#use-with-the-mr-doge-sdk)
-for the first one.
+source. [Adapters](/docs/ui/adapters/mrdoge-sdk#match-card) map a real provider's
+response onto a component's props — small, pure, type-checked functions.
+Mr. Doge SDK's are the ones used throughout every example on this site,
+pairing directly with [`@mrdoge/client`](https://mrdoge.ai). Bringing a
+different data provider? Open a PR with your own.

@@ -44,8 +44,8 @@ for a [Settlement Badge](/docs/ui/components/settlement-badge) automatically.
 ## Use with the Mr. Doge SDK
 
 `ai.recommendations.list()`/`.get()` returns `outcome` as a raw code (same
-convention as `BetItem.code` elsewhere in this SDK) rather than a
-human-readable label — fully resolving one needs a joined `Market`/`BetItem`
+convention as `Line.code` elsewhere in this SDK) rather than a
+human-readable label — fully resolving one needs a joined `Market`/`Line`
 lookup, out of scope for a single mapping function. This adapter falls back
 to the raw code, and requires `match` to be present on the input (request
 `select: { match: true }` when fetching) since the card needs the

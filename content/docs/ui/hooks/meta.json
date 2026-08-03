@@ -1,3 +1,5 @@
 {
+  "title": "Hooks",
+  "icon": "Plug",
   "pages": ["use-live-match", "use-live-odds", "use-odds-movement", "use-trending-matches"]
 }

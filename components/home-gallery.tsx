@@ -6,7 +6,6 @@ import { Check, Copy } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { BetSlip } from "@/registry/mrdoge-ui/bet-slip/bet-slip"
-import { CompetitionHeader } from "@/registry/mrdoge-ui/competition-header/competition-header"
 import { MatchCard } from "@/registry/mrdoge-ui/match-card/match-card"
 import { LiveIndicator } from "@/registry/mrdoge-ui/live-indicator/live-indicator"
 import { MatchTimeline } from "@/registry/mrdoge-ui/match-timeline/match-timeline"
@@ -169,19 +168,6 @@ export function HomeGallery() {
           description="Recent match results for a team."
         >
           <TeamFormIndicator results={sampleForm} />
-        </ShowcaseItem>
-
-        <ShowcaseItem
-          name="competition-header"
-          title="Competition Header"
-          description="Banner for a competition: name, region, and stage."
-        >
-          <CompetitionHeader
-            name="Brasileirão Série A"
-            region="Brazil"
-            stage="Round 22"
-            className="w-full max-w-sm"
-          />
         </ShowcaseItem>
       </div>
     </div>

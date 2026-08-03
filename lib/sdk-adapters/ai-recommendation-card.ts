@@ -22,8 +22,8 @@ function toConfidence(confidence: Recommendation["confidence"]): RecommendationC
 }
 
 // A fully resolved human label ("Over 2.5 goals") needs a joined
-// Market/BetItem lookup this adapter doesn't have — `outcome` is a raw
-// code (same convention as BetItem.code elsewhere in this codebase), still
+// Market/Line lookup this adapter doesn't have — `outcome` is a raw
+// code (same convention as Line.code elsewhere in this codebase), still
 // meaningful to anyone familiar with the market even without the join.
 function toPickLabel(rec: Recommendation): string {
   return rec.point != null ? `${rec.outcome} ${rec.point}` : rec.outcome
