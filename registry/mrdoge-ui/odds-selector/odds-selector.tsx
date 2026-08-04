@@ -35,12 +35,25 @@ export interface OddsSelectorProps {
   label?: string
   /** A single market's selections, laid out in one row. Ignored when `lines` is set. */
   options?: OddsOption[]
-  /** Id of the currently selected option — shared by `options` and `lines`, so only one selection is possible across the whole table even when it spans several rows/markets. */
+  /** Id of the currently selected option, for `options` mode. */
   selectedId?: string
-  /** Called with the pressed option's id, or `undefined` when pressing the already-selected option deselects it. */
+  /** Called with the pressed option's id, or `undefined` when pressing the already-selected option deselects it. For `options` mode. */
   onSelect?: (id: string | undefined) => void
-  /** Several markets, one per row — e.g. every Over/Under goal threshold stacked in one card. Takes over `options` when set; still uses `selectedId`/`onSelect`. */
+  /** Several markets, one per row — e.g. every Over/Under goal threshold stacked in one card. Takes over `options` when set. */
   lines?: OddsLine[]
+  /** Ids of every currently selected option across `lines` — unlike `options`, more than one row can be selected at once. */
+  selectedLineIds?: string[]
+  /** Called with a pressed option's id and the resulting selected state (not a bare toggle), for `lines` mode. */
+  onSelectLine?: (id: string, selected: boolean) => void
+  /**
+   * Ids that render as unavailable — e.g. because they're logically
+   * incompatible with the current selection. Applies to both `options`
+   * and `lines`. Computed externally (e.g. via a conflict adapter) and
+   * passed in; OddsSelector never decides this itself. Unlike
+   * `suspended`, a disabled option still shows its real price — it's
+   * fully priced and available, just not currently combinable.
+   */
+  disabledIds?: string[]
   /** Adds a header toggle to browse `lines` one at a time via a slider instead of a stacked list. No effect with fewer than 2 lines. */
   enableSliderView?: boolean
   /** Adds a header toggle to collapse the selector down to just its header. Requires `label` (or `lines`/`enableSliderView`) to have a header to put it in. */
@@ -67,18 +80,22 @@ const movementColor: Record<OddsMovement, string> = {
 function OddsOptionButton({
   option,
   selected,
+  disabled,
   onClick,
   layout,
 }: {
   option: OddsOption
   selected: boolean
+  /** Conflict-disabled, distinct from `option.suspended` — still shows the real price. */
+  disabled?: boolean
   onClick: () => void
   layout: "column" | "row"
 }) {
+  const inactive = option.suspended || disabled
   return (
     <button
       type="button"
-      disabled={option.suspended}
+      disabled={inactive}
       onClick={(e) => {
         e.stopPropagation()
         onClick()
@@ -89,7 +106,7 @@ function OddsOptionButton({
           ? "flex-col items-center justify-center gap-0.5 px-2 py-2.5"
           : "items-center justify-between gap-2 px-3 py-2.5 text-left",
         selected ? "bg-primary text-primary-foreground" : "hover:bg-accent/50",
-        option.suspended && "pointer-events-none opacity-50"
+        inactive && "pointer-events-none opacity-50"
       )}
     >
       <span
@@ -115,24 +132,27 @@ function OddsOptionButton({
 
 function OddsLineRow({
   line,
-  selectedId,
-  onSelect,
+  selectedIds,
+  disabledIds,
+  onToggle,
 }: {
   line: OddsLine
-  selectedId: string | undefined
-  onSelect: (id: string | undefined) => void
+  selectedIds: string[]
+  disabledIds?: string[]
+  onToggle: (id: string, selected: boolean) => void
 }) {
   return (
     <div className="grid grid-cols-2 divide-x">
       {[line.over, line.under].map((option) => {
-        const selected = option.id === selectedId
+        const selected = selectedIds.includes(option.id)
         return (
           <OddsOptionButton
             key={option.id}
             option={option}
             layout="row"
             selected={selected}
-            onClick={() => onSelect(selected ? undefined : option.id)}
+            disabled={disabledIds?.includes(option.id)}
+            onClick={() => onToggle(option.id, !selected)}
           />
         )
       })}
@@ -158,12 +178,14 @@ function mostBalancedIndex(lines: OddsLine[]): number {
 
 function OddsLinesSlider({
   lines,
-  selectedId,
-  onSelect,
+  selectedIds,
+  disabledIds,
+  onSelectLine,
 }: {
   lines: OddsLine[]
-  selectedId?: string
-  onSelect?: (id: string | undefined) => void
+  selectedIds: string[]
+  disabledIds?: string[]
+  onSelectLine?: (id: string, selected: boolean) => void
 }) {
   const [index, setIndex] = useState(() => mostBalancedIndex(lines))
   // Lines can arrive/change size as live data updates — clamp rather than
@@ -173,7 +195,12 @@ function OddsLinesSlider({
 
   return (
     <div className="flex flex-col">
-      <OddsLineRow line={line} selectedId={selectedId} onSelect={(id) => onSelect?.(id)} />
+      <OddsLineRow
+        line={line}
+        selectedIds={selectedIds}
+        disabledIds={disabledIds}
+        onToggle={(id, selected) => onSelectLine?.(id, selected)}
+      />
       <div className="flex flex-col items-center gap-1 border-t px-3 py-3">
         {line.label ? (
           <span className="text-sm font-semibold text-card-foreground">{line.label}</span>
@@ -196,9 +223,12 @@ function OddsLinesSlider({
 export function OddsSelector({
   label,
   options = [],
-  lines,
   selectedId,
   onSelect,
+  lines,
+  selectedLineIds = [],
+  onSelectLine,
+  disabledIds,
   enableSliderView = false,
   collapsible = false,
   variant = "card",
@@ -275,15 +305,21 @@ export function OddsSelector({
       {!collapsed &&
         (lines ? (
           showLinesToggle && linesView === "slider" ? (
-            <OddsLinesSlider lines={lines} selectedId={selectedId} onSelect={onSelect} />
+            <OddsLinesSlider
+              lines={lines}
+              selectedIds={selectedLineIds}
+              disabledIds={disabledIds}
+              onSelectLine={onSelectLine}
+            />
           ) : (
             <div className="divide-y">
               {lines.map((line) => (
                 <OddsLineRow
                   key={line.id}
                   line={line}
-                  selectedId={selectedId}
-                  onSelect={(id) => onSelect?.(id)}
+                  selectedIds={selectedLineIds}
+                  disabledIds={disabledIds}
+                  onToggle={(id, selected) => onSelectLine?.(id, selected)}
                 />
               ))}
             </div>
@@ -298,6 +334,7 @@ export function OddsSelector({
                   option={option}
                   layout="column"
                   selected={selected}
+                  disabled={disabledIds?.includes(option.id)}
                   onClick={() => onSelect?.(selected ? undefined : option.id)}
                 />
               )

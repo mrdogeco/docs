@@ -35,3 +35,46 @@ Over/Under pair as a single representative line, e.g. for the Odds Board
 example, instead of an arbitrary — often lopsided — first market.
 
 <InstallTabs name="mrdoge-odds-selector-adapter" />
+
+## Bet Slip
+
+Builds a `BetSlipPick` directly from a real match, one of its markets,
+and a selected line id — a pick is basically a selected odds line. For
+[Bet Slip](/docs/ui/components/bet-slip)'s `picks`. Also populates
+`home`/`away` from the match's teams, so `BetSlipPickRow` can render team
+crests.
+
+<InstallTabs name="mrdoge-bet-slip-adapter" />
+
+## Conflicts
+
+Some selections are mutually exclusive on the same match — any Match
+Result pick rules out the entire Double Chance market, Over 4.5 rules
+out Under 1.5 in Total Goals, and so on. `getConflictingIds` checks a set of
+selections against every available candidate and returns the ids
+incompatible with at least one of them; `getConflictingPickIds` does the
+same directly against an existing `BetSlipPick[]`, for consumers without
+live `Market` data on hand (e.g. picks loaded from storage).
+
+What to do with a conflicting id is entirely up to you — feed it into
+[Odds Selector](/docs/ui/components/odds-selector)'s `disabledIds` to
+block the click before it happens, or into
+[Bet Slip](/docs/ui/components/bet-slip)'s `conflictingPickIds` to flag
+an already-added pick instead. The adapter only tells you what conflicts,
+never what to do about it.
+
+<InstallTabs name="mrdoge-conflict-adapter" />
+
+Three rule families, scoped to the same match:
+
+- **Match Result ↔ Double Chance** — Double Chance is just two of Match
+  Result's three outcomes combined, so the two markets describe
+  overlapping information about the same result rather than independent
+  events. Any Match Result selection blocks the entire Double Chance
+  market, and vice versa — not just the specific pairs that are outright
+  impossible.
+- **Over/Under threshold overlap** — Over-at-`T1` and Under-at-`T2` in the
+  same Totals market conflict once `T1 >= T2` (Under 1.5 + Over 4.5 can
+  never both be true; Over 1.5 + Under 4.5 can).
+- **Both Teams to Score ↔ low Totals** — BTTS "Yes" conflicts with Under
+  1.5 goals or lower (scoring twice needs at least 2 goals).

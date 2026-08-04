@@ -7,6 +7,7 @@ import { OddsSelector } from "@/registry/mrdoge-ui/odds-selector/odds-selector"
 import { OddsLinesSkeleton } from "@/registry/mrdoge-ui/odds-selector/odds-selector-skeleton"
 import { matchToMatchCardProps } from "@/lib/sdk-adapters/match-card"
 import { toOddsLines } from "@/lib/sdk-adapters/odds-lines"
+import { toConflictCandidates, getConflictingIds } from "@/lib/sdk-adapters/conflicts"
 import { getMrDogeClient } from "@/registry/mrdoge-ui/mrdoge-client/mrdoge-client"
 import { useLiveMatch } from "@/registry/mrdoge-ui/use-live-match/use-live-match"
 import { useLiveOdds } from "@/registry/mrdoge-ui/use-live-odds/use-live-odds"
@@ -64,7 +65,7 @@ export function OddsSelectorLinesDemo() {
 
   const match = useLiveMatch({ matchId: matchId ?? undefined })
   const markets = useLiveOdds({ matchId: matchId ?? undefined, betTypes: TOTAL_GOALS_BET_TYPES })
-  const [selectedId, setSelectedId] = useState<string | undefined>()
+  const [selectedLineIds, setSelectedLineIds] = useState<string[]>([])
 
   if (matchId === null || match === null || markets === null) {
     return <p className="text-sm text-fd-muted-foreground">No trending match to show right now.</p>
@@ -74,6 +75,9 @@ export function OddsSelectorLinesDemo() {
   // Odds close once the match ends — same as matchToMatchCardProps, drop
   // them rather than freeze on the last live value.
   const showOdds = match?.status !== "completed"
+
+  const conflictCandidates = matchId && markets ? toConflictCandidates(matchId, markets) : []
+  const disabledIds = Array.from(getConflictingIds(selectedLineIds, conflictCandidates))
 
   return (
     <div className="flex w-full max-w-sm flex-col gap-4">
@@ -85,8 +89,11 @@ export function OddsSelectorLinesDemo() {
           <OddsSelector
             label="Total Goals"
             lines={lines}
-            selectedId={selectedId}
-            onSelect={setSelectedId}
+            selectedLineIds={selectedLineIds}
+            onSelectLine={(id, selected) =>
+              setSelectedLineIds((ids) => (selected ? [...ids, id] : ids.filter((i) => i !== id)))
+            }
+            disabledIds={disabledIds}
             enableSliderView
             collapsible
             className="w-full"

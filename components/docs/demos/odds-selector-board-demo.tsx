@@ -7,6 +7,7 @@ import { OddsSelector } from "@/registry/mrdoge-ui/odds-selector/odds-selector"
 import { OddsSelectorSkeleton } from "@/registry/mrdoge-ui/odds-selector/odds-selector-skeleton"
 import { matchToMatchCardProps, toOddsOptions } from "@/lib/sdk-adapters/match-card"
 import { pickMostBalancedMarket } from "@/lib/sdk-adapters/odds-lines"
+import { toConflictCandidates, getConflictingIds } from "@/lib/sdk-adapters/conflicts"
 import { getMrDogeClient } from "@/registry/mrdoge-ui/mrdoge-client/mrdoge-client"
 import { useLiveMatch } from "@/registry/mrdoge-ui/use-live-match/use-live-match"
 import { useLiveOdds } from "@/registry/mrdoge-ui/use-live-odds/use-live-odds"
@@ -17,9 +18,10 @@ import { useTrendingMatches } from "@/registry/mrdoge-ui/use-trending-matches/us
 // separate sysname before kickoff, so both forms are included.
 const MATCH_RESULT_BET_TYPES = ["SOCCER_MATCH_RESULT", "SOCCER_MATCH_RESULT_PRELIVE"]
 const TOTAL_GOALS_BET_TYPES = ["SOCCER_UNDER_OVER", "SOCCER_UNDER_OVER_PRELIVE"]
+const DOUBLE_CHANCE_BET_TYPES = ["SOCCER_DOUBLE_CHANCE"]
 
-// Resolves the first candidate that has both markets posted, checked in
-// parallel.
+// Resolves the first candidate that has all three markets posted, checked
+// in parallel.
 function useBoardMatchId(candidates: Match[] | null | undefined) {
   const [resolvedId, setResolvedId] = useState<string | null | undefined>(undefined)
 
@@ -32,9 +34,10 @@ function useBoardMatchId(candidates: Match[] | null | undefined) {
         Promise.all([
           getMrDogeClient().odds.list({ matchId: candidate.id, betTypes: MATCH_RESULT_BET_TYPES }),
           getMrDogeClient().odds.list({ matchId: candidate.id, betTypes: TOTAL_GOALS_BET_TYPES }),
+          getMrDogeClient().odds.list({ matchId: candidate.id, betTypes: DOUBLE_CHANCE_BET_TYPES }),
         ])
-          .then(([matchResult, totalGoals]) =>
-            matchResult.length > 0 && totalGoals.length > 0 ? candidate.id : null
+          .then(([matchResult, totalGoals, doubleChance]) =>
+            matchResult.length > 0 && totalGoals.length > 0 && doubleChance.length > 0 ? candidate.id : null
           )
           .catch(() => null)
       )
@@ -72,11 +75,17 @@ export function OddsSelectorBoardDemo() {
   const totalGoalsMovement = useOddsMovement(totalGoals)
   const [totalGoalsSelectedId, setTotalGoalsSelectedId] = useState<string | undefined>()
 
+  const doubleChanceMarkets = useLiveOdds({ matchId: matchId ?? undefined, betTypes: DOUBLE_CHANCE_BET_TYPES })
+  const doubleChance = doubleChanceMarkets?.[0]
+  const doubleChanceMovement = useOddsMovement(doubleChance)
+  const [doubleChanceSelectedId, setDoubleChanceSelectedId] = useState<string | undefined>()
+
   if (
     matchId === null ||
     match === null ||
     matchResultMarkets === null ||
-    totalGoalsMarkets === null
+    totalGoalsMarkets === null ||
+    doubleChanceMarkets === null
   ) {
     return <p className="text-sm text-fd-muted-foreground">No trending match to show right now.</p>
   }
@@ -84,6 +93,20 @@ export function OddsSelectorBoardDemo() {
   // Odds close once the match ends — same as matchToMatchCardProps, drop
   // them rather than freeze on the last live value.
   const showOdds = match?.status !== "completed"
+
+  // Match Result and Double Chance describe overlapping information
+  // about the same result — any selection in one blocks the entire
+  // other market rather than just a specific contradicting option.
+  const mrDcCandidates =
+    matchId && matchResultMarkets && doubleChanceMarkets
+      ? toConflictCandidates(matchId, [...matchResultMarkets, ...doubleChanceMarkets])
+      : []
+  const matchResultDisabledIds = Array.from(
+    getConflictingIds(doubleChanceSelectedId ? [doubleChanceSelectedId] : [], mrDcCandidates)
+  )
+  const doubleChanceDisabledIds = Array.from(
+    getConflictingIds(matchResultSelectedId ? [matchResultSelectedId] : [], mrDcCandidates)
+  )
 
   return (
     <div className="flex w-full max-w-sm flex-col gap-4">
@@ -94,9 +117,23 @@ export function OddsSelectorBoardDemo() {
         ) : (
           <OddsSelector
             label={matchResult.displayName}
-            options={toOddsOptions(matchResult, { movementById: matchResultMovement })}
+            options={toOddsOptions(matchResult, { labelFrom: "code", movementById: matchResultMovement })}
             selectedId={matchResultSelectedId}
             onSelect={setMatchResultSelectedId}
+            disabledIds={matchResultDisabledIds}
+            className="w-full"
+          />
+        ))}
+      {showOdds &&
+        (doubleChance === undefined ? (
+          <OddsSelectorSkeleton optionCount={3} label className="w-full" />
+        ) : (
+          <OddsSelector
+            label={doubleChance.displayName}
+            options={toOddsOptions(doubleChance, { labelFrom: "code", movementById: doubleChanceMovement })}
+            selectedId={doubleChanceSelectedId}
+            onSelect={setDoubleChanceSelectedId}
+            disabledIds={doubleChanceDisabledIds}
             className="w-full"
           />
         ))}

@@ -76,6 +76,7 @@ function ShowcaseItem({
 export function HomeGallery() {
   const [selectedOddsId, setSelectedOddsId] = useState<string | undefined>("home")
   const [picks, setPicks] = useState(samplePicks)
+  const [stake, setStake] = useState("")
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-12 px-6 py-16">
@@ -126,6 +127,8 @@ export function HomeGallery() {
           <BetSlip
             picks={picks}
             onRemovePick={(id) => setPicks((prev) => prev.filter((p) => p.id !== id))}
+            stake={stake}
+            onStakeChange={setStake}
           />
         </ShowcaseItem>
 

@@ -79,12 +79,42 @@
       "name": "bet-slip",
       "type": "registry:component",
       "title": "Bet Slip",
-      "description": "Panel for selected picks with stake input and computed potential payout.",
-      "registryDependencies": ["button", "card", "input", "separator"],
+      "description": "Panel for selected picks — single/parlay mode, optional stake input and computed potential payout.",
+      "registryDependencies": ["button", "input", "entity-image"],
       "files": [
         {
           "path": "registry/mrdoge-ui/bet-slip/bet-slip.tsx",
           "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "mrdoge-bet-slip-adapter",
+      "type": "registry:lib",
+      "title": "Bet Slip Adapter (Mr. Doge SDK)",
+      "description": "Builds a BetSlipPick from a real match, one of its markets, and a selected line id.",
+      "registryDependencies": ["bet-slip"],
+      "dependencies": ["@mrdoge/protocol"],
+      "files": [
+        {
+          "path": "lib/sdk-adapters/bet-slip.ts",
+          "type": "registry:lib",
+          "target": "lib/sdk-adapters/bet-slip.ts"
+        }
+      ]
+    },
+    {
+      "name": "mrdoge-conflict-adapter",
+      "type": "registry:lib",
+      "title": "Conflict Adapter (Mr. Doge SDK)",
+      "description": "Flags mutually incompatible picks (Match Result vs Double Chance, Over/Under threshold overlap, BTTS vs low Totals) for disabledIds or conflictingPickIds.",
+      "registryDependencies": ["bet-slip"],
+      "dependencies": ["@mrdoge/protocol"],
+      "files": [
+        {
+          "path": "lib/sdk-adapters/conflicts.ts",
+          "type": "registry:lib",
+          "target": "lib/sdk-adapters/conflicts.ts"
         }
       ]
     },
@@ -238,6 +268,31 @@
       "files": [
         {
           "path": "registry/mrdoge-ui/use-live-match/use-live-match.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/mrdoge-ui/mrdoge-client/mrdoge-client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/mrdoge-ui/mrdoge-token-route/route.ts",
+          "type": "registry:page",
+          "target": "app/api/mrdoge/token/route.ts"
+        }
+      ]
+    },
+    {
+      "name": "use-match",
+      "type": "registry:hook",
+      "title": "useMatch",
+      "description": "One-shot fetch of a single match — no live updates, unlike useLiveMatch. Call again / remount to refresh.",
+      "dependencies": ["@mrdoge/client", "@mrdoge/node", "server-only"],
+      "envVars": {
+        "MRDOGE_ODDS_API_KEY": ""
+      },
+      "files": [
+        {
+          "path": "registry/mrdoge-ui/use-match/use-match.ts",
           "type": "registry:hook"
         },
         {

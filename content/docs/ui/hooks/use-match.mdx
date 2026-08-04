@@ -1,0 +1,76 @@
+---
+title: useMatch
+description: One-shot fetch of a single match — no live updates, unlike useLiveMatch.
+---
+
+import { BetSlipDemo } from "@/components/docs/demos/bet-slip-demo"
+import { InstallTabs } from "@/components/docs/install-tabs"
+
+This is the fetch powering the default example on
+[Bet Slip](/docs/ui/components/bet-slip) — a fixed upcoming match that
+shouldn't visibly change state while someone's reading the page, unlike
+`useLiveMatch`'s WS subscription.
+
+<ExampleSection file="components/docs/demos/bet-slip-demo.tsx">
+  <BetSlipDemo />
+</ExampleSection>
+
+## Installation
+
+<InstallTabs name="use-match" />
+
+Installing this pulls in three files: the hook itself, a browser SDK client
+singleton (`getMrDogeClient`), and a Next.js route at
+`app/api/mrdoge/token/route.ts` that mints short-lived tokens using
+`@mrdoge/node` and your own `MRDOGE_ODDS_API_KEY` — the browser client never
+sees the raw key.
+
+## Usage
+
+```tsx
+import { useMatch } from "@/hooks/use-match"
+
+function Match({ matchId }: { matchId: string | undefined }) {
+  const match = useMatch({ matchId })
+
+  if (match === undefined) return <p>Loading…</p>
+  if (match === null) return <p>Couldn't load this match.</p>
+
+  return <p>{match.homeTeam.name} vs {match.awayTeam.name}</p>
+}
+```
+
+Takes a single options object, like every real SDK method it wraps
+(`matches.get(params)`) — not positional arguments.
+
+## Parameters
+
+<TypeTable
+  type={{
+    matchId: {
+      description: "The match to fetch. Pass undefined to skip fetching — e.g. while some other lookup is still resolving which match to show.",
+      type: "string | undefined",
+      required: true,
+    },
+  }}
+/>
+
+## Returns
+
+`MatchDetail | null | undefined` — `undefined` while loading (or while
+`matchId` is `undefined`), `null` if the fetch failed (no fallback data —
+an honest empty state beats a fake one), otherwise the match as of the
+initial fetch. Never updates after that — call again / remount to
+refresh.
+
+## Why a hook, not just the component
+
+[Bet Slip](/docs/ui/components/bet-slip) (and every other mrdoge-ui
+component) takes plain props — it doesn't know where data comes from.
+`useMatch` is the specific piece that fetches a real match once and feeds
+those props via
+[`matchToMatchCardProps`](/docs/ui/adapters/mrdoge-sdk#match-card). Use
+it as shown, or as a reference for wiring `matches.get()` into your own
+state management — including when you specifically want a match that
+*doesn't* update live, unlike
+[useLiveMatch](/docs/ui/hooks/use-live-match).

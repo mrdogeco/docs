@@ -16,8 +16,12 @@ import { InstallTabs } from "@/components/docs/install-tabs"
 
 Rendering several markets at once is just several Odds Selectors —
 there's no separate component for it. This example shows a match's Match
-Result and Total Goals lines stacked together, each with its own
-selection state and live price movement:
+Result, Double Chance, and Total Goals lines stacked together, each with
+its own selection state and live price movement. Match Result and Double
+Chance describe overlapping information about the same result, so
+picking either one live-disables the *entire* other panel, via the same
+[Conflict Adapter](/docs/ui/adapters/mrdoge-sdk#conflicts) used in
+Multiple Lines below:
 
 <ExampleSection file="components/docs/demos/odds-selector-board-demo.tsx">
   <OddsSelectorBoardDemo />
@@ -29,9 +33,14 @@ Some bet types post one market per line instead of one market total —
 `SOCCER_UNDER_OVER` posts a separate market for each Over/Under threshold
 (0.5, 1.5, 2.5, ...). Pass all of them to the `lines` prop instead of
 `options`, and Odds Selector renders one row per market — Over on the
-left, Under on the right. `enableSliderView` adds a header toggle to
-browse them one at a time via a slider instead, and `collapsible` adds a
-toggle to collapse the whole thing down to just its header:
+left, Under on the right. Unlike `options`, more than one line can be
+selected at once — compatible cross-threshold picks like Over 1.5 +
+Under 4.5 are both allowed, while genuinely incompatible ones like
+Under 1.5 + Over 4.5 are blocked via `disabledIds`, computed here from the
+[Conflict Adapter](/docs/ui/adapters/mrdoge-sdk#conflicts). `enableSliderView`
+adds a header toggle to browse them one at a time via a slider instead,
+and `collapsible` adds a toggle to collapse the whole thing down to just
+its header:
 
 <ExampleSection file="components/docs/demos/odds-selector-lines-demo.tsx">
   <OddsSelectorLinesDemo />
@@ -60,16 +69,28 @@ functions behind the examples above.
       type: "OddsOption[]",
     },
     lines: {
-      description: <>Several markets, one per row — e.g. every Over/Under goal threshold stacked in one card. See <a href="#oddsline">OddsLine</a> below. Takes over options when set; still uses selectedId/onSelect.</>,
+      description: <>Several markets, one per row — e.g. every Over/Under goal threshold stacked in one card. See <a href="#oddsline">OddsLine</a> below. Takes over options when set; uses selectedLineIds/onSelectLine instead of selectedId/onSelect.</>,
       type: "OddsLine[]",
     },
     selectedId: {
-      description: "Id of the currently selected option. Shared by options and lines — only one selection is possible across the whole table, even across different rows/markets.",
+      description: "Id of the currently selected option, for options mode.",
       type: "string",
     },
     onSelect: {
-      description: "Called with the pressed option's id, or undefined when pressing the already-selected option deselects it.",
+      description: "Called with the pressed option's id, or undefined when pressing the already-selected option deselects it. For options mode.",
       type: "(id: string | undefined) => void",
+    },
+    selectedLineIds: {
+      description: "Ids of every currently selected option across lines — unlike options, more than one row can be selected at once.",
+      type: "string[]",
+    },
+    onSelectLine: {
+      description: "Called with a pressed option's id and the resulting selected state (not a bare toggle), for lines mode.",
+      type: "(id: string, selected: boolean) => void",
+    },
+    disabledIds: {
+      description: <>Ids that render as unavailable — e.g. because they're logically incompatible with the current selection. Applies to both options and lines. Computed externally (e.g. via the <a href="/docs/ui/adapters/mrdoge-sdk#conflicts">Conflict Adapter</a>) and passed in; Odds Selector never decides this itself. Unlike suspended, a disabled option still shows its real price — it's fully priced and available, just not currently combinable.</>,
+      type: "string[]",
     },
     enableSliderView: {
       description: "Adds a header toggle to browse lines one at a time via a slider instead of a stacked list. No effect with fewer than 2 lines.",
