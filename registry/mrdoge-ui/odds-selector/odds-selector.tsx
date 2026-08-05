@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { ChevronDown, LayoutGrid, SlidersHorizontal } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
 
 export type OddsMovement = "up" | "down" | "flat"
 
@@ -101,7 +102,7 @@ function OddsOptionButton({
         onClick()
       }}
       className={cn(
-        "flex min-w-0 transition-colors",
+        "flex min-w-0 cursor-pointer",
         layout === "column"
           ? "flex-col items-center justify-center gap-0.5 px-2 py-2.5"
           : "items-center justify-between gap-2 px-3 py-2.5 text-left",
@@ -258,46 +259,52 @@ export function OddsSelector({
           <div className="flex items-center gap-1">
             {showLinesToggle ? (
               <div className="flex items-center gap-1 rounded-md border p-0.5">
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="icon-xs"
                   aria-label="List view"
                   aria-pressed={linesView === "list"}
                   onClick={() => setLinesView("list")}
                   className={cn(
-                    "rounded p-1 transition-colors",
+                    "rounded",
                     linesView === "list"
-                      ? "bg-accent text-accent-foreground"
+                      ? "bg-accent text-accent-foreground hover:bg-accent hover:text-accent-foreground"
                       : "text-muted-foreground hover:text-foreground"
                   )}
                 >
                   <LayoutGrid className="size-3.5" />
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="icon-xs"
                   aria-label="Slider view"
                   aria-pressed={linesView === "slider"}
                   onClick={() => setLinesView("slider")}
                   className={cn(
-                    "rounded p-1 transition-colors",
+                    "rounded",
                     linesView === "slider"
-                      ? "bg-accent text-accent-foreground"
+                      ? "bg-accent text-accent-foreground hover:bg-accent hover:text-accent-foreground"
                       : "text-muted-foreground hover:text-foreground"
                   )}
                 >
                   <SlidersHorizontal className="size-3.5" />
-                </button>
+                </Button>
               </div>
             ) : null}
             {collapsible ? (
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="icon-xs"
                 aria-label={collapsed ? "Expand" : "Collapse"}
                 aria-expanded={!collapsed}
                 onClick={() => setCollapsed((c) => !c)}
-                className="rounded p-1 text-muted-foreground transition-colors hover:text-foreground"
+                className="rounded text-muted-foreground hover:text-foreground"
               >
                 <ChevronDown className={cn("size-3.5 transition-transform", collapsed && "-rotate-90")} />
-              </button>
+              </Button>
             ) : null}
           </div>
         </div>

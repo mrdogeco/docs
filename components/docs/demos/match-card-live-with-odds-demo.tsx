@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import type { Match } from "@mrdoge/protocol"
 import { MatchCard } from "@/registry/mrdoge-ui/match-card/match-card"
-import { matchToMatchCardProps } from "@/lib/sdk-adapters/match-card"
+import { matchToMatchCardProps } from "@/lib/mrdoge-adapters/match-card"
 import { getMrDogeClient } from "@/registry/mrdoge-ui/mrdoge-client/mrdoge-client"
 import { useLiveMatch } from "@/registry/mrdoge-ui/use-live-match/use-live-match"
 import { useLiveOdds } from "@/registry/mrdoge-ui/use-live-odds/use-live-odds"

@@ -55,7 +55,7 @@ export function RegionAccordion({
                     onClick={() =>
                       onSelectCompetition?.(region.id, competition.id)
                     }
-                    className="flex w-full items-center justify-between gap-2 rounded-md px-2 py-1.5 text-left text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                    className="flex w-full cursor-pointer items-center justify-between gap-2 rounded-md px-2 py-1.5 text-left text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                   >
                     <span>{competition.name}</span>
                     {competition.eventCount !== undefined && (

@@ -1,7 +1,7 @@
 "use client"
 
 import { MatchCard } from "@/registry/mrdoge-ui/match-card/match-card"
-import { matchToMatchCardProps } from "@/lib/sdk-adapters/match-card"
+import { matchToMatchCardProps } from "@/lib/mrdoge-adapters/match-card"
 import { useLiveMatch } from "@/registry/mrdoge-ui/use-live-match/use-live-match"
 import { DEMO_MATCH_ID } from "@/components/docs/sample-data"
 

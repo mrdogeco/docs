@@ -1,6 +1,6 @@
 "use client"
 
-import { CheckCircle2, Circle, Layers, MinusCircle, Ticket, TriangleAlert, X, XCircle } from "lucide-react"
+import { Check, CheckCircle2, Circle, Layers, Loader2, MinusCircle, Ticket, TriangleAlert, X, XCircle } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -45,6 +45,16 @@ export interface BetSlipProps {
   onPickStakeChange?: (id: string, value: string) => void
   /** Ids from `picks` that conflict with another pick in the slip — computed externally (e.g. via the Conflict Adapter) and rendered as a warning. BetSlip only ever flags; it has no "add pick" affordance of its own to prevent one from being added in the first place. */
   conflictingPickIds?: string[]
+  /** Called when the submit button is pressed. Renders the button only when this is passed — BetSlip has no idea what "submitting" means for your product (auth and the actual request are yours; report progress back via submitState). */
+  onSubmit?: () => void
+  /** Overrides the button's default label ("Place parlay" in parlay mode, "Place bet" otherwise). Only applies to the idle state. */
+  submitLabel?: string
+  /** Disables the submit button regardless of submitState, e.g. while picks still conflict. */
+  submitDisabled?: boolean
+  /** "idle" (default) | "loading" | "success" | "error" — set this from your submit request's own state. Swaps the button's icon/label and disables it during "loading"/"success". */
+  submitState?: "idle" | "loading" | "success" | "error"
+  /** Shown above the button when submitState is "error". BetSlip has no toast/notification system of its own, so this is just a plain inline message — use your own if you have one. */
+  submitError?: string
   className?: string
 }
 
@@ -115,8 +125,8 @@ const movementColor: Record<NonNullable<BetSlipPick["movement"]>, string> = {
  * pick.
  *
  * `connected` (default true) draws a circle-and-line connector down the
- * left side between legs of the same group, like mrdoge-app's same-game
- * parlay — pass `position` ("first"/"middle"/"last", in order) alongside
+ * left side between legs of the same group — pass `position`
+ * ("first"/"middle"/"last", in order) alongside
  * it. Set `connected={false}` for singles, where picks from the same
  * match are still grouped but aren't one combined bet — the circle stays
  * (so removal still reads as "removing one pick"), the connecting lines
@@ -198,7 +208,7 @@ export function BetSlipPickRow({
       </div>
       {onStakeChange ? (
         <div className="flex items-center justify-between gap-3 px-3 pb-3">
-          <label className="text-xs text-muted-foreground">Stake</label>
+          <label className="text-sm text-muted-foreground">Stake</label>
           <Input
             type="text"
             inputMode="decimal"
@@ -247,6 +257,11 @@ export function BetSlip({
   pickStakes,
   onPickStakeChange,
   conflictingPickIds,
+  onSubmit,
+  submitLabel,
+  submitDisabled,
+  submitState = "idle",
+  submitError,
   className,
 }: BetSlipProps) {
   // A parlay needs 2+ legs — below that there's nothing to combine, so
@@ -262,7 +277,8 @@ export function BetSlip({
     0
   )
   const showFooter =
-    picks.length > 0 && (effectiveMode === "parlay" || (effectiveMode === "single" && Boolean(onPickStakeChange)))
+    picks.length > 0 &&
+    (effectiveMode === "parlay" || (effectiveMode === "single" && Boolean(onPickStakeChange)) || Boolean(onSubmit))
 
   return (
     <div
@@ -271,41 +287,43 @@ export function BetSlip({
         className
       )}
     >
-      <div className="flex h-10 items-center justify-between gap-2 border-b py-2 pl-3 pr-2">
+      {picks.length > 0 ? <div className="flex h-10 items-center justify-between gap-2 border-b py-2 pl-3 pr-2">
         <span className="truncate text-sm font-medium">
-          {picks.length > 0 ? `${effectiveMode === "parlay" ? "Parlay" : "Singles"} · ${picks.length}` : ""}
+          {`${effectiveMode === "parlay" ? "Parlay" : "Singles"}`}
         </span>
-        {picks.length >= 2 ? (
+        {picks.length >= 2 ?
           <div className="flex items-center gap-1 rounded-md border p-0.5">
             {(["single", "parlay"] as const).map((m) => {
               const Icon = m === "single" ? Ticket : Layers
               const active = effectiveMode === m
               return (
-                <button
+                <Button
                   key={m}
                   type="button"
+                  variant="ghost"
+                  size="icon-xs"
                   aria-label={m === "single" ? "Single bets" : "Parlay"}
                   aria-pressed={active}
                   onClick={() => onModeChange?.(m)}
                   className={cn(
-                    "rounded p-1 transition-colors",
+                    "rounded",
                     active
-                      ? "bg-accent text-accent-foreground"
+                      ? "bg-accent text-accent-foreground hover:bg-accent hover:text-accent-foreground"
                       : "text-muted-foreground hover:text-foreground"
                   )}
                 >
                   <Icon className="size-3.5" />
-                </button>
+                </Button>
               )
             })}
           </div>
-        ) : null}
-      </div>
+          : null}
+      </div> : null}
 
       {picks.length === 0 ? (
         <div className="flex flex-col items-center gap-1.5 p-6 text-center">
           <Ticket className="size-6 text-muted-foreground" />
-          <p className="text-sm text-muted-foreground border-t border-transparent">No picks selected yet.</p>
+          <p className="text-sm text-muted-foreground">No picks selected yet.</p>
         </div>
       ) : (
         <div className="divide-y">
@@ -387,6 +405,33 @@ export function BetSlip({
                 <span className="font-semibold tabular-nums">{totalPickPayout.toFixed(2)}</span>
               </div>
             </>
+          ) : null}
+          {onSubmit ? (
+            <div className="flex flex-col gap-1.5">
+              {submitState === "error" && submitError ? (
+                <p className="text-xs text-destructive">{submitError}</p>
+              ) : null}
+              <Button
+                type="button"
+                onClick={onSubmit}
+                disabled={submitDisabled || submitState === "loading" || submitState === "success"}
+                className="w-full"
+              >
+                {submitState === "loading" ? (
+                  <>
+                    <Loader2 className="size-4 animate-spin" />
+                    Placing...
+                  </>
+                ) : submitState === "success" ? (
+                  <>
+                    <Check className="size-4" />
+                    Placed
+                  </>
+                ) : (
+                  (submitLabel ?? (effectiveMode === "parlay" ? "Place parlay" : "Place bet"))
+                )}
+              </Button>
+            </div>
           ) : null}
         </div>
       ) : null}

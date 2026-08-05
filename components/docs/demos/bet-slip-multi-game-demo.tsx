@@ -4,13 +4,13 @@ import { useEffect, useState } from "react"
 import type { Match } from "@mrdoge/protocol"
 import { MatchCard } from "@/registry/mrdoge-ui/match-card/match-card"
 import { BetSlip, type BetSlipPick } from "@/registry/mrdoge-ui/bet-slip/bet-slip"
-import { matchToMatchCardProps } from "@/lib/sdk-adapters/match-card"
-import { toBetSlipPick } from "@/lib/sdk-adapters/bet-slip"
+import { matchToMatchCardProps } from "@/lib/mrdoge-adapters/match-card"
+import { toBetSlipPick } from "@/lib/mrdoge-adapters/bet-slip"
 import { getMrDogeClient } from "@/registry/mrdoge-ui/mrdoge-client/mrdoge-client"
 import { useMatch } from "@/registry/mrdoge-ui/use-match/use-match"
 import { useLiveOdds } from "@/registry/mrdoge-ui/use-live-odds/use-live-odds"
 import { useOddsMovement } from "@/registry/mrdoge-ui/use-odds-movement/use-odds-movement"
-import { useTrendingMatches } from "@/registry/mrdoge-ui/use-trending-matches/use-trending-matches"
+import { useMatches } from "@/registry/mrdoge-ui/use-matches/use-matches"
 
 const MATCH_RESULT_BET_TYPES = ["SOCCER_MATCH_RESULT", "SOCCER_MATCH_RESULT_PRELIVE"]
 const GAME_COUNT = 3
@@ -47,10 +47,8 @@ function useMultiMatchIds(candidates: Match[] | null | undefined, count: number)
   return resolvedIds
 }
 
-// One match's own Match Card + embedded odds row — fetches its own
-// match/odds (hooks can't be called in a loop for a variable-length match
-// list) and reports its current pick up to the parent, which owns the
-// combined BetSlip.
+// Fetches one match's own data and reports its current pick up to the
+// parent, which owns the combined BetSlip.
 function MultiGameSelector({
   matchId,
   onPickChange,
@@ -91,16 +89,17 @@ function MultiGameSelector({
 }
 
 export function BetSlipMultiGameDemo() {
-  const trending = useTrendingMatches({ sports: ["soccer"], status: ["upcoming"], limit: 20 })
-  const matchIds = useMultiMatchIds(trending, GAME_COUNT)
+  const upcomingMatches = useMatches({ sports: ["soccer"], status: ["upcoming"], limit: 20 })
+  const matchIds = useMultiMatchIds(upcomingMatches, GAME_COUNT)
 
   const [entries, setEntries] = useState<Record<string, { pick?: BetSlipPick; clear: () => void }>>({})
   const [mode, setMode] = useState<"single" | "parlay">("parlay")
   const [stake, setStake] = useState("")
   const [pickStakes, setPickStakes] = useState<Record<string, string>>({})
+  const [submitState, setSubmitState] = useState<"idle" | "loading" | "success" | "error">("idle")
 
   if (matchIds === null) {
-    return <p className="text-sm text-fd-muted-foreground">No trending matches to show right now.</p>
+    return <p className="text-sm text-fd-muted-foreground">No upcoming matches to show right now.</p>
   }
 
   const picks = matchIds
@@ -135,6 +134,20 @@ export function BetSlipMultiGameDemo() {
         onStakeChange={setStake}
         pickStakes={pickStakes}
         onPickStakeChange={(id, value) => setPickStakes((prev) => ({ ...prev, [id]: value }))}
+        onSubmit={() => {
+          // Fake submit — no real endpoint here, just enough to show the states.
+          setSubmitState("loading")
+          setTimeout(() => {
+            setSubmitState("success")
+            setTimeout(() => {
+              Object.values(entries).forEach((entry) => entry.clear())
+              setPickStakes({})
+              setStake("")
+              setSubmitState("idle")
+            }, 1500)
+          }, 1000)
+        }}
+        submitState={submitState}
         className="w-full"
       />
     </div>

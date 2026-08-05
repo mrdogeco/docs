@@ -37,9 +37,9 @@
       "dependencies": ["@mrdoge/protocol"],
       "files": [
         {
-          "path": "lib/sdk-adapters/match-card.ts",
+          "path": "lib/mrdoge-adapters/match-card.ts",
           "type": "registry:lib",
-          "target": "lib/sdk-adapters/match-card.ts"
+          "target": "lib/mrdoge-adapters/match-card.ts"
         }
       ]
     },
@@ -48,7 +48,7 @@
       "type": "registry:component",
       "title": "Odds Selector",
       "description": "Labeled odds card for a market: selectable options with price movement and suspended states.",
-      "registryDependencies": [],
+      "registryDependencies": ["button"],
       "files": [
         {
           "path": "registry/mrdoge-ui/odds-selector/odds-selector.tsx",
@@ -69,9 +69,9 @@
       "dependencies": ["@mrdoge/protocol"],
       "files": [
         {
-          "path": "lib/sdk-adapters/odds-lines.ts",
+          "path": "lib/mrdoge-adapters/odds-lines.ts",
           "type": "registry:lib",
-          "target": "lib/sdk-adapters/odds-lines.ts"
+          "target": "lib/mrdoge-adapters/odds-lines.ts"
         }
       ]
     },
@@ -97,9 +97,9 @@
       "dependencies": ["@mrdoge/protocol"],
       "files": [
         {
-          "path": "lib/sdk-adapters/bet-slip.ts",
+          "path": "lib/mrdoge-adapters/bet-slip.ts",
           "type": "registry:lib",
-          "target": "lib/sdk-adapters/bet-slip.ts"
+          "target": "lib/mrdoge-adapters/bet-slip.ts"
         }
       ]
     },
@@ -112,9 +112,9 @@
       "dependencies": ["@mrdoge/protocol"],
       "files": [
         {
-          "path": "lib/sdk-adapters/conflicts.ts",
+          "path": "lib/mrdoge-adapters/conflicts.ts",
           "type": "registry:lib",
-          "target": "lib/sdk-adapters/conflicts.ts"
+          "target": "lib/mrdoge-adapters/conflicts.ts"
         }
       ]
     },
@@ -359,6 +359,31 @@
       "files": [
         {
           "path": "registry/mrdoge-ui/use-trending-matches/use-trending-matches.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/mrdoge-ui/mrdoge-client/mrdoge-client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/mrdoge-ui/mrdoge-token-route/route.ts",
+          "type": "registry:page",
+          "target": "app/api/mrdoge/token/route.ts"
+        }
+      ]
+    },
+    {
+      "name": "use-matches",
+      "type": "registry:hook",
+      "title": "useMatches",
+      "description": "A plain list of matches, not limited to today's most-viewed ones. One-shot, not a subscription.",
+      "dependencies": ["@mrdoge/client", "@mrdoge/node", "server-only"],
+      "envVars": {
+        "MRDOGE_ODDS_API_KEY": ""
+      },
+      "files": [
+        {
+          "path": "registry/mrdoge-ui/use-matches/use-matches.ts",
           "type": "registry:hook"
         },
         {

@@ -66,16 +66,25 @@ function conflicts(a: ConflictCandidate, b: ConflictCandidate): boolean {
   if (isMrDcPair) return true
 
   if (TOTALS.includes(a.betType) && TOTALS.includes(b.betType)) {
-    const over = a.code.startsWith("O") ? a : b.code.startsWith("O") ? b : undefined
-    const under = a.code.startsWith("U") ? a : b.code.startsWith("U") ? b : undefined
-    if (!over || !under || over === under || over.threshold === undefined || under.threshold === undefined) {
-      return false
+    if (a.threshold === undefined || b.threshold === undefined) return false
+    const aIsOver = a.code.startsWith("O")
+    const bIsOver = b.code.startsWith("O")
+
+    if (aIsOver === bIsOver) {
+      // Same side at different thresholds, e.g. Over 1.5 + Over 2.5 — the
+      // higher threshold winning always means the lower one wins too, so
+      // the pair is never a genuinely new combination, just a redundant
+      // (or actively worse) parlay leg.
+      return a.threshold !== b.threshold
     }
-    // Over-at-T1 and Under-at-T2 are only both true when goals can land
-    // strictly between the two thresholds, e.g. Over 1.5 + Under 4.5
-    // (2, 3, or 4 goals) — impossible once T1 >= T2, e.g. Under 1.5 +
-    // Over 4.5.
-    return over.threshold >= under.threshold
+
+    // Opposite sides — Over-at-T1 and Under-at-T2 are only both true when
+    // goals can land strictly between the two thresholds, e.g. Over 1.5 +
+    // Under 4.5 (2, 3, or 4 goals) — impossible once T1 >= T2, e.g. Under
+    // 1.5 + Over 4.5.
+    const overThreshold = aIsOver ? a.threshold : b.threshold
+    const underThreshold = aIsOver ? b.threshold : a.threshold
+    return overThreshold >= underThreshold
   }
 
   const [btts, totals] = BTTS.includes(a.betType) && TOTALS.includes(b.betType)

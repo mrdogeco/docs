@@ -7,10 +7,11 @@ import { InstallTabs } from "@/components/docs/install-tabs"
 
 Small, pure functions from a real `@mrdoge/protocol` response to a
 component's plain props — type-checked, so a schema change fails to
-compile instead of silently going stale. These are the ones used
-throughout every example on this site. Integrating a different data
-provider? A new page here, following the same pattern, is the way — PRs
-welcome.
+compile instead of silently going stale. They live in
+`lib/mrdoge-adapters/`, named for this specific integration, and are the
+ones used throughout every example on this site. Integrating a different
+data provider? Your own `lib/<provider>-adapters/` directory, following
+the same pattern, is the way — a new page here too, PRs welcome.
 
 ## Match Card
 
@@ -75,6 +76,9 @@ Three rule families, scoped to the same match:
   impossible.
 - **Over/Under threshold overlap** — Over-at-`T1` and Under-at-`T2` in the
   same Totals market conflict once `T1 >= T2` (Under 1.5 + Over 4.5 can
-  never both be true; Over 1.5 + Under 4.5 can).
+  never both be true; Over 1.5 + Under 4.5 can). Same-side pairs at
+  different thresholds conflict too, e.g. Over 1.5 + Over 2.5 — the
+  higher threshold winning always means the lower one wins too, so it's
+  never a genuinely new combination.
 - **Both Teams to Score ↔ low Totals** — BTTS "Yes" conflicts with Under
   1.5 goals or lower (scoring twice needs at least 2 goals).

@@ -73,7 +73,7 @@ export const sampleForm: FormResult[] = ["L", "D", "W", "W", "W"]
 
 // The real API returns both summary.form and matches most-recent-first —
 // kept in that order here to match; teamFormToProps() reverses both for
-// display (see lib/sdk-adapters/team-form-indicator.ts).
+// display (see lib/mrdoge-adapters/team-form-indicator.ts).
 export const sampleTeamForm = {
   team: { id: 1, name: "Palmeiras", sport: { id: 1, name: "Soccer" } },
   summary: {
