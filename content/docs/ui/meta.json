@@ -2,5 +2,5 @@
   "title": "Mr. Doge UI",
   "icon": "Blocks",
   "root": true,
-  "pages": ["index", "components", "hooks", "adapters"]
+  "pages": ["index", "components", "blocks", "hooks", "adapters"]
 }

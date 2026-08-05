@@ -89,7 +89,18 @@ function MultiGameSelector({
 }
 
 export function BetSlipMultiGameDemo() {
-  const upcomingMatches = useMatches({ sports: ["soccer"], status: ["upcoming"], limit: 20 })
+  // Bounded to today/tomorrow — "upcoming" alone can include matches
+  // stuck on that status well past their real kickoff.
+  const today = new Date()
+  const tomorrow = new Date(today)
+  tomorrow.setDate(tomorrow.getDate() + 1)
+  const upcomingMatches = useMatches({
+    sports: ["soccer"],
+    status: ["upcoming"],
+    startDate: today.toISOString().slice(0, 10),
+    endDate: tomorrow.toISOString().slice(0, 10),
+    limit: 20,
+  })
   const matchIds = useMultiMatchIds(upcomingMatches, GAME_COUNT)
 
   const [entries, setEntries] = useState<Record<string, { pick?: BetSlipPick; clear: () => void }>>({})

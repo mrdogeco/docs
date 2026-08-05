@@ -44,6 +44,51 @@
       ]
     },
     {
+      "name": "match-card-compact",
+      "type": "registry:component",
+      "title": "Match Card Compact",
+      "description": "Minimal match row — overlapping crests plus a label, no score/status/odds.",
+      "registryDependencies": ["entity-image"],
+      "files": [
+        {
+          "path": "registry/mrdoge-ui/match-card-compact/match-card-compact.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "match-highlight",
+      "type": "registry:component",
+      "title": "Match Highlight",
+      "description": "Detailed match header for a match page — teams, score, live clock, cards, and corners.",
+      "registryDependencies": ["popover", "match-card-compact"],
+      "files": [
+        {
+          "path": "registry/mrdoge-ui/match-highlight/match-highlight.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/mrdoge-ui/entity-image/entity-image.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "mrdoge-match-highlight-adapter",
+      "type": "registry:lib",
+      "title": "Match Highlight Adapter (Mr. Doge SDK)",
+      "description": "Maps a real matches.get()/matches.subscribe() response onto Match Highlight's props.",
+      "registryDependencies": ["match-highlight"],
+      "dependencies": ["@mrdoge/protocol"],
+      "files": [
+        {
+          "path": "lib/mrdoge-adapters/match-highlight.ts",
+          "type": "registry:lib",
+          "target": "lib/mrdoge-adapters/match-highlight.ts"
+        }
+      ]
+    },
+    {
       "name": "odds-selector",
       "type": "registry:component",
       "title": "Odds Selector",
@@ -80,7 +125,7 @@
       "type": "registry:component",
       "title": "Bet Slip",
       "description": "Panel for selected picks — single/parlay mode, optional stake input and computed potential payout.",
-      "registryDependencies": ["button", "input", "entity-image"],
+      "registryDependencies": ["button", "input", "match-card-compact"],
       "files": [
         {
           "path": "registry/mrdoge-ui/bet-slip/bet-slip.tsx",
@@ -132,19 +177,45 @@
       ]
     },
     {
-      "name": "ai-recommendation-card",
+      "name": "stats-list",
       "type": "registry:component",
-      "title": "AI Recommendation Card",
-      "description": "AI-generated pick with confidence, edge, rationale, and risk factors.",
-      "registryDependencies": ["badge", "card"],
+      "title": "Stats List",
+      "description": "Generic home/away match stats comparison — one row per stat, sport-agnostic.",
+      "registryDependencies": [],
       "files": [
         {
-          "path": "registry/mrdoge-ui/ai-recommendation-card/ai-recommendation-card.tsx",
+          "path": "registry/mrdoge-ui/stats-list/stats-list.tsx",
           "type": "registry:component"
-        },
+        }
+      ]
+    },
+    {
+      "name": "mrdoge-stats-list-adapter",
+      "type": "registry:lib",
+      "title": "Stats List Adapter (Mr. Doge SDK)",
+      "description": "Maps a real match.stats (any of the 8 sports) onto Stats List's entries prop.",
+      "registryDependencies": ["stats-list"],
+      "dependencies": ["@mrdoge/protocol"],
+      "files": [
         {
-          "path": "registry/mrdoge-ui/settlement-badge/settlement-badge.tsx",
-          "type": "registry:component"
+          "path": "lib/mrdoge-adapters/stats-list.ts",
+          "type": "registry:lib",
+          "target": "lib/mrdoge-adapters/stats-list.ts"
+        }
+      ]
+    },
+    {
+      "name": "mrdoge-match-timeline-adapter",
+      "type": "registry:lib",
+      "title": "Match Timeline Adapter (Mr. Doge SDK)",
+      "description": "Maps a real match's timeline events onto Match Timeline's entries prop.",
+      "registryDependencies": ["match-timeline"],
+      "dependencies": ["@mrdoge/protocol"],
+      "files": [
+        {
+          "path": "lib/mrdoge-adapters/match-timeline.ts",
+          "type": "registry:lib",
+          "target": "lib/mrdoge-adapters/match-timeline.ts"
         }
       ]
     },

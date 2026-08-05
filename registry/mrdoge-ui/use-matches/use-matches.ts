@@ -9,6 +9,12 @@ export interface UseMatchesOptions {
   sports?: string[]
   /** Restrict to specific match statuses, e.g. ["upcoming"]. Omit for all statuses. */
   status?: ("upcoming" | "live" | "completed")[]
+  /** Single day, YYYY-MM-DD. Mutually exclusive with startDate/endDate. */
+  date?: string
+  /** Start of a date range, YYYY-MM-DD, inclusive. */
+  startDate?: string
+  /** End of a date range, YYYY-MM-DD, inclusive. */
+  endDate?: string
   /** Result count. Server default 20, capped at 100. */
   limit?: number
   /** IANA timezone for any timezone-dependent fields server-side. */
@@ -26,7 +32,16 @@ export interface UseMatchesOptions {
  * undefined = loading, null = the request failed (no fallback — that's an
  * honest empty state, not a fictional one).
  */
-export function useMatches({ sports, status, limit, timezone, locale }: UseMatchesOptions = {}) {
+export function useMatches({
+  sports,
+  status,
+  date,
+  startDate,
+  endDate,
+  limit,
+  timezone,
+  locale,
+}: UseMatchesOptions = {}) {
   const [matches, setMatches] = useState<Match[] | null | undefined>(undefined)
   const sportsKey = sports?.join(",")
   const statusKey = status?.join(",")
@@ -35,7 +50,7 @@ export function useMatches({ sports, status, limit, timezone, locale }: UseMatch
     let cancelled = false
 
     getMrDogeClient()
-      .matches.list({ sports, status, limit, timezone, locale })
+      .matches.list({ sports, status, date, startDate, endDate, limit, timezone, locale })
       .then((result) => {
         if (!cancelled) setMatches(result.data)
       })
@@ -47,7 +62,7 @@ export function useMatches({ sports, status, limit, timezone, locale }: UseMatch
       cancelled = true
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- sportsKey/statusKey are the stable forms of sports/status
-  }, [sportsKey, statusKey, limit, timezone, locale])
+  }, [sportsKey, statusKey, date, startDate, endDate, limit, timezone, locale])
 
   return matches
 }

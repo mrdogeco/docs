@@ -5,7 +5,7 @@ import { Check, CheckCircle2, Circle, Layers, Loader2, MinusCircle, Ticket, Tria
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { EntityImage } from "@/registry/mrdoge-ui/entity-image/entity-image"
+import { MatchCardCompact } from "@/registry/mrdoge-ui/match-card-compact/match-card-compact"
 
 export interface BetSlipPick {
   id: string
@@ -78,15 +78,13 @@ export function BetSlipMatchGroup({
 }) {
   return (
     <div>
-      <div className="flex items-center gap-2 px-3 py-2.5">
-        {home && away ? (
-          <div className="flex shrink-0 -space-x-1.5">
-            <EntityImage src={home.logoUrl} name={home.name} size="sm" className="ring-2 ring-card" />
-            <EntityImage src={away.logoUrl} name={away.name} size="sm" className="ring-2 ring-card" />
-          </div>
-        ) : null}
-        <span className="truncate text-sm font-medium">{eventLabel}</span>
-      </div>
+      {home && away ? (
+        <MatchCardCompact home={home} away={away} label={eventLabel} className="px-3 py-2.5" />
+      ) : (
+        <div className="flex items-center gap-2 px-3 py-2.5">
+          <span className="truncate text-sm font-medium">{eventLabel}</span>
+        </div>
+      )}
       <div className="border-t">{children}</div>
     </div>
   )

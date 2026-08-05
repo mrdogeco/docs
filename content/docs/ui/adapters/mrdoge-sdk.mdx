@@ -26,6 +26,55 @@ market from [`odds.list()`](/docs/reference/odds)) onto
 color options as prices change (green/red), or omit it and options render
 without any color change.
 
+## Match Highlight
+
+`matchToMatchHighlightProps` maps a real
+[`matches.get()`](/docs/reference/matches)/`matches.subscribe()` response
+onto [Match Highlight](/docs/ui/components/match-highlight)'s props —
+including the `minute`/`stoppage`/`elapsedSeconds`/`referenceTime` fields
+that drive its live ticking clock. Cards and corners are soccer-specific;
+other sports get no stats row rather than misleading zeros.
+
+`matchesToCompetitionMatches` is separate — a pure mapping from a
+[`matches.list({ competitionIds, date })`](/docs/reference/matches)
+response onto `competitionMatches`, excluding the match you're already
+viewing and sorting by kickoff time. Running that query lazily (only once
+the dropdown first opens) is the caller's job, same as fetching itself —
+see [The competition dropdown](/docs/ui/components/match-highlight#the-competition-dropdown).
+
+<InstallTabs name="mrdoge-match-highlight-adapter" />
+
+## Match Timeline
+
+Maps a real [`matches.get()`](/docs/reference/matches)/`matches.subscribe()`
+response onto [Match Timeline](/docs/ui/components/match-timeline)'s
+`entries` prop — filtered to goals, cards, penalties, and half/full-time,
+most-recent-first. Full-time is synthesized from
+`match.status`/`stats` rather than a specific timeline event, since
+there's no single event that reliably marks a match as truly over once
+extra time is possible.
+
+<InstallTabs name="mrdoge-match-timeline-adapter" />
+
+## Stats List
+
+`statsToStatsListEntries` maps `match.stats` onto
+[Stats List](/docs/ui/components/stats-list)'s `entries` prop.
+`MatchStats` is a discriminated union per sport, so this switches on
+`stats.sport` — soccer has the richest set (possession, shots, corners,
+cards, tackles, throw-ins, goal kicks, woodwork hits, penalty kicks,
+...); american football, baseball, ice hockey, and handball currently
+have no comparable home/away stats in the protocol beyond score and
+clock, so those return an empty array.
+
+`matchToPlayerStatsListEntries` is separate — the top player per side
+(soccer only) for shots, shots on target, and woodwork hits, from
+`match.stats`'s per-player arrays. Returns empty unless `match.timeline`
+has at least one player-attributed event, a proxy for "this match has
+player-level tracking at all."
+
+<InstallTabs name="mrdoge-stats-list-adapter" />
+
 ## Odds Selector
 
 `SOCCER_UNDER_OVER` posts one market per threshold (0.5, 1.5, 2.5, ...)

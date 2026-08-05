@@ -1,4 +1,4 @@
-import type { Market, TimelineEvent, TeamForm, Recommendation, Region, Competition } from "@mrdoge/protocol"
+import type { Market, TeamForm, Region, Competition } from "@mrdoge/protocol"
 import type { OddsOption } from "@/registry/mrdoge-ui/odds-selector/odds-selector"
 import type { MatchTimelineEntry } from "@/registry/mrdoge-ui/match-timeline/match-timeline"
 import type { BetSlipPick } from "@/registry/mrdoge-ui/bet-slip/bet-slip"
@@ -8,6 +8,11 @@ import type { FormResult } from "@/registry/mrdoge-ui/team-form-indicator/team-f
 // live demo pages (see registry/mrdoge-ui/use-live-match/use-live-match.ts)
 // are predictable.
 export const DEMO_MATCH_ID = "45293428"
+
+// 2026 World Cup Final (Spain 1-0 Argentina, after extra time) — a
+// completed match with a full stats/timeline history, for Match
+// Highlight's "completed" example.
+export const FINISHED_MATCH_ID = "47170270"
 
 // Typed against the real SDK response shape (satisfies Market[]/TimelineEvent[]/etc),
 // so a schema change in @mrdoge/protocol shows up here as a build failure
@@ -56,13 +61,6 @@ export const sampleTimeline: MatchTimelineEntry[] = [
   { id: "3", time: "58'", type: "substitution", side: "home", description: "Silva off, Costa on" },
   { id: "4", time: "77'", type: "goal", side: "away", description: "Goal — Reyes" },
 ]
-
-export const sampleTimelineEvents = [
-  { type: "GoalWithScorer", side: "home", phase: "1H", captions: ["Silva"], timeOffsetSeconds: 720 },
-  { type: "YellowCard", side: "away", phase: "1H", captions: ["Reyes"], timeOffsetSeconds: 2040 },
-  { type: "Substitution", side: "home", phase: "2H", captions: ["Silva", "Costa"], timeOffsetSeconds: 3480 },
-  { type: "GoalWithScorer", side: "away", phase: "2H", captions: ["Reyes"], timeOffsetSeconds: 4620 },
-] satisfies TimelineEvent[]
 
 export const samplePicks: BetSlipPick[] = [
   { id: "1", eventLabel: "Palmeiras vs Flamengo", market: "Match Winner", selection: "Palmeiras", price: 1.85 },
@@ -144,37 +142,6 @@ export const sampleTeamForm = {
     },
   ],
 } satisfies TeamForm
-
-export const sampleRecommendation = {
-  id: "rec-1",
-  matchId: "match-2",
-  match: {
-    id: "match-2",
-    startTime: "2026-07-31T21:00:00Z",
-    status: "upcoming",
-    homeTeam: { id: 1, name: "Palmeiras" },
-    awayTeam: { id: 7, name: "Corinthians" },
-    sport: { id: 1, name: "Soccer" },
-    competition: { id: 1, name: "Brasileirão Série A" },
-    region: { id: 1, name: "Brazil" },
-  },
-  marketId: "market-2",
-  betItemId: "home",
-  outcome: "1",
-  odds: 1.95,
-  point: null,
-  confidence: "High",
-  edgePercentage: 0.084,
-  kellyFraction: 0.032,
-  rationale: [
-    "Palmeiras unbeaten in 8 home matches this season.",
-    "Corinthians missing two starting defenders to injury.",
-  ],
-  riskFactors: ["Palmeiras rotating squad ahead of a continental fixture."],
-  settled: false,
-  result: null,
-  createdAt: "2026-07-30T12:00:00Z",
-} satisfies Recommendation
 
 export const sampleRegions = [
   { id: 1, name: "Brazil", eventCount: 12 },

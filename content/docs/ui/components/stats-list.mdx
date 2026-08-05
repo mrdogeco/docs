@@ -1,6 +1,112 @@
 ---
 title: Stats List
-description: Coming soon.
+description: Generic home/away match stats comparison bars — one row per stat, sport-agnostic.
 ---
 
-Not built yet — coming soon.
+import { StatsListDemo } from "@/components/docs/demos/stats-list-demo"
+import { InstallTabs } from "@/components/docs/install-tabs"
+
+<ExampleSection file="components/docs/demos/stats-list-demo.tsx">
+  <StatsListDemo />
+</ExampleSection>
+
+<Callout title="Coverage varies by sport">
+  Which stats show up depends entirely on what the data source reports
+   — see [the adapter](#use-with-the-mr-doge-sdk) below for
+  exactly what each sport contributes today. Stats List itself renders
+  nothing for an empty `entries` array — decide what "no stats" should
+  look like at the call site, same as
+  [Match Timeline](/docs/ui/components/match-timeline) with an empty
+  list.
+</Callout>
+
+## Installation
+
+<InstallTabs name="stats-list" />
+
+## Usage
+
+```tsx
+import { StatsList } from "@/components/stats-list"
+
+<StatsList
+  entries={[
+    { label: "Possession", home: "62%", away: "38%", homeValue: 0.62, awayValue: 0.38 },
+    { label: "Shots", home: "14", away: "9", homeValue: 14, awayValue: 9 },
+    { label: "Serving", home: "Yes", away: "No", homeValue: 1, awayValue: 0 },
+  ]}
+/>
+```
+
+`homeValue`/`awayValue` size the two bars — the side with the greater
+value gets a bold label and a solid bar; the other stays muted. Bars
+animate when values change, e.g. from a live subscription.
+
+Pass `showBars={false}` to drop the bar from every row and keep just the
+numbers.
+
+## Use with the Mr. Doge SDK
+
+Stats List takes a plain `entries` array, so it works with any data
+source. See the
+[Stats List Adapter](/docs/ui/adapters/mrdoge-sdk#stats-list) for the
+real functions mapping a match's `stats` (from
+`matches.get()`/`matches.subscribe()`) onto this prop, across all 8
+sports the SDK covers, plus a second function for the player-level
+section — the ones behind the example above.
+
+## Props
+
+<TypeTable
+  type={{
+    entries: {
+      description: <>See <a href="#statslistentry">StatsListEntry</a> below.</>,
+      type: "StatsListEntry[]",
+      required: true,
+    },
+    showBars: {
+      description: "Set to false to omit the comparison bar from every row, keeping just the numbers and label. Defaults to true.",
+      type: "boolean",
+    },
+    className: {
+      type: "string",
+    },
+  }}
+/>
+
+### StatsListEntry
+
+<TypeTable
+  type={{
+    label: {
+      type: "string",
+      required: true,
+    },
+    home: {
+      description: 'Pre-formatted for display, e.g. "62%", "14", "Yamal (3)".',
+      type: "string",
+      required: true,
+    },
+    away: {
+      description: "Pre-formatted for display, same as home.",
+      type: "string",
+      required: true,
+    },
+    homeValue: {
+      description: "Raw numeric value for this side — sizes the comparison bar.",
+      type: "number",
+      required: true,
+    },
+    awayValue: {
+      description: "Raw numeric value for this side — sizes the comparison bar.",
+      type: "number",
+      required: true,
+    },
+  }}
+/>
+
+### StatsListSkeleton
+
+`import { StatsListSkeleton } from "@/components/stats-list"` — for a
+loading state before the real entries have arrived. Takes `rowCount`
+(default 5) and `className`.

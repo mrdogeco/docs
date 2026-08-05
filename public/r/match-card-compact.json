@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "match-card-compact",
+  "title": "Match Card Compact",
+  "description": "Minimal match row — overlapping crests plus a label, no score/status/odds.",
+  "registryDependencies": [
+    "entity-image"
+  ],
+  "files": [
+    {
+      "path": "registry/mrdoge-ui/match-card-compact/match-card-compact.tsx",
+      "content": "import { cn } from \"@/lib/utils\"\nimport { EntityImage } from \"@/registry/mrdoge-ui/entity-image/entity-image\"\n\nexport interface MatchCardCompactTeam {\n  name: string\n  logoUrl?: string\n}\n\nexport interface MatchCardCompactProps {\n  home: MatchCardCompactTeam\n  away: MatchCardCompactTeam\n  /** Shown next to the crests. Defaults to \"home vs away\". */\n  label?: string\n  /** Shown right-aligned, e.g. a score or kickoff time. */\n  info?: string\n  className?: string\n}\n\n/**\n * A minimal match row — overlapping crests plus a label, no\n * score/status/odds. Deliberately lighter than Match Card, for contexts\n * that just need to identify a match at a glance: a dropdown item, a\n * group header. See Bet Slip's `BetSlipMatchGroup` and Match Highlight's\n * competition dropdown.\n */\nexport function MatchCardCompact({ home, away, label, info, className }: MatchCardCompactProps) {\n  return (\n    <div className={cn(\"flex items-center gap-2\", className)}>\n      <div className=\"flex shrink-0 -space-x-1.5\">\n        <EntityImage src={home.logoUrl} name={home.name} size=\"sm\" className=\"ring-2 ring-card\" />\n        <EntityImage src={away.logoUrl} name={away.name} size=\"sm\" className=\"ring-2 ring-card\" />\n      </div>\n      <span className=\"min-w-0 flex-1 truncate text-sm font-medium\">{label ?? `${home.name} vs ${away.name}`}</span>\n      {info ? <span className=\"shrink-0 text-xs tabular-nums text-muted-foreground\">{info}</span> : null}\n    </div>\n  )\n}\n",
+      "type": "registry:component"
+    }
+  ],
+  "type": "registry:component"
+}

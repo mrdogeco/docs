@@ -29,7 +29,7 @@ export interface SportPickerProps {
 }
 
 // Phosphor (react-icons/pi) covers 7 of 8 sports; handball has no Phosphor
-// icon, so it falls back to Material Design — same fallback mrdoge-ai uses.
+// icon, so it falls back to Material Design.
 const sportIcon: Record<string, ComponentType<{ className?: string }>> = {
   soccer: PiSoccerBall,
   basketball: PiBasketball,

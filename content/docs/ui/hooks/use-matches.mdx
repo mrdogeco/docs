@@ -27,7 +27,8 @@ just needs *some* real upcoming match keeps working regardless:
 import { useMatches } from "@/hooks/use-matches"
 
 function UpcomingMatches() {
-  const matches = useMatches({ sports: ["soccer"], status: ["upcoming"], limit: 20 })
+  const today = new Date().toISOString().slice(0, 10)
+  const matches = useMatches({ sports: ["soccer"], status: ["upcoming"], startDate: today, limit: 20 })
 
   if (matches === undefined) return <p>Loading…</p>
   if (matches === null) return <p>Couldn't load matches.</p>
@@ -38,6 +39,14 @@ function UpcomingMatches() {
 
 Takes a single options object, like every real SDK method it wraps
 (`matches.list(params)`) — not positional arguments.
+
+<Callout title="status alone isn't enough">
+  A match stuck on `"upcoming"` past its real kickoff (delayed, postponed,
+  never updated) still matches that filter alone — pass `startDate` (and
+  `endDate` for a range) to rule those out. See
+  [Bet Slip](/docs/ui/components/bet-slip)'s default example for a real
+  today/tomorrow range.
+</Callout>
 
 ## Parameters
 
@@ -50,6 +59,18 @@ Takes a single options object, like every real SDK method it wraps
     status: {
       description: 'Restrict to specific match statuses, e.g. ["upcoming"]. Omit for all statuses.',
       type: '("upcoming" | "live" | "completed")[]',
+    },
+    date: {
+      description: "Single day, YYYY-MM-DD. Mutually exclusive with startDate/endDate.",
+      type: "string",
+    },
+    startDate: {
+      description: "Start of a date range, YYYY-MM-DD, inclusive.",
+      type: "string",
+    },
+    endDate: {
+      description: "End of a date range, YYYY-MM-DD, inclusive.",
+      type: "string",
     },
     limit: {
       description: "Result count. Server default 20, capped at 100.",

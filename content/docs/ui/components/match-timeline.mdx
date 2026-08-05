@@ -1,19 +1,14 @@
 ---
 title: Match Timeline
-description: Chronological feed of match events.
+description: Chronological feed of match events — goals, cards, penalties, and half/full-time, most-recent-first.
 ---
 
-import { MatchTimeline } from "@/registry/mrdoge-ui/match-timeline/match-timeline"
+import { MatchTimelineDemo } from "@/components/docs/demos/match-timeline-demo"
 import { InstallTabs } from "@/components/docs/install-tabs"
-import { timelineToMatchTimelineProps } from "@/lib/mrdoge-adapters/match-timeline"
-import { sampleTimelineEvents } from "@/components/docs/sample-data"
 
-<ComponentPreview>
-  <MatchTimeline
-    {...timelineToMatchTimelineProps(sampleTimelineEvents)}
-    className="w-full max-w-sm"
-  />
-</ComponentPreview>
+<ExampleSection file="components/docs/demos/match-timeline-demo.tsx">
+  <MatchTimelineDemo />
+</ExampleSection>
 
 ## Installation
 
@@ -26,52 +21,38 @@ import { MatchTimeline } from "@/components/match-timeline"
 
 <MatchTimeline
   entries={[
-    { id: "1", time: "12'", type: "goal", side: "home", description: "Goal — Silva" },
-    { id: "2", time: "34'", type: "yellow-card", side: "away", description: "Yellow card — Reyes" },
+    { id: "1", side: "match", type: "divider", live: true, description: "2nd Half 1 - 0" },
+    { id: "2", side: "match", type: "divider", description: "HT 1 - 0" },
+    { id: "3", time: "39'", type: "yellow-card", side: "away", description: "J. Mickels" },
+    { id: "4", time: "31'", type: "goal", side: "home", description: "J. Bogere", score: { home: 1, away: 0 } },
   ]}
 />
 ```
 
+`type` is an open string — pass whatever event kinds your data has (e.g.
+`"goal"`, `"yellow-card"`); unrecognized ones fall back to a generic
+marker instead of being rejected. `side: "match"` entries render as a
+divider (a horizontal line either side of centered text) instead of a
+row — pass `live` to color the current one red instead of muted.
+
 ## Use with the Mr. Doge SDK
 
-`type` is an open string on both sides — sport-specific event types (the
-SDK documents per-sport unions like `SoccerTimelineEventType`,
-`TennisTimelineEventType`) pass straight through, and unrecognized types
-just fall back to a generic marker instead of being rejected:
-
-```tsx
-import type { TimelineEvent } from "@mrdoge/protocol"
-import type { MatchTimelineProps } from "@/components/match-timeline"
-
-const MINUTE_CLOCK_PHASES = new Set(["1H", "2H", "ET1", "ET2"])
-
-function toTimeLabel(event: TimelineEvent): string | undefined {
-  if (event.timeOffsetSeconds === 0) return undefined
-  if (MINUTE_CLOCK_PHASES.has(event.phase)) {
-    return `${Math.floor(event.timeOffsetSeconds / 60)}'`
-  }
-  return event.phase
-}
-
-function timelineToMatchTimelineProps(events: TimelineEvent[]): MatchTimelineProps {
-  return {
-    entries: events.map((event, index) => ({
-      id: String(index),
-      time: toTimeLabel(event),
-      type: event.type,
-      side: event.side,
-      description: event.captions.join(" — "),
-    })),
-  }
-}
-```
+Match Timeline takes a plain `entries` array, so it works with any data
+source. See the
+[Match Timeline Adapter](/docs/ui/adapters/mrdoge-sdk#match-timeline) for
+the real function mapping a match's timeline (from
+`matches.get()`/`matches.subscribe()`) onto this prop — the one behind
+the example above. It filters down to goals, cards, penalties, and
+half/full-time — the rest of a real timeline (fouls, tackles, throw-ins,
+corners, goal kicks, offsides, shots) stays available on the match object
+itself if you want a denser view.
 
 ## Props
 
 <TypeTable
   type={{
     entries: {
-      description: "Entries ordered chronologically. See MatchTimelineEntry below.",
+      description: <>Entries ordered most-recent-first. See <a href="#matchtimelineentry">MatchTimelineEntry</a> below.</>,
       type: "MatchTimelineEntry[]",
       required: true,
     },
@@ -90,21 +71,37 @@ function timelineToMatchTimelineProps(events: TimelineEvent[]): MatchTimelinePro
       required: true,
     },
     time: {
-      description: 'Pre-formatted time label, e.g. "45+2\'", "Q3", "Set 2", "HT". Not every sport has a meaningful running clock, so this is a string the caller formats rather than a raw minute count.',
+      description: 'Pre-formatted time label, e.g. "45+2\'", "90+3\'". Not every sport has a meaningful running clock, so this is a string the caller formats rather than a raw minute count.',
       type: "string",
     },
     type: {
-      description: "Open event type — sport-specific (e.g. \"goal\", \"ace\"). Unrecognized types get a generic marker.",
+      description: "Open event type, e.g. \"goal\", \"yellow-card\" — pass whatever your data has. Unrecognized types get a generic marker.",
       type: "string",
       required: true,
     },
     side: {
+      description: '"match" renders as a divider instead of a row — see live below.',
       type: '"home" | "away" | "match"',
       required: true,
     },
     description: {
+      description: "Always shown — the divider's full text for side \"match\" entries, or the player/team name otherwise. score (below) adds a pill alongside it, not instead of it.",
       type: "string",
       required: true,
     },
+    score: {
+      description: "Goal-type events only — renders a running score pill alongside description.",
+      type: "{ home: number; away: number }",
+    },
+    live: {
+      description: 'side "match" entries only — colors the divider red instead of muted, for the current live period.',
+      type: "boolean",
+    },
   }}
 />
+
+### MatchTimelineSkeleton
+
+`import { MatchTimelineSkeleton } from "@/components/match-timeline"` —
+for a loading state before the real entries have arrived. Takes
+`rowCount` (default 4) and `className`.
