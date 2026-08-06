@@ -17,12 +17,16 @@ import type { MatchTimelineEntry, MatchTimelineProps } from "@/registry/mrdoge-u
 // running score below. captions still degrades correctly either way —
 // no player name in captions[2] just falls back to the team name.
 //
+// "GoalWith" (not just "Goal") — "GoalKick" also starts with "Goal" and
+// is a real, unrelated event type; matching on "Goal" alone counted every
+// goal kick as a scored goal.
+//
 // Substitution is deliberately not included — no live match sampled
 // while building this had any substitution events, so the caption order
 // for on/off couldn't be confirmed against real data.
 function classify(type: string): "goal" | "own-goal" | "yellow-card" | "red-card" | "penalty" | null {
   if (type === "OwnGoal") return "own-goal"
-  if (type.startsWith("Goal")) return "goal"
+  if (type.startsWith("GoalWith")) return "goal"
   if (type.startsWith("YellowCard")) return "yellow-card"
   if (type.startsWith("RedCard")) return "red-card"
   if (type === "PenaltyKick") return "penalty"

@@ -4,12 +4,12 @@
   "title": "Mr. Doge Client",
   "description": "Browser SDK client singleton, authenticated via short-lived tokens minted by your own backend — never a raw API key.",
   "dependencies": [
-    "@mrdoge/client"
+    "@mrdoge/react"
   ],
   "files": [
     {
       "path": "registry/mrdoge-ui/mrdoge-client/mrdoge-client.ts",
-      "content": "import { MrDoge } from \"@mrdoge/client\"\n\nlet client: MrDoge | null = null\n\n/** Browser-only — the SDK authenticates via short-lived tokens minted at /api/mrdoge/token, never a raw API key. */\nexport function getMrDogeClient() {\n  if (typeof window === \"undefined\") {\n    throw new Error(\"getMrDogeClient() must be called in the browser\")\n  }\n  if (!client) {\n    client = new MrDoge({ authEndpoint: \"/api/mrdoge/token\" })\n  }\n  return client\n}\n",
+      "content": "// Re-exported from @mrdoge/react — the same singleton every hook uses\n// internally. Import this directly for one-off SDK calls with no matching\n// hook (e.g. matches.search()).\nexport { getMrDogeClient, configureMrDoge } from \"@mrdoge/react\"\n",
       "type": "registry:lib"
     }
   ],

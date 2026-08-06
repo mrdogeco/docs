@@ -5,14 +5,17 @@ import { matchToMatchHighlightProps } from "@/lib/mrdoge-adapters/match-highligh
 import { StatsList, StatsListSkeleton } from "@/registry/mrdoge-ui/stats-list/stats-list"
 import { statsToStatsListEntries, matchToPlayerStatsListEntries } from "@/lib/mrdoge-adapters/stats-list"
 import { useLiveMatch } from "@/registry/mrdoge-ui/use-live-match/use-live-match"
-import { useHighlightMatchId } from "@/components/docs/demos/use-highlight-match-id"
+import { useSharedLiveOrCompletedMatchId } from "@/components/docs/demos/use-shared-demo-matches"
 
 export function StatsListDemo() {
-  const matchId = useHighlightMatchId("live")
-  const match = useLiveMatch({ matchId: matchId ?? undefined })
+  // Prefers a genuinely live match; falls back to a fixed completed match
+  // if nothing's live right now (e.g. quiet hours) — an upcoming match
+  // would just trade one empty stats view for another.
+  const matchId = useSharedLiveOrCompletedMatchId()
+  const match = useLiveMatch({ matchId })
 
-  if (matchId === null || match === null) {
-    return <p className="text-sm text-fd-muted-foreground">No live match to show right now.</p>
+  if (match === null) {
+    return <p className="text-sm text-fd-muted-foreground">Couldn't load this match right now.</p>
   }
 
   const entries = match ? statsToStatsListEntries(match.stats) : []

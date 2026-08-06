@@ -14,11 +14,11 @@ when nothing matching your filters happens to be trending right now.
 
 <InstallTabs name="use-matches" />
 
-Installing this pulls in three files: the hook itself, a browser SDK client
-singleton (`getMrDogeClient`), and a Next.js route at
-`app/api/mrdoge/token/route.ts` that mints short-lived tokens using
-`@mrdoge/node` and your own `MRDOGE_ODDS_API_KEY` — the browser client never
-sees the raw key.
+Installing this pulls in two files: the hook itself (a thin re-export
+from [`@mrdoge/react`](/docs/ui/mrdoge-sdk/installation), which does the
+real work) and a Next.js route at `app/api/mrdoge/token/route.ts` that
+mints short-lived tokens using `@mrdoge/node` and your own
+`MRDOGE_ODDS_API_KEY` — the browser client never sees the raw key.
 
 ## Usage
 

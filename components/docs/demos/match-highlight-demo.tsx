@@ -7,7 +7,10 @@ import { matchToMatchHighlightProps, matchesToCompetitionMatches } from "@/lib/m
 import { getMrDogeClient } from "@/registry/mrdoge-ui/mrdoge-client/mrdoge-client"
 import { useMatch } from "@/registry/mrdoge-ui/use-match/use-match"
 import { useLiveMatch } from "@/registry/mrdoge-ui/use-live-match/use-live-match"
-import { useHighlightMatchId } from "@/components/docs/demos/use-highlight-match-id"
+import {
+  useSharedUpcomingMatchId,
+  useSharedLiveOrUpcomingMatchId,
+} from "@/components/docs/demos/use-shared-demo-matches"
 import { FINISHED_MATCH_ID } from "@/components/docs/sample-data"
 
 // Lazily fetches other matches today in the same competition — only once
@@ -67,7 +70,7 @@ function FinishedHighlight() {
 }
 
 function UpcomingHighlight() {
-  const resolvedId = useHighlightMatchId("upcoming")
+  const resolvedId = useSharedUpcomingMatchId()
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const matchId = selectedId ?? resolvedId
   // One-shot, not live — nothing about an upcoming match changes before kickoff.
@@ -98,7 +101,10 @@ function UpcomingHighlight() {
 }
 
 function LiveHighlight() {
-  const resolvedId = useHighlightMatchId("live")
+  // Prefers a genuinely live match; falls back to the shared upcoming
+  // match if nothing's live right now (e.g. quiet hours) rather than
+  // showing a blank state.
+  const resolvedId = useSharedLiveOrUpcomingMatchId()
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const matchId = selectedId ?? resolvedId
   const match = useLiveMatch({ matchId: matchId ?? undefined })
@@ -108,7 +114,7 @@ function LiveHighlight() {
   )
 
   if (matchId === null || match === null) {
-    return <p className="text-sm text-fd-muted-foreground">No live match to show right now.</p>
+    return <p className="text-sm text-fd-muted-foreground">No match to show right now.</p>
   }
 
   return (

@@ -24,8 +24,8 @@ export function EntityImageDemo() {
   if (match === undefined) {
     return (
       <div className="flex items-center gap-4">
-        <span className="size-5 animate-pulse rounded-full bg-muted" />
-        <span className="size-8 animate-pulse rounded-full bg-muted" />
+        <span className="size-10 animate-pulse rounded-full bg-muted" />
+        <span className="size-10 animate-pulse rounded-full bg-muted" />
         <span className="size-10 animate-pulse rounded-full bg-muted" />
       </div>
     )
@@ -33,9 +33,9 @@ export function EntityImageDemo() {
 
   return (
     <div className="flex items-center gap-4">
-      <EntityImage src={teamLogoUrl(match.homeTeam.id)} name={match.homeTeam.name} size="sm"/>
+      <EntityImage src={teamLogoUrl(match.homeTeam.id)} name={match.homeTeam.name} size="lg"/>
+      <EntityImage src={regionLogoUrl(match.region.id)} name={match.region.name} size="lg"/>
       <EntityImage src={teamLogoUrl(match.awayTeam.id)} name={match.awayTeam.name} size="lg" />
-      <EntityImage src={regionLogoUrl(match.region.id)} name={match.region.name} />
     </div>
   )
 }

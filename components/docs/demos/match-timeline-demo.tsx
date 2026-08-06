@@ -8,7 +8,7 @@ import { MatchTimeline, MatchTimelineSkeleton } from "@/registry/mrdoge-ui/match
 import { matchToMatchTimelineProps } from "@/lib/mrdoge-adapters/match-timeline"
 import { getMrDogeClient } from "@/registry/mrdoge-ui/mrdoge-client/mrdoge-client"
 import { useLiveMatch } from "@/registry/mrdoge-ui/use-live-match/use-live-match"
-import { useHighlightMatchId } from "@/components/docs/demos/use-highlight-match-id"
+import { useSharedLiveOrCompletedMatchId } from "@/components/docs/demos/use-shared-demo-matches"
 
 // matches.subscribe only pushes stats.upd/status.upd — there's no
 // timeline.upd, so useLiveMatch's own snapshot never gets new events
@@ -42,12 +42,15 @@ function useLiveTimeline(matchId: string | undefined, isLive: boolean) {
 }
 
 export function MatchTimelineDemo() {
-  const matchId = useHighlightMatchId("live")
-  const match = useLiveMatch({ matchId: matchId ?? undefined })
-  const liveTimeline = useLiveTimeline(matchId ?? undefined, match?.status === "live")
+  // Prefers a genuinely live match; falls back to a fixed completed match
+  // if nothing's live right now (e.g. quiet hours) — an upcoming match
+  // would just trade one empty timeline for another.
+  const matchId = useSharedLiveOrCompletedMatchId()
+  const match = useLiveMatch({ matchId })
+  const liveTimeline = useLiveTimeline(matchId, match?.status === "live")
 
-  if (matchId === null || match === null) {
-    return <p className="text-sm text-fd-muted-foreground">No live match to show right now.</p>
+  if (match === null) {
+    return <p className="text-sm text-fd-muted-foreground">Couldn't load this match right now.</p>
   }
 
   const timeline = match

@@ -1,68 +1,24 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import type { Match } from "@mrdoge/protocol"
+import { useState } from "react"
 import { MatchCard } from "@/registry/mrdoge-ui/match-card/match-card"
 import { OddsSelector } from "@/registry/mrdoge-ui/odds-selector/odds-selector"
 import { OddsSelectorSkeleton } from "@/registry/mrdoge-ui/odds-selector/odds-selector-skeleton"
 import { matchToMatchCardProps, toOddsOptions } from "@/lib/mrdoge-adapters/match-card"
 import { pickMostBalancedMarket } from "@/lib/mrdoge-adapters/odds-lines"
 import { toConflictCandidates, getConflictingIds } from "@/lib/mrdoge-adapters/conflicts"
-import { getMrDogeClient } from "@/registry/mrdoge-ui/mrdoge-client/mrdoge-client"
 import { useLiveMatch } from "@/registry/mrdoge-ui/use-live-match/use-live-match"
 import { useLiveOdds } from "@/registry/mrdoge-ui/use-live-odds/use-live-odds"
 import { useOddsMovement } from "@/registry/mrdoge-ui/use-odds-movement/use-odds-movement"
-import { useTrendingMatches } from "@/registry/mrdoge-ui/use-trending-matches/use-trending-matches"
-
-// Two markets posted for the full length of any match. Each has a
-// separate sysname before kickoff, so both forms are included.
-const MATCH_RESULT_BET_TYPES = ["SOCCER_MATCH_RESULT", "SOCCER_MATCH_RESULT_PRELIVE"]
-const TOTAL_GOALS_BET_TYPES = ["SOCCER_UNDER_OVER", "SOCCER_UNDER_OVER_PRELIVE"]
-const DOUBLE_CHANCE_BET_TYPES = ["SOCCER_DOUBLE_CHANCE"]
-
-// Resolves the first candidate that has all three markets posted, checked
-// in parallel.
-function useBoardMatchId(candidates: Match[] | null | undefined) {
-  const [resolvedId, setResolvedId] = useState<string | null | undefined>(undefined)
-
-  useEffect(() => {
-    if (!candidates || candidates.length === 0) return
-
-    let cancelled = false
-    Promise.all(
-      candidates.map((candidate) =>
-        Promise.all([
-          getMrDogeClient().odds.list({ matchId: candidate.id, betTypes: MATCH_RESULT_BET_TYPES }),
-          getMrDogeClient().odds.list({ matchId: candidate.id, betTypes: TOTAL_GOALS_BET_TYPES }),
-          getMrDogeClient().odds.list({ matchId: candidate.id, betTypes: DOUBLE_CHANCE_BET_TYPES }),
-        ])
-          .then(([matchResult, totalGoals, doubleChance]) =>
-            matchResult.length > 0 && totalGoals.length > 0 && doubleChance.length > 0 ? candidate.id : null
-          )
-          .catch(() => null)
-      )
-    ).then((results) => {
-      if (!cancelled) setResolvedId(results.find((id) => id !== null) ?? null)
-    })
-
-    return () => {
-      cancelled = true
-    }
-  }, [candidates])
-
-  if (candidates === undefined) return undefined
-  if (candidates === null || candidates.length === 0) return null
-  return resolvedId
-}
+import {
+  useSharedOddsMatchId,
+  MATCH_RESULT_BET_TYPES,
+  TOTAL_GOALS_BET_TYPES,
+  DOUBLE_CHANCE_BET_TYPES,
+} from "@/components/docs/demos/use-shared-demo-matches"
 
 export function OddsSelectorBoardDemo() {
-  const trending = useTrendingMatches({ sports: ["soccer"], status: ["live", "upcoming"], limit: 20 })
-  const candidates =
-    trending === null || trending === undefined
-      ? trending
-      : [...trending.filter((m) => m.status === "live"), ...trending.filter((m) => m.status !== "live")]
-  const matchId = useBoardMatchId(candidates)
-
+  const matchId = useSharedOddsMatchId()
   const match = useLiveMatch({ matchId: matchId ?? undefined })
 
   const matchResultMarkets = useLiveOdds({ matchId: matchId ?? undefined, betTypes: MATCH_RESULT_BET_TYPES })

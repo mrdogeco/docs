@@ -4,20 +4,15 @@
   "title": "useMatches",
   "description": "A plain list of matches, not limited to today's most-viewed ones. One-shot, not a subscription.",
   "dependencies": [
-    "@mrdoge/client",
+    "@mrdoge/react",
     "@mrdoge/node",
     "server-only"
   ],
   "files": [
     {
       "path": "registry/mrdoge-ui/use-matches/use-matches.ts",
-      "content": "\"use client\"\n\nimport { useEffect, useState } from \"react\"\nimport type { Match } from \"@mrdoge/protocol\"\nimport { getMrDogeClient } from \"@/registry/mrdoge-ui/mrdoge-client/mrdoge-client\"\n\nexport interface UseMatchesOptions {\n  /** Restrict to specific sports, e.g. [\"soccer\"]. Omit for all sports. */\n  sports?: string[]\n  /** Restrict to specific match statuses, e.g. [\"upcoming\"]. Omit for all statuses. */\n  status?: (\"upcoming\" | \"live\" | \"completed\")[]\n  /** Single day, YYYY-MM-DD. Mutually exclusive with startDate/endDate. */\n  date?: string\n  /** Start of a date range, YYYY-MM-DD, inclusive. */\n  startDate?: string\n  /** End of a date range, YYYY-MM-DD, inclusive. */\n  endDate?: string\n  /** Result count. Server default 20, capped at 100. */\n  limit?: number\n  /** IANA timezone for any timezone-dependent fields server-side. */\n  timezone?: string\n  /** Locale for any localized fields server-side. */\n  locale?: string\n}\n\n/**\n * A plain list of matches — see `matches.list`. Unlike useTrendingMatches,\n * not limited to today's most-viewed ones, so it still returns results\n * even when nothing matching your filters happens to be trending right\n * now. One-shot (not a subscription): call again / remount to refresh.\n *\n * undefined = loading, null = the request failed (no fallback — that's an\n * honest empty state, not a fictional one).\n */\nexport function useMatches({\n  sports,\n  status,\n  date,\n  startDate,\n  endDate,\n  limit,\n  timezone,\n  locale,\n}: UseMatchesOptions = {}) {\n  const [matches, setMatches] = useState<Match[] | null | undefined>(undefined)\n  const sportsKey = sports?.join(\",\")\n  const statusKey = status?.join(\",\")\n\n  useEffect(() => {\n    let cancelled = false\n\n    getMrDogeClient()\n      .matches.list({ sports, status, date, startDate, endDate, limit, timezone, locale })\n      .then((result) => {\n        if (!cancelled) setMatches(result.data)\n      })\n      .catch(() => {\n        if (!cancelled) setMatches(null)\n      })\n\n    return () => {\n      cancelled = true\n    }\n    // eslint-disable-next-line react-hooks/exhaustive-deps -- sportsKey/statusKey are the stable forms of sports/status\n  }, [sportsKey, statusKey, date, startDate, endDate, limit, timezone, locale])\n\n  return matches\n}\n",
+      "content": "// Re-exported from @mrdoge/react — fetched once per unique params, shared\n// by every component asking for the same ones; a later mount reads the\n// cache instead of refetching.\nexport { useMatches, type UseMatchesOptions } from \"@mrdoge/react\"\n",
       "type": "registry:hook"
-    },
-    {
-      "path": "registry/mrdoge-ui/mrdoge-client/mrdoge-client.ts",
-      "content": "import { MrDoge } from \"@mrdoge/client\"\n\nlet client: MrDoge | null = null\n\n/** Browser-only — the SDK authenticates via short-lived tokens minted at /api/mrdoge/token, never a raw API key. */\nexport function getMrDogeClient() {\n  if (typeof window === \"undefined\") {\n    throw new Error(\"getMrDogeClient() must be called in the browser\")\n  }\n  if (!client) {\n    client = new MrDoge({ authEndpoint: \"/api/mrdoge/token\" })\n  }\n  return client\n}\n",
-      "type": "registry:lib"
     },
     {
       "path": "registry/mrdoge-ui/mrdoge-token-route/route.ts",

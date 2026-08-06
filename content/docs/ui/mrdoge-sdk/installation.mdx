@@ -1,0 +1,87 @@
+---
+title: Installation
+description: Set up @mrdoge/react — the shared-cache hooks package every live example on this site is built on.
+---
+
+import { InstallTabs } from "@/components/docs/install-tabs"
+
+`@mrdoge/react` is a real npm package, not a copy-paste registry item like
+the components — React hooks for `@mrdoge/client`, backed by a shared
+cache so any number of components watching the same match/odds share one
+subscription and one copy of the data instead of each duplicating it.
+
+<Tabs items={["pnpm", "npm", "yarn", "bun"]}>
+  <Tab value="pnpm">
+    ```bash
+    pnpm add @mrdoge/react
+    ```
+  </Tab>
+  <Tab value="npm">
+    ```bash
+    npm install @mrdoge/react
+    ```
+  </Tab>
+  <Tab value="yarn">
+    ```bash
+    yarn add @mrdoge/react
+    ```
+  </Tab>
+  <Tab value="bun">
+    ```bash
+    bun add @mrdoge/react
+    ```
+  </Tab>
+</Tabs>
+
+## Token route
+
+The client authenticates via short-lived tokens minted by your own
+backend — never a raw API key. Add this route:
+
+<InstallTabs name="mrdoge-token-route" />
+
+Requires `MRDOGE_ODDS_API_KEY` (your `sk_live_...` key) as a server-only
+env var, never exposed to the browser.
+
+## Usage
+
+No Provider required — the client and its cache are both module-level,
+the same zero-setup shape as calling `@mrdoge/client` directly.
+
+```tsx
+import { useLiveMatch } from "@mrdoge/react"
+
+function Match({ matchId }: { matchId: string }) {
+  const match = useLiveMatch({ matchId })
+  // ...
+}
+```
+
+Mount `useLiveMatch({ matchId: "123" })` in ten different components and
+they share one `matches.subscribe()` call and one copy of the data — the
+first mount starts it, the last unmount cancels it. See
+[Hooks](/docs/ui/mrdoge-sdk/hooks/use-live-match) for the full list.
+
+## Custom config
+
+```ts
+import { configureMrDoge } from "@mrdoge/react"
+
+// Call once, before any hook runs — e.g. at the top of your app's entry file.
+configureMrDoge({ authEndpoint: "/api/mrdoge/token", locale: "pt-BR" })
+```
+
+Same options as `MrDogeOptions` in `@mrdoge/client`. Omit this entirely
+and it defaults to `authEndpoint: "/api/mrdoge/token"`.
+
+## Imperative access
+
+`getMrDogeClient()` returns the same configured singleton every hook uses
+internally — for one-off SDK calls with no matching hook (e.g.
+`matches.search()`):
+
+```ts
+import { getMrDogeClient } from "@mrdoge/react"
+
+const results = await getMrDogeClient().matches.search({ query: "Palmeiras" })
+```

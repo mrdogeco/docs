@@ -11,8 +11,8 @@ import { useMatch } from "@/registry/mrdoge-ui/use-match/use-match"
 import { useLiveOdds } from "@/registry/mrdoge-ui/use-live-odds/use-live-odds"
 import { useOddsMovement } from "@/registry/mrdoge-ui/use-odds-movement/use-odds-movement"
 import { useMatches } from "@/registry/mrdoge-ui/use-matches/use-matches"
+import { MATCH_RESULT_BET_TYPES } from "@/components/docs/demos/use-shared-demo-matches"
 
-const MATCH_RESULT_BET_TYPES = ["SOCCER_MATCH_RESULT", "SOCCER_MATCH_RESULT_PRELIVE"]
 const GAME_COUNT = 3
 
 // Resolves the first `count` distinct upcoming matches that have a Match

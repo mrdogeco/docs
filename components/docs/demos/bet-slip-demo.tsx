@@ -1,7 +1,6 @@
 "use client"
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react"
-import type { Match } from "@mrdoge/protocol"
+import { useLayoutEffect, useRef, useState } from "react"
 import { MatchCard } from "@/registry/mrdoge-ui/match-card/match-card"
 import { OddsSelector } from "@/registry/mrdoge-ui/odds-selector/odds-selector"
 import { OddsSelectorSkeleton, OddsLinesSkeleton } from "@/registry/mrdoge-ui/odds-selector/odds-selector-skeleton"
@@ -10,73 +9,18 @@ import { matchToMatchCardProps, toOddsOptions } from "@/lib/mrdoge-adapters/matc
 import { toOddsLines } from "@/lib/mrdoge-adapters/odds-lines"
 import { toBetSlipPick } from "@/lib/mrdoge-adapters/bet-slip"
 import { toConflictCandidates, getConflictingIds } from "@/lib/mrdoge-adapters/conflicts"
-import { getMrDogeClient } from "@/registry/mrdoge-ui/mrdoge-client/mrdoge-client"
 import { useMatch } from "@/registry/mrdoge-ui/use-match/use-match"
 import { useLiveOdds } from "@/registry/mrdoge-ui/use-live-odds/use-live-odds"
 import { useOddsMovement } from "@/registry/mrdoge-ui/use-odds-movement/use-odds-movement"
-import { useMatches } from "@/registry/mrdoge-ui/use-matches/use-matches"
-
-const MATCH_RESULT_BET_TYPES = ["SOCCER_MATCH_RESULT", "SOCCER_MATCH_RESULT_PRELIVE"]
-const DOUBLE_CHANCE_BET_TYPES = ["SOCCER_DOUBLE_CHANCE"]
-const TOTAL_GOALS_BET_TYPES = ["SOCCER_UNDER_OVER", "SOCCER_UNDER_OVER_PRELIVE"]
-
-// Resolves the upcoming candidate with both other markets posted and the
-// most Total Goals thresholds available, checked in parallel — prefers a
-// richer board over a fixed minimum, so this doesn't fall back to "no
-// match" on days when few matches have many thresholds posted yet.
-function useBetSlipMatchId(candidates: Match[] | null | undefined) {
-  const [resolvedId, setResolvedId] = useState<string | null | undefined>(undefined)
-
-  useEffect(() => {
-    if (!candidates || candidates.length === 0) return
-
-    let cancelled = false
-    Promise.all(
-      candidates.map((candidate) =>
-        Promise.all([
-          getMrDogeClient().odds.list({ matchId: candidate.id, betTypes: MATCH_RESULT_BET_TYPES }),
-          getMrDogeClient().odds.list({ matchId: candidate.id, betTypes: DOUBLE_CHANCE_BET_TYPES }),
-          getMrDogeClient().odds.list({ matchId: candidate.id, betTypes: TOTAL_GOALS_BET_TYPES }),
-        ])
-          .then(([matchResult, doubleChance, totalGoals]) =>
-            matchResult.length > 0 && doubleChance.length > 0 && totalGoals.length > 0
-              ? { id: candidate.id, lineCount: totalGoals.length }
-              : null
-          )
-          .catch(() => null)
-      )
-    ).then((results) => {
-      if (cancelled) return
-      const qualifying = results.filter((r): r is { id: string; lineCount: number } => r !== null)
-      const best = qualifying.length > 0 ? qualifying.reduce((a, b) => (b.lineCount > a.lineCount ? b : a)) : null
-      setResolvedId(best?.id ?? null)
-    })
-
-    return () => {
-      cancelled = true
-    }
-  }, [candidates])
-
-  if (candidates === undefined) return undefined
-  if (candidates === null || candidates.length === 0) return null
-  return resolvedId
-}
+import {
+  useSharedUpcomingMatchId,
+  MATCH_RESULT_BET_TYPES,
+  DOUBLE_CHANCE_BET_TYPES,
+  TOTAL_GOALS_BET_TYPES,
+} from "@/components/docs/demos/use-shared-demo-matches"
 
 export function BetSlipDemo() {
-  // Bounded to today/tomorrow — "upcoming" alone can include matches
-  // stuck on that status well past their real kickoff.
-  const today = new Date()
-  const tomorrow = new Date(today)
-  tomorrow.setDate(tomorrow.getDate() + 1)
-  const upcomingMatches = useMatches({
-    sports: ["soccer"],
-    status: ["upcoming"],
-    startDate: today.toISOString().slice(0, 10),
-    endDate: tomorrow.toISOString().slice(0, 10),
-    limit: 20,
-  })
-  const matchId = useBetSlipMatchId(upcomingMatches)
-
+  const matchId = useSharedUpcomingMatchId()
   const match = useMatch({ matchId: matchId ?? undefined })
 
   const matchResultMarkets = useLiveOdds({ matchId: matchId ?? undefined, betTypes: MATCH_RESULT_BET_TYPES })

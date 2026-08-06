@@ -4,20 +4,15 @@
   "title": "useLiveOdds",
   "description": "Subscribes to a single match's live odds over WebSocket (Business tier) — every matching market updates in place as odds change.",
   "dependencies": [
-    "@mrdoge/client",
+    "@mrdoge/react",
     "@mrdoge/node",
     "server-only"
   ],
   "files": [
     {
       "path": "registry/mrdoge-ui/use-live-odds/use-live-odds.ts",
-      "content": "\"use client\"\n\nimport { useEffect, useState } from \"react\"\nimport type { Market } from \"@mrdoge/protocol\"\nimport { getMrDogeClient } from \"@/registry/mrdoge-ui/mrdoge-client/mrdoge-client\"\n\nexport interface UseLiveOddsOptions {\n  /** The match to subscribe odds for. Pass undefined to skip subscribing. */\n  matchId: string | undefined\n  /**\n   * Restrict which markets come back. Omit to get every live market on the\n   * match.\n   *\n   * Some bet types post one market per line instead of one market total —\n   * e.g. `SOCCER_UNDER_OVER` posts a separate market for each Over/Under\n   * threshold (0.5, 1.5, 2.5, ...). This hook always returns every market\n   * that matched, so filtering to a single-market bet type (like\n   * `SOCCER_MATCH_RESULT`) is what makes indexing `[0]` safe.\n   *\n   * Some markets also use a different sysname before kickoff — e.g. the\n   * standard 1X2 line is `SOCCER_MATCH_RESULT_PRELIVE` up until the match\n   * goes live, then `SOCCER_MATCH_RESULT`. Filter on both if you want the\n   * market regardless of match state: `[\"SOCCER_MATCH_RESULT\",\n   * \"SOCCER_MATCH_RESULT_PRELIVE\"]`.\n   */\n  betTypes?: string[]\n}\n\n/**\n * undefined = loading, null = no live markets match this filter for this\n * match (Business tier only — no fallback, that's an honest empty state,\n * not a fictional one).\n */\nexport function useLiveOdds({ matchId, betTypes }: UseLiveOddsOptions) {\n  const [markets, setMarkets] = useState<Market[] | null | undefined>(undefined)\n  const betTypesKey = betTypes?.join(\",\")\n\n  useEffect(() => {\n    if (!matchId) {\n      setMarkets(undefined)\n      return\n    }\n\n    let cancelled = false\n    let subscription: { cancel: () => Promise<void> } | null = null\n\n    getMrDogeClient()\n      .odds.subscribe({ matchId, betTypes })\n      .then((sub) => {\n        if (cancelled) {\n          sub.cancel()\n          return\n        }\n        subscription = sub\n        setMarkets(sub.snapshot.length > 0 ? sub.snapshot : null)\n        sub.on(\"snapshot\", (next) => setMarkets(next.length > 0 ? next : null))\n        sub.on(\"odds.upd\", (next) => setMarkets(next.length > 0 ? next : null))\n      })\n      .catch(() => {\n        if (!cancelled) setMarkets(null)\n      })\n\n    return () => {\n      cancelled = true\n      subscription?.cancel()\n    }\n    // eslint-disable-next-line react-hooks/exhaustive-deps -- betTypesKey is the stable form of betTypes\n  }, [matchId, betTypesKey])\n\n  return markets\n}\n",
+      "content": "// Re-exported from @mrdoge/react — every component subscribing to the same\n// matchId + betTypes shares one underlying WS subscription and one copy of\n// the data.\nexport { useLiveOdds, type UseLiveOddsOptions } from \"@mrdoge/react\"\n",
       "type": "registry:hook"
-    },
-    {
-      "path": "registry/mrdoge-ui/mrdoge-client/mrdoge-client.ts",
-      "content": "import { MrDoge } from \"@mrdoge/client\"\n\nlet client: MrDoge | null = null\n\n/** Browser-only — the SDK authenticates via short-lived tokens minted at /api/mrdoge/token, never a raw API key. */\nexport function getMrDogeClient() {\n  if (typeof window === \"undefined\") {\n    throw new Error(\"getMrDogeClient() must be called in the browser\")\n  }\n  if (!client) {\n    client = new MrDoge({ authEndpoint: \"/api/mrdoge/token\" })\n  }\n  return client\n}\n",
-      "type": "registry:lib"
     },
     {
       "path": "registry/mrdoge-ui/mrdoge-token-route/route.ts",

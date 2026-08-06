@@ -1,5 +1,4 @@
 {
   "title": "Mr. Doge SDK",
-  "icon": "ArrowRightLeft",
-  "pages": ["usage", "hooks"]
+  "pages": ["usage", "installation", "hooks"]
 }

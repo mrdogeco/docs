@@ -4,20 +4,15 @@
   "title": "useMatch",
   "description": "One-shot fetch of a single match — no live updates, unlike useLiveMatch. Call again / remount to refresh.",
   "dependencies": [
-    "@mrdoge/client",
+    "@mrdoge/react",
     "@mrdoge/node",
     "server-only"
   ],
   "files": [
     {
       "path": "registry/mrdoge-ui/use-match/use-match.ts",
-      "content": "\"use client\"\n\nimport { useEffect, useState } from \"react\"\nimport type { MatchDetail } from \"@mrdoge/protocol\"\nimport { getMrDogeClient } from \"@/registry/mrdoge-ui/mrdoge-client/mrdoge-client\"\n\nexport interface UseMatchOptions {\n  /** The match to fetch. Pass undefined to skip fetching — e.g. while some other lookup is still resolving which match to show. */\n  matchId: string | undefined\n}\n\n/**\n * One-shot fetch of a single match — see `matches.get`. Unlike\n * `useLiveMatch`, this never updates after the initial fetch: call again\n * / remount to refresh. The right choice when live score/status updates\n * would be unwanted noise, e.g. a fixed upcoming match in a demo that\n * shouldn't visibly change state mid-read.\n *\n * undefined = loading (or no matchId yet), null = the request failed (no\n * fallback — that's an honest empty state, not a fictional one).\n */\nexport function useMatch({ matchId }: UseMatchOptions) {\n  const [match, setMatch] = useState<MatchDetail | null | undefined>(undefined)\n\n  useEffect(() => {\n    if (!matchId) {\n      setMatch(undefined)\n      return\n    }\n\n    let cancelled = false\n    getMrDogeClient()\n      // matches.get takes `id`, not `matchId` — unlike every other\n      // matches.* method. Real SDK quirk, not a typo.\n      .matches.get({ id: matchId })\n      .then((result) => {\n        if (!cancelled) setMatch(result)\n      })\n      .catch(() => {\n        if (!cancelled) setMatch(null)\n      })\n\n    return () => {\n      cancelled = true\n    }\n  }, [matchId])\n\n  return match\n}\n",
+      "content": "// Re-exported from @mrdoge/react — fetched once per matchId, shared by\n// every component asking for it; a later mount reads the cache instead of\n// refetching.\nexport { useMatch, type UseMatchOptions } from \"@mrdoge/react\"\n",
       "type": "registry:hook"
-    },
-    {
-      "path": "registry/mrdoge-ui/mrdoge-client/mrdoge-client.ts",
-      "content": "import { MrDoge } from \"@mrdoge/client\"\n\nlet client: MrDoge | null = null\n\n/** Browser-only — the SDK authenticates via short-lived tokens minted at /api/mrdoge/token, never a raw API key. */\nexport function getMrDogeClient() {\n  if (typeof window === \"undefined\") {\n    throw new Error(\"getMrDogeClient() must be called in the browser\")\n  }\n  if (!client) {\n    client = new MrDoge({ authEndpoint: \"/api/mrdoge/token\" })\n  }\n  return client\n}\n",
-      "type": "registry:lib"
     },
     {
       "path": "registry/mrdoge-ui/mrdoge-token-route/route.ts",

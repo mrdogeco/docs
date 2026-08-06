@@ -42,8 +42,9 @@ const movementById = useOddsMovement(market)
 
 `Record<string, "up" | "down" | "flat">` — keyed by line id. In
 practice only `"up"` and `"down"` are ever produced; `"flat"` exists on
-the type (`OddsMovement`, from Odds Selector) but this hook never emits
-it. A line only gets an entry once there's a previous price to compare
+the type (`OddsMovement`, from `@mrdoge/react`, structurally the same
+type Odds Selector's own `movement` prop takes) but this hook never
+emits it. A line only gets an entry once there's a previous price to compare
 against — the first snapshot ever seen for a given id has nothing to
 diff, and an unchanged price isn't given an entry either. A color that
 never goes away would just be noise; ids missing from the result should

@@ -17,6 +17,9 @@ importers:
       '@mrdoge/protocol':
         specifier: ^0.4.3
         version: 0.4.3
+      '@mrdoge/react':
+        specifier: ^0.1.4
+        version: 0.1.4(react@19.2.4)
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -752,6 +755,11 @@ packages:
 
   '@mrdoge/protocol@0.4.3':
     resolution: {integrity: sha512-7D1ORoXXOtmDPIH+7bIEODOKQMfF7tumKz5wgcBfVFm14EoG4AhgKK3h9EoiHXO/Hn/cMF5jRvfVA+lLImxbVg==}
+
+  '@mrdoge/react@0.1.4':
+    resolution: {integrity: sha512-TD4c3KX0+tLFuvvu+snfdfzgOA5jBpgaB4IrmHjAdgKFDmgWwC68Uaj//YVcaot8QsBmS3BOI7E9auTMZwkHSA==}
+    peerDependencies:
+      react: ^18.0.0 || ^19.0.0
 
   '@napi-rs/wasm-runtime@1.2.0':
     resolution: {integrity: sha512-kDoONqMa+VnZ4vvvu/ZUurpJ4gkZU57e7g69qpNgWhYcZFPUHZM2CEMKm+cG6ufDVALbjMvfmMjFVqaK7uEMnA==}
@@ -5769,6 +5777,12 @@ snapshots:
   '@mrdoge/protocol@0.4.3':
     dependencies:
       zod: 3.25.76
+
+  '@mrdoge/react@0.1.4(react@19.2.4)':
+    dependencies:
+      '@mrdoge/client': 0.4.3
+      '@mrdoge/protocol': 0.4.3
+      react: 19.2.4
 
   '@napi-rs/wasm-runtime@1.2.0(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)':
     dependencies:

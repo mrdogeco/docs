@@ -7,8 +7,8 @@ import Image from "next/image"
 import { InstallTabs } from "@/components/docs/install-tabs"
 
 <div className="not-prose mb-6 flex items-center justify-center">
-  <Image src="/assets/mrdoge-sdk-light.svg" alt="Mr. Doge SDK" width={340} height={70} className="dark:hidden" />
-  <Image src="/assets/mrdoge-sdk-dark.svg" alt="Mr. Doge SDK" width={340} height={70} className="hidden dark:block" />
+  <Image src="/assets/mrdoge-sdk-light-big.svg" alt="Mr. Doge SDK" width={340} height={47} className="dark:hidden w-[340px] h-[47px]" />
+  <Image src="/assets/mrdoge-sdk-dark-big.svg" alt="Mr. Doge SDK" width={340} height={47} className="hidden dark:block w-[340px] h-[47px]" />
 </div>
 
 Small, pure functions from a real `@mrdoge/protocol` response to a
@@ -18,6 +18,9 @@ compile instead of silently going stale. They live in
 ones used throughout every example on this site. Integrating a different
 data provider? Your own `lib/<provider>-adapters/` directory, following
 the same pattern, is the way — a new page here too, PRs welcome.
+
+See [Installation](/docs/ui/mrdoge-sdk/installation) for setting up
+`@mrdoge/react`, the hooks package that feeds these adapters real data.
 
 ## Match Card
 

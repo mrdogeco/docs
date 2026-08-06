@@ -26,9 +26,9 @@ export interface MatchCardCompactProps {
 export function MatchCardCompact({ home, away, label, info, className }: MatchCardCompactProps) {
   return (
     <div className={cn("flex items-center gap-2", className)}>
-      <div className="flex shrink-0 -space-x-1.5">
-        <EntityImage src={home.logoUrl} name={home.name} size="sm" className="ring-2 ring-card" />
-        <EntityImage src={away.logoUrl} name={away.name} size="sm" className="ring-2 ring-card" />
+      <div className="flex shrink-0">
+        <EntityImage src={home.logoUrl} name={home.name} size="sm"  />
+        <EntityImage src={away.logoUrl} name={away.name} size="sm" />
       </div>
       <span className="min-w-0 flex-1 truncate text-sm font-medium">{label ?? `${home.name} vs ${away.name}`}</span>
       {info ? <span className="shrink-0 text-xs tabular-nums text-muted-foreground">{info}</span> : null}

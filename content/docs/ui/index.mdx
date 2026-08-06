@@ -11,7 +11,10 @@ a shadcn/ui-compatible registry, not as an installable package. There is no
 dependency on any particular data provider — every component takes plain
 props. The [Mr. Doge SDK adapter](/docs/ui/mrdoge-sdk/usage) is
 the one exception — a real, opinionated integration for live data out of
-the box.
+the box. Every live example on this site runs on it:
+[`@mrdoge/client`](https://mrdoge.ai) for the SDK calls themselves, and
+[`@mrdoge/react`](/docs/ui/mrdoge-sdk/installation) for the hooks and
+shared cache wrapping it.
 
 ## Installation
 
@@ -69,13 +72,15 @@ source. [Adapters](/docs/ui/mrdoge-sdk/usage#match-card) map a real provider's
 response onto a component's props — small, pure, type-checked functions.
 Mr. Doge SDK's are the ones used throughout every example on this site,
 pairing directly with [`@mrdoge/client`](https://mrdoge.ai), and come with
-their own live-data hooks:
+their own live-data hooks, implemented by
+[`@mrdoge/react`](/docs/ui/mrdoge-sdk/installation):
 [`useLiveMatch`](/docs/ui/mrdoge-sdk/hooks/use-live-match) and
 [`useLiveOdds`](/docs/ui/mrdoge-sdk/hooks/use-live-odds) subscribe
 to a real match (and its odds) over WebSocket, so a component like Match
 Card can show live data with no glue code of your own.
 [`useTrendingMatches`](/docs/ui/mrdoge-sdk/hooks/use-trending-matches)
-resolves *which* match — today's most-viewed, ranked server-side. These
-pull in `@mrdoge/client` / `@mrdoge/node` directly and need a
-`MRDOGE_ODDS_API_KEY` — see each hook's own page for setup. Bringing a
+resolves *which* match — today's most-viewed, ranked server-side. Any
+number of components asking for the same match or odds share one
+subscription and one copy of the data — see
+[Installation](/docs/ui/mrdoge-sdk/installation) for setup. Bringing a
 different data provider? Open a PR with your own.
