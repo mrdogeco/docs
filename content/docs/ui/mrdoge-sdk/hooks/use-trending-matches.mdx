@@ -1,0 +1,67 @@
+---
+title: useTrendingMatches
+description: Today's most-viewed matches, ranked server-side by views. One-shot, not a subscription.
+---
+
+import { InstallTabs } from "@/components/docs/install-tabs"
+
+Wraps `matches.trending()` — today's matches with `views > 0`, ordered by
+views descending.
+
+## Installation
+
+<InstallTabs name="use-trending-matches" />
+
+Installing this pulls in three files: the hook itself, a browser SDK client
+singleton (`getMrDogeClient`), and a Next.js route at
+`app/api/mrdoge/token/route.ts` that mints short-lived tokens using
+`@mrdoge/node` and your own `MRDOGE_ODDS_API_KEY` — the browser client never
+sees the raw key.
+
+## Usage
+
+```tsx
+import { useTrendingMatches } from "@/hooks/use-trending-matches"
+
+const matches = useTrendingMatches({ sports: ["soccer"], limit: 5 })
+```
+
+Takes a single options object, like every real SDK method it wraps
+(`matches.trending(params)`) — not positional arguments. Only resolves
+*which* matches — pair it with
+[useLiveMatch](/docs/ui/mrdoge-sdk/hooks/use-live-match) or
+[useMatch](/docs/ui/mrdoge-sdk/hooks/use-match) to actually fetch one.
+
+## Parameters
+
+<TypeTable
+  type={{
+    sports: {
+      description: 'Restrict to specific sports, e.g. ["soccer"]. Omit for all sports.',
+      type: "string[]",
+    },
+    status: {
+      description: 'Restrict to specific match statuses, e.g. ["upcoming"]. Omit for all statuses.',
+      type: '("upcoming" | "live" | "completed")[]',
+    },
+    limit: {
+      description: "Result count. Server default 5, capped at 50.",
+      type: "number",
+    },
+    timezone: {
+      description: "IANA timezone for any timezone-dependent fields server-side.",
+      type: "string",
+    },
+    locale: {
+      description: "Locale for any localized fields server-side.",
+      type: "string",
+    },
+  }}
+/>
+
+## Returns
+
+`Match[] | null | undefined` — `undefined` while the request is in flight,
+`null` if it failed (no fallback data), otherwise the ranked list. One-shot:
+this doesn't push live updates the way `useLiveMatch`/`useLiveOdds` do —
+call it again (or remount) to refresh.

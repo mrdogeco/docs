@@ -90,7 +90,7 @@ their data loads.
 ## Use with the Mr. Doge SDK
 
 MatchCard takes plain props, so it works with any data source. See the
-[Match Card Adapter](/docs/ui/adapters/mrdoge-sdk#match-card) for the real function
+[Match Card Adapter](/docs/ui/mrdoge-sdk/usage#match-card) for the real function
 mapping a `matches.get()`/`odds.list()` response onto these props — the
 one behind both examples above.
 
@@ -107,7 +107,7 @@ Everything below applies when `loading` is omitted or `false`.
       type: "boolean",
     },
     status: {
-      description: <>See <a href="/docs/ui/components/live-indicator">Live Indicator</a>.</>,
+      description: "Drives the score/red-card visibility, the live score color, and the status column's label.",
       type: '"scheduled" | "live" | "paused" | "intermission" | "interrupted" | "finished"',
       required: true,
     },

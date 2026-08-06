@@ -118,7 +118,7 @@ function useClockLabel(status: MatchHighlightStatus, clock: MatchHighlightClock 
   // frozen on a stale in-progress reading (e.g. "125'" from extra time)
   // if the last push arrived right before the match ended. `status` is
   // authoritative here; the caller falls back to a plain "FT" instead.
-  // Same reasoning as Match Card's own toLiveIndicatorStatus.
+  // Same reasoning as Match Card's own toMatchCardStatus.
   if (!clock || status === "completed") return null
   if (canTick) {
     const driftSeconds = (now - new Date(clock.referenceTime!).getTime()) / 1000

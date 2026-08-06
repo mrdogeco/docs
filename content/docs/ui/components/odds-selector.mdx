@@ -20,7 +20,7 @@ Result, Double Chance, and Total Goals lines stacked together, each with
 its own selection state and live price movement. Match Result and Double
 Chance describe overlapping information about the same result, so
 picking either one live-disables the *entire* other panel, via the same
-[Conflict Adapter](/docs/ui/adapters/mrdoge-sdk#conflicts) used in
+[Conflict Adapter](/docs/ui/mrdoge-sdk/usage#conflicts) used in
 Multiple Lines below:
 
 <ExampleSection file="components/docs/demos/odds-selector-board-demo.tsx">
@@ -37,7 +37,7 @@ left, Under on the right. Unlike `options`, more than one line can be
 selected at once — compatible cross-threshold picks like Over 1.5 +
 Under 4.5 are both allowed, while genuinely incompatible ones like
 Under 1.5 + Over 4.5 are blocked via `disabledIds`, computed here from the
-[Conflict Adapter](/docs/ui/adapters/mrdoge-sdk#conflicts). `enableSliderView`
+[Conflict Adapter](/docs/ui/mrdoge-sdk/usage#conflicts). `enableSliderView`
 adds a header toggle to browse them one at a time via a slider instead,
 and `collapsible` adds a toggle to collapse the whole thing down to just
 its header:
@@ -53,7 +53,7 @@ its header:
 ## Use with the Mr. Doge SDK
 
 Odds Selector takes plain props, so it works with any data source. See
-the [Odds Selector Adapter](/docs/ui/adapters/mrdoge-sdk#odds-selector) for the real
+the [Odds Selector Adapter](/docs/ui/mrdoge-sdk/usage#odds-selector) for the real
 functions behind the examples above.
 
 ## Props
@@ -89,7 +89,7 @@ functions behind the examples above.
       type: "(id: string, selected: boolean) => void",
     },
     disabledIds: {
-      description: <>Ids that render as unavailable — e.g. because they're logically incompatible with the current selection. Applies to both options and lines. Computed externally (e.g. via the <a href="/docs/ui/adapters/mrdoge-sdk#conflicts">Conflict Adapter</a>) and passed in; Odds Selector never decides this itself. Unlike suspended, a disabled option still shows its real price — it's fully priced and available, just not currently combinable.</>,
+      description: <>Ids that render as unavailable — e.g. because they're logically incompatible with the current selection. Applies to both options and lines. Computed externally (e.g. via the <a href="/docs/ui/mrdoge-sdk/usage#conflicts">Conflict Adapter</a>) and passed in; Odds Selector never decides this itself. Unlike suspended, a disabled option still shows its real price — it's fully priced and available, just not currently combinable.</>,
       type: "string[]",
     },
     enableSliderView: {

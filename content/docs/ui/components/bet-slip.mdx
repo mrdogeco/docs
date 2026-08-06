@@ -41,7 +41,7 @@ real [Match Card](/docs/ui/components/match-card) with its own odds row:
 ## Use with the Mr. Doge SDK
 
 BetSlip takes plain props, so it works with any data source. See the
-[Bet Slip Adapter](/docs/ui/adapters/mrdoge-sdk#bet-slip) for the real
+[Bet Slip Adapter](/docs/ui/mrdoge-sdk/usage#bet-slip) for the real
 function building a `BetSlipPick` from a match, market, and selected line
 id — the one behind both examples above, including the `home`/`away`
 team crests shown per match group.
@@ -64,7 +64,7 @@ import { getConflictingPickIds } from "@/lib/mrdoge-adapters/conflicts"
 />
 ```
 
-See the [Conflict Adapter](/docs/ui/adapters/mrdoge-sdk#conflicts) for
+See the [Conflict Adapter](/docs/ui/mrdoge-sdk/usage#conflicts) for
 the full rule set.
 
 ## Props
@@ -105,7 +105,7 @@ the full rule set.
       type: "(id: string, value: string) => void",
     },
     conflictingPickIds: {
-      description: <>Ids from picks that conflict with another pick in the slip — computed externally (e.g. via the <a href="/docs/ui/adapters/mrdoge-sdk#conflicts">Conflict Adapter</a>) and rendered as a warning. See <a href="#conflicts">Conflicts</a> above.</>,
+      description: <>Ids from picks that conflict with another pick in the slip — computed externally (e.g. via the <a href="/docs/ui/mrdoge-sdk/usage#conflicts">Conflict Adapter</a>) and rendered as a warning. See <a href="#conflicts">Conflicts</a> above.</>,
       type: "string[]",
     },
     onSubmit: {
@@ -176,7 +176,7 @@ the full rule set.
       type: "{ name: string; logoUrl?: string }",
     },
     matchId: {
-      description: <>Groups picks from the same match together, and is required (with betType/code) for conflict-checking via the <a href="/docs/ui/adapters/mrdoge-sdk#conflicts">Conflict Adapter</a>. Picks without one each render in their own group.</>,
+      description: <>Groups picks from the same match together, and is required (with betType/code) for conflict-checking via the <a href="/docs/ui/mrdoge-sdk/usage#conflicts">Conflict Adapter</a>. Picks without one each render in their own group.</>,
       type: "string",
     },
     betType: {

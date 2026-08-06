@@ -8,11 +8,6 @@
     "match-highlight",
     "match-timeline",
     "stats-list",
-    "region-accordion",
-    "live-indicator",
-    "settlement-badge",
-    "team-form-indicator",
-    "sport-picker",
     "entity-image"
   ]
 }

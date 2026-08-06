@@ -3,16 +3,12 @@ title: Entity Image
 description: Team or region logo, unstyled — falls back to initials when the image is missing.
 ---
 
-import { EntityImage } from "@/registry/mrdoge-ui/entity-image/entity-image"
+import { EntityImageDemo } from "@/components/docs/demos/entity-image-demo"
 import { InstallTabs } from "@/components/docs/install-tabs"
 
-<ComponentPreview>
-  <div className="flex items-center gap-4">
-    <EntityImage name="Palmeiras" size="sm" />
-    <EntityImage name="Flamengo" />
-    <EntityImage name="Corinthians" size="lg" />
-  </div>
-</ComponentPreview>
+<ExampleSection file="components/docs/demos/entity-image-demo.tsx">
+  <EntityImageDemo />
+</ExampleSection>
 
 ## Installation
 
@@ -32,8 +28,7 @@ circle. Pass a `size` (`sm` / `default` / `lg`) or a `className` like
 `size-6` to control dimensions — `className` wins if both are set.
 
 When `src` is missing or fails to load, it falls back to a small
-muted-background circle with the entity's initials — shown above, since
-these demo entities have no real logo URL.
+muted-background circle with the entity's initials.
 
 ## Use with the Mr. Doge SDK
 

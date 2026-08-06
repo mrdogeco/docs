@@ -1,9 +1,15 @@
 ---
-title: Mr. Doge SDK
+title: Usage
 description: Adapters mapping real Mr. Doge SDK responses onto mrdoge-ui component props.
 ---
 
+import Image from "next/image"
 import { InstallTabs } from "@/components/docs/install-tabs"
+
+<div className="not-prose mb-6 flex items-center justify-center">
+  <Image src="/assets/mrdoge-sdk-light.svg" alt="Mr. Doge SDK" width={340} height={70} className="dark:hidden" />
+  <Image src="/assets/mrdoge-sdk-dark.svg" alt="Mr. Doge SDK" width={340} height={70} className="hidden dark:block" />
+</div>
 
 Small, pure functions from a real `@mrdoge/protocol` response to a
 component's plain props — type-checked, so a schema change fails to

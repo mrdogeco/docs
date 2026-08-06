@@ -1,8 +1,7 @@
-import type { Market, TeamForm, Region, Competition } from "@mrdoge/protocol"
+import type { Market } from "@mrdoge/protocol"
 import type { OddsOption } from "@/registry/mrdoge-ui/odds-selector/odds-selector"
 import type { MatchTimelineEntry } from "@/registry/mrdoge-ui/match-timeline/match-timeline"
 import type { BetSlipPick } from "@/registry/mrdoge-ui/bet-slip/bet-slip"
-import type { FormResult } from "@/registry/mrdoge-ui/team-form-indicator/team-form-indicator"
 
 // A specific, curated real match — not "whatever's live right now" — so the
 // live demo pages (see registry/mrdoge-ui/use-live-match/use-live-match.ts)
@@ -66,93 +65,3 @@ export const samplePicks: BetSlipPick[] = [
   { id: "1", eventLabel: "Palmeiras vs Flamengo", market: "Match Winner", selection: "Palmeiras", price: 1.85 },
   { id: "2", eventLabel: "Corinthians vs Santos", market: "Total Goals", selection: "Over 2.5", price: 2.1 },
 ]
-
-export const sampleForm: FormResult[] = ["L", "D", "W", "W", "W"]
-
-// The real API returns both summary.form and matches most-recent-first —
-// kept in that order here to match; teamFormToProps() reverses both for
-// display (see lib/mrdoge-adapters/team-form-indicator.ts).
-export const sampleTeamForm = {
-  team: { id: 1, name: "Palmeiras", sport: { id: 1, name: "Soccer" } },
-  summary: {
-    wins: 3,
-    draws: 1,
-    losses: 1,
-    goalsFor: 9,
-    goalsAgainst: 5,
-    sampleSize: 5,
-    form: ["W", "W", "W", "D", "L"],
-    streak: "W3",
-  },
-  matches: [
-    {
-      matchId: "form-match-5",
-      startedAt: "2026-07-30T21:00:00Z",
-      competition: { id: 1, name: "Brasileirão Série A", region: "Brazil" },
-      homeTeam: { id: 1, name: "Palmeiras" },
-      awayTeam: { id: 2, name: "Flamengo" },
-      opponent: { id: 2, name: "Flamengo" },
-      isHome: true,
-      score: { for: 2, against: 1, home: 2, away: 1 },
-      result: "win",
-    },
-    {
-      matchId: "form-match-4",
-      startedAt: "2026-07-22T21:00:00Z",
-      competition: { id: 1, name: "Brasileirão Série A", region: "Brazil" },
-      homeTeam: { id: 6, name: "Botafogo" },
-      awayTeam: { id: 1, name: "Palmeiras" },
-      opponent: { id: 6, name: "Botafogo" },
-      isHome: false,
-      score: { for: 2, against: 0, home: 0, away: 2 },
-      result: "win",
-    },
-    {
-      matchId: "form-match-3",
-      startedAt: "2026-07-15T21:00:00Z",
-      competition: { id: 1, name: "Brasileirão Série A", region: "Brazil" },
-      homeTeam: { id: 1, name: "Palmeiras" },
-      awayTeam: { id: 5, name: "Fluminense" },
-      opponent: { id: 5, name: "Fluminense" },
-      isHome: true,
-      score: { for: 3, against: 1, home: 3, away: 1 },
-      result: "win",
-    },
-    {
-      matchId: "form-match-2",
-      startedAt: "2026-07-08T21:00:00Z",
-      competition: { id: 1, name: "Brasileirão Série A", region: "Brazil" },
-      homeTeam: { id: 4, name: "Grêmio" },
-      awayTeam: { id: 1, name: "Palmeiras" },
-      opponent: { id: 4, name: "Grêmio" },
-      isHome: false,
-      score: { for: 1, against: 1, home: 1, away: 1 },
-      result: "draw",
-    },
-    {
-      matchId: "form-match-1",
-      startedAt: "2026-07-01T21:00:00Z",
-      competition: { id: 1, name: "Brasileirão Série A", region: "Brazil" },
-      homeTeam: { id: 1, name: "Palmeiras" },
-      awayTeam: { id: 3, name: "São Paulo" },
-      opponent: { id: 3, name: "São Paulo" },
-      isHome: true,
-      score: { for: 1, against: 2, home: 1, away: 2 },
-      result: "loss",
-    },
-  ],
-} satisfies TeamForm
-
-export const sampleRegions = [
-  { id: 1, name: "Brazil", eventCount: 12 },
-  { id: 2, name: "England", eventCount: 8 },
-  { id: 3, name: "Spain", eventCount: 5 },
-] satisfies Region[]
-
-export const sampleCompetitions = [
-  { id: 1, name: "Brasileirão Série A", regionId: 1, eventCount: 8 },
-  { id: 2, name: "Brasileirão Série B", regionId: 1, eventCount: 4 },
-  { id: 3, name: "Premier League", regionId: 2, eventCount: 6 },
-  { id: 4, name: "Championship", regionId: 2, eventCount: 2 },
-  { id: 5, name: "La Liga", regionId: 3, eventCount: 5 },
-] satisfies Competition[]

@@ -7,15 +7,12 @@ import { Check, Copy } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { BetSlip } from "@/registry/mrdoge-ui/bet-slip/bet-slip"
 import { MatchCard } from "@/registry/mrdoge-ui/match-card/match-card"
-import { LiveIndicator } from "@/registry/mrdoge-ui/live-indicator/live-indicator"
 import { MatchTimeline } from "@/registry/mrdoge-ui/match-timeline/match-timeline"
 import { OddsSelector } from "@/registry/mrdoge-ui/odds-selector/odds-selector"
-import { TeamFormIndicator } from "@/registry/mrdoge-ui/team-form-indicator/team-form-indicator"
 import {
   sampleOdds,
   sampleTimeline,
   samplePicks,
-  sampleForm,
 } from "@/components/docs/sample-data"
 
 const REGISTRY_URL = "https://mrdoge.co"
@@ -146,31 +143,11 @@ export function HomeGallery() {
         </ShowcaseItem>
 
         <ShowcaseItem
-          name="live-indicator"
-          title="Live Indicator"
-          description="Status pill: scheduled, live, or finished."
-        >
-          <div className="flex flex-wrap items-center gap-3">
-            <LiveIndicator status="scheduled" kickoff={new Date()} />
-            <LiveIndicator status="live" elapsed="63'" />
-            <LiveIndicator status="finished" />
-          </div>
-        </ShowcaseItem>
-
-        <ShowcaseItem
           name="match-timeline"
           title="Match Timeline"
           description="Chronological feed of match events."
         >
           <MatchTimeline entries={sampleTimeline} className="w-full max-w-sm" />
-        </ShowcaseItem>
-
-        <ShowcaseItem
-          name="team-form-indicator"
-          title="Team Form Indicator"
-          description="Recent match results for a team."
-        >
-          <TeamFormIndicator results={sampleForm} />
         </ShowcaseItem>
       </div>
     </div>

@@ -1,6 +1,9 @@
 import type { MatchDetail, Market } from "@mrdoge/protocol"
-import type { MatchCardDataProps, MatchCardOdds } from "@/registry/mrdoge-ui/match-card/match-card"
-import type { LiveIndicatorStatus } from "@/registry/mrdoge-ui/live-indicator/live-indicator"
+import type {
+  MatchCardDataProps,
+  MatchCardOdds,
+  MatchCardStatus,
+} from "@/registry/mrdoge-ui/match-card/match-card"
 import type { OddsOption, OddsMovement } from "@/registry/mrdoge-ui/odds-selector/odds-selector"
 
 // match.status (upcoming/live/completed) is the authoritative field, always
@@ -9,7 +12,7 @@ import type { OddsOption, OddsMovement } from "@/registry/mrdoge-ui/odds-selecto
 // once a match ends — e.g. frozen on "live" at "90+5'" instead of ever
 // transitioning to "finished". So match.status decides the coarse bucket
 // first; clock.state only refines *within* "live".
-function toLiveIndicatorStatus(match: MatchDetail): LiveIndicatorStatus {
+function toMatchCardStatus(match: MatchDetail): MatchCardStatus {
   if (match.status === "upcoming") return "scheduled"
   if (match.status === "completed") return "finished"
   return match.stats?.clock?.state ?? "live"
@@ -95,12 +98,12 @@ export function matchToMatchCardProps(
   const stats = match.stats?.sport === "soccer" ? match.stats : undefined
 
   return {
-    status: toLiveIndicatorStatus(match),
+    status: toMatchCardStatus(match),
     kickoff: match.startTime,
     // Only meaningful while the match is actually in progress — once
     // completed, the clock display is a frozen artifact (e.g. "90+5'"),
-    // not a real "FT" transition, so drop it and let LiveIndicator show
-    // its own "FT" label instead.
+    // not a real "FT" transition, so drop it and let Match Card show its
+    // own "FT" label instead.
     elapsed: match.status === "live" ? (match.stats?.clock?.display ?? undefined) : undefined,
     home: {
       name: match.homeTeam.name,

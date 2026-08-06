@@ -1,0 +1,53 @@
+---
+title: useLiveOdds
+description: Subscribes to a single match's live odds over WebSocket (Business tier) — every matching market updates in place as odds change.
+---
+
+import { InstallTabs } from "@/components/docs/install-tabs"
+
+Wraps `odds.subscribe()`. Business tier only — on a lower tier the
+subscribe call rejects and this resolves to `null`, with no fallback.
+Pairs with [useLiveMatch](/docs/ui/mrdoge-sdk/hooks/use-live-match), which
+subscribes to the match itself.
+
+## Installation
+
+<InstallTabs name="use-live-odds" />
+
+Same three supporting files as [useLiveMatch](/docs/ui/mrdoge-sdk/hooks/use-live-match)
+(the SDK client singleton and the token route) — if you've already installed
+that hook, you likely have them.
+
+## Usage
+
+```tsx
+import { useLiveOdds } from "@/hooks/use-live-odds"
+
+const markets = useLiveOdds({ matchId, betTypes: ["SOCCER_MATCH_RESULT"] })
+```
+
+Takes a single options object, like every real SDK method it wraps
+(`odds.subscribe(params)`) — not positional arguments.
+
+## Parameters
+
+<TypeTable
+  type={{
+    matchId: {
+      description: "The match to subscribe odds for. Pass undefined to skip subscribing (e.g. while the match itself is still loading).",
+      type: "string | undefined",
+      required: true,
+    },
+    betTypes: {
+      description: 'Restrict which markets come back. Omit to get every live market on the match. Some bet types post one market per line instead of one market total — filtering to a single-market bet type (like "SOCCER_MATCH_RESULT") is what makes indexing markets?.[0] safe. Some bet types also split by sysname across match state, e.g. ["SOCCER_MATCH_RESULT", "SOCCER_MATCH_RESULT_PRELIVE"] for the standard 1X2 line regardless of live/not-live.',
+      type: "string[]",
+    },
+  }}
+/>
+
+## Returns
+
+`Market[] | null | undefined` — `undefined` while loading or when `matchId`
+is `undefined`, `null` once loaded if no markets matched (wrong tier, or
+none live right now), otherwise every matching market, updated in place as
+`odds.upd` events arrive.

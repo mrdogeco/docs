@@ -3,49 +3,40 @@ title: useMatches
 description: A plain list of matches, not limited to today's most-viewed ones. One-shot, not a subscription.
 ---
 
-import { BetSlipDemo } from "@/components/docs/demos/bet-slip-demo"
 import { InstallTabs } from "@/components/docs/install-tabs"
 
-This is the resolver behind [Bet Slip](/docs/ui/components/bet-slip)'s
-default example. `useTrendingMatches` only covers today's most-viewed
-matches — a real but narrow slice, and one that's sometimes empty (e.g.
-nothing upcoming happens to be trending right now). `useMatches` wraps
-the plain `matches.list()` listing instead, so a demo like this one that
-just needs *some* real upcoming match keeps working regardless:
-
-<ExampleSection file="components/docs/demos/bet-slip-demo.tsx">
-  <BetSlipDemo />
-</ExampleSection>
+Wraps `matches.list()`. Unlike
+[useTrendingMatches](/docs/ui/mrdoge-sdk/hooks/use-trending-matches), not
+limited to today's most-viewed matches, so it still returns results even
+when nothing matching your filters happens to be trending right now.
 
 ## Installation
 
 <InstallTabs name="use-matches" />
+
+Installing this pulls in three files: the hook itself, a browser SDK client
+singleton (`getMrDogeClient`), and a Next.js route at
+`app/api/mrdoge/token/route.ts` that mints short-lived tokens using
+`@mrdoge/node` and your own `MRDOGE_ODDS_API_KEY` — the browser client never
+sees the raw key.
 
 ## Usage
 
 ```tsx
 import { useMatches } from "@/hooks/use-matches"
 
-function UpcomingMatches() {
-  const today = new Date().toISOString().slice(0, 10)
-  const matches = useMatches({ sports: ["soccer"], status: ["upcoming"], startDate: today, limit: 20 })
-
-  if (matches === undefined) return <p>Loading…</p>
-  if (matches === null) return <p>Couldn't load matches.</p>
-
-  return matches.map((m) => <p key={m.id}>{m.homeTeam.name} vs {m.awayTeam.name}</p>)
-}
+const matches = useMatches({ sports: ["soccer"], status: ["upcoming"], limit: 20 })
 ```
 
 Takes a single options object, like every real SDK method it wraps
-(`matches.list(params)`) — not positional arguments.
+(`matches.list(params)`) — not positional arguments. Only resolves *which*
+matches — pair it with [useMatch](/docs/ui/mrdoge-sdk/hooks/use-match) to
+actually fetch one.
 
 <Callout title="status alone isn't enough">
   A match stuck on `"upcoming"` past its real kickoff (delayed, postponed,
   never updated) still matches that filter alone — pass `startDate` (and
-  `endDate` for a range) to rule those out. See
-  [Bet Slip](/docs/ui/components/bet-slip)'s default example for a real
-  today/tomorrow range.
+  `endDate` for a range) to rule those out.
 </Callout>
 
 ## Parameters
@@ -93,14 +84,3 @@ Takes a single options object, like every real SDK method it wraps
 `null` if it failed (no fallback data), otherwise the list. One-shot: this
 doesn't push live updates the way `useLiveMatch`/`useLiveOdds` do — call it
 again (or remount) to refresh.
-
-## Composing with useMatch
-
-`useMatches` only resolves *which* matches — pair it with
-[useMatch](/docs/ui/hooks/use-match) to actually fetch one:
-
-```tsx
-const matches = useMatches({ sports: ["soccer"], status: ["upcoming"], limit: 1 })
-const matchId = matches?.[0]?.id
-const match = useMatch({ matchId })
-```

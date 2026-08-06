@@ -3,16 +3,11 @@ title: useOddsMovement
 description: Diffs each line's price against its previous snapshot, so an Odds Selector can color a price green or red as live odds change.
 ---
 
-import { MatchCardLiveWithOddsDemo } from "@/components/docs/demos/match-card-live-with-odds-demo"
 import { InstallTabs } from "@/components/docs/install-tabs"
-
-<ExampleSection file="components/docs/demos/match-card-live-with-odds-demo.tsx">
-  <MatchCardLiveWithOddsDemo />
-</ExampleSection>
 
 Movement isn't something the SDK computes or sends — `odds.subscribe`
 pushes a full replace-in-place snapshot on every change (see
-[useLiveOdds](/docs/ui/hooks/use-live-odds)), with no "this went up" flag
+[useLiveOdds](/docs/ui/mrdoge-sdk/hooks/use-live-odds)), with no "this went up" flag
 attached. This hook remembers the previous snapshot's prices itself and
 diffs against the new one, entirely client-side.
 
@@ -20,40 +15,16 @@ diffs against the new one, entirely client-side.
 
 <InstallTabs name="use-odds-movement" />
 
-Pairs with [useLiveOdds](/docs/ui/hooks/use-live-odds) — pass it the same
+Pairs with [useLiveOdds](/docs/ui/mrdoge-sdk/hooks/use-live-odds) — pass it the same
 market. No extra SDK setup beyond what useLiveOdds already needs.
 
 ## Usage
 
 ```tsx
-import { useLiveOdds } from "@/hooks/use-live-odds"
 import { useOddsMovement } from "@/hooks/use-odds-movement"
-import { OddsSelector } from "@/components/odds-selector"
 
-function Market({ matchId }: { matchId: string }) {
-  const markets = useLiveOdds({ matchId, betTypes: ["SOCCER_MATCH_RESULT"] })
-  const market = markets?.[0]
-  const movementById = useOddsMovement(market)
-
-  if (!market) return null
-
-  return (
-    <OddsSelector
-      options={market.lines.map((line) => ({
-        id: line.id,
-        label: line.code,
-        price: line.price.toFixed(2),
-        suspended: !line.isAvailable,
-        movement: movementById[line.id],
-      }))}
-    />
-  )
-}
+const movementById = useOddsMovement(market)
 ```
-
-This is exactly what [Match Card](/docs/ui/components/match-card)'s own
-SDK adapter does — `matchToMatchCardProps(match, market, movementById)`
-takes the result as an optional third argument.
 
 ## Parameters
 

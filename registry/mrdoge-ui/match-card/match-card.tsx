@@ -3,13 +3,17 @@
 import { cn } from "@/lib/utils"
 import { EntityImage } from "@/registry/mrdoge-ui/entity-image/entity-image"
 import {
-  LiveIndicator,
-  type LiveIndicatorStatus,
-} from "@/registry/mrdoge-ui/live-indicator/live-indicator"
-import {
   OddsSelector,
   type OddsOption,
 } from "@/registry/mrdoge-ui/odds-selector/odds-selector"
+
+export type MatchCardStatus =
+  | "scheduled"
+  | "live"
+  | "paused"
+  | "intermission"
+  | "interrupted"
+  | "finished"
 
 export interface MatchCardTeam {
   name: string
@@ -26,7 +30,7 @@ export interface MatchCardOdds {
 
 export interface MatchCardDataProps {
   loading?: false
-  status: LiveIndicatorStatus
+  status: MatchCardStatus
   kickoff?: Date | string
   elapsed?: string
   /**
@@ -77,6 +81,63 @@ interface MatchCardLoadingProps {
 }
 
 export type MatchCardProps = MatchCardDataProps | MatchCardLoadingProps
+
+function formatKickoff(kickoff: Date | string, timeFormat: "12h" | "24h") {
+  const date = typeof kickoff === "string" ? new Date(kickoff) : kickoff
+  return date.toLocaleTimeString(undefined, {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: timeFormat === "12h",
+  })
+}
+
+const stoppedPlayLabel: Record<"paused" | "intermission" | "interrupted", string> = {
+  paused: "Paused",
+  intermission: "Intermission",
+  interrupted: "Interrupted",
+}
+
+function StatusColumn({
+  status,
+  kickoff,
+  elapsed,
+  timeFormat,
+}: {
+  status: MatchCardStatus
+  kickoff?: Date | string
+  elapsed?: string
+  timeFormat: "12h" | "24h"
+}) {
+  if (status === "live") {
+    return (
+      <span className="text-xs font-bold leading-tight text-destructive tabular-nums">
+        {elapsed ?? "LIVE"}
+      </span>
+    )
+  }
+
+  if (status === "paused" || status === "intermission" || status === "interrupted") {
+    return (
+      <span className="text-xs font-bold leading-tight text-amber-600 tabular-nums dark:text-amber-400">
+        {elapsed ?? stoppedPlayLabel[status]}
+      </span>
+    )
+  }
+
+  if (status === "finished") {
+    return (
+      <span className="text-xs font-bold leading-tight text-muted-foreground tabular-nums">
+        {elapsed ?? "FT"}
+      </span>
+    )
+  }
+
+  return (
+    <span className="text-xs font-medium leading-tight text-muted-foreground tabular-nums">
+      {kickoff ? formatKickoff(kickoff, timeFormat) : "—"}
+    </span>
+  )
+}
 
 function RedCardIndicator({ count }: { count: number }) {
   return (
@@ -279,13 +340,7 @@ export function MatchCard(props: MatchCardProps) {
       <div className={cn(wantsRow && "@lg:flex @lg:items-stretch")}>
         <div className={cn("flex flex-1 gap-3 px-3 py-3", wantsRow && "@lg:min-w-0")}>
           <div className="flex w-11 shrink-0 items-center justify-center border-r pr-3 text-center">
-            <LiveIndicator
-              variant="plain"
-              status={status}
-              kickoff={kickoff}
-              elapsed={elapsed}
-              timeFormat={timeFormat}
-            />
+            <StatusColumn status={status} kickoff={kickoff} elapsed={elapsed} timeFormat={timeFormat} />
           </div>
           <div className="flex min-w-0 flex-1 flex-col justify-center gap-2">
             <TeamRow
