@@ -15,8 +15,8 @@ const LINK_GROUPS = [
   {
     group: "Legal",
     items: [
-      { title: "Terms", href: "https://mrdoge.ai/terms" },
-      { title: "Privacy", href: "https://mrdoge.ai/privacy" },
+      { title: "Terms", href: "https://mrdoge.co/terms" },
+      { title: "Privacy", href: "https://mrdoge.co/privacy" },
     ],
   },
 ]

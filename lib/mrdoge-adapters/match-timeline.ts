@@ -25,9 +25,8 @@ function toTimeLabel(event: TimelineEvent): string | undefined {
 // Half" at 100+ real minutes elapsed. clock.elapsedSeconds is the one
 // field that's actually continuous, so it drives the 1st/2nd half split
 // below (generous buffer either side of 45 for stoppage). Extra
-// time/penalties aren't guessed from it — real observed sysnames per
-// mrdoge-odds-api's data/phases.csv: SOCCER_MATCH_EXTRA_FIRST_HALF,
-// SOCCER_MATCH_EXTRA_SECOND_HALF, SOCCER_MATCH_PENALTIES.
+// time/penalties aren't guessed from it — mapped by real sysname below
+// instead.
 const SOCCER_PHASE_LABEL: Record<string, string> = {
   SOCCER_MATCH_FIRST_HALF: "1st Half",
   SOCCER_MATCH_SECOND_HALF: "2nd Half",
