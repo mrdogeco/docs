@@ -8,14 +8,14 @@ const MRDOGE_SDK_LOGO = (
       alt="Mr. Doge SDK"
       width={200}
       height={50}
-      className="dark:hidden w-30 h-5"
+      className="dark:hidden w-30 h-5 -ml-0.5 scale-[0.94]"
     />
     <Image
       src="/assets/mrdoge-sdk-dark.svg"
       alt="Mr. Doge SDK"
       width={200}
       height={50}
-      className="hidden dark:block w-30 h-5"
+      className="hidden dark:block w-30 h-5 -ml-0.5 scale-[0.94]"
     />
   </>
 )
