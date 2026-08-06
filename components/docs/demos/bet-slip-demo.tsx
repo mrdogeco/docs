@@ -10,7 +10,7 @@ import { toOddsLines } from "@/lib/mrdoge-adapters/odds-lines"
 import { toBetSlipPick } from "@/lib/mrdoge-adapters/bet-slip"
 import { toConflictCandidates, getConflictingIds } from "@/lib/mrdoge-adapters/conflicts"
 import { useMatch } from "@/registry/mrdoge-ui/use-match/use-match"
-import { useLiveOdds } from "@/registry/mrdoge-ui/use-live-odds/use-live-odds"
+import { useOdds } from "@/registry/mrdoge-ui/use-odds/use-odds"
 import { useOddsMovement } from "@/registry/mrdoge-ui/use-odds-movement/use-odds-movement"
 import {
   useSharedUpcomingMatchId,
@@ -23,17 +23,17 @@ export function BetSlipDemo() {
   const matchId = useSharedUpcomingMatchId()
   const match = useMatch({ matchId: matchId ?? undefined })
 
-  const matchResultMarkets = useLiveOdds({ matchId: matchId ?? undefined, betTypes: MATCH_RESULT_BET_TYPES })
+  const matchResultMarkets = useOdds({ matchId: matchId ?? undefined, betTypes: MATCH_RESULT_BET_TYPES })
   const matchResult = matchResultMarkets?.[0]
   const matchResultMovement = useOddsMovement(matchResult)
   const [matchResultSelectedId, setMatchResultSelectedId] = useState<string | undefined>()
 
-  const doubleChanceMarkets = useLiveOdds({ matchId: matchId ?? undefined, betTypes: DOUBLE_CHANCE_BET_TYPES })
+  const doubleChanceMarkets = useOdds({ matchId: matchId ?? undefined, betTypes: DOUBLE_CHANCE_BET_TYPES })
   const doubleChance = doubleChanceMarkets?.[0]
   const doubleChanceMovement = useOddsMovement(doubleChance)
   const [doubleChanceSelectedId, setDoubleChanceSelectedId] = useState<string | undefined>()
 
-  const totalGoalsMarkets = useLiveOdds({ matchId: matchId ?? undefined, betTypes: TOTAL_GOALS_BET_TYPES })
+  const totalGoalsMarkets = useOdds({ matchId: matchId ?? undefined, betTypes: TOTAL_GOALS_BET_TYPES })
   const totalGoalsLines = totalGoalsMarkets ? toOddsLines(totalGoalsMarkets) : undefined
   const [totalGoalsSelectedIds, setTotalGoalsSelectedIds] = useState<string[]>([])
 

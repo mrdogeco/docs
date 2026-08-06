@@ -76,7 +76,7 @@ function teamLogoUrl(teamId: number) {
  * all also has `market === undefined`, and this function can't tell the
  * difference. Pass `oddsLoading` as a sibling prop at the call site
  * instead, e.g. `oddsLoading={market === undefined}`, only when you're
- * actually using useLiveOdds.
+ * actually using useOdds.
  *
  * `movementById` is optional — pass `useOddsMovement(market)`'s result to
  * color options as odds change; omit it and options render without any

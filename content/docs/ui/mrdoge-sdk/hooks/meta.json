@@ -1,4 +1,4 @@
 {
   "title": "Hooks",
-  "pages": ["use-live-match", "use-match", "use-live-odds", "use-trending-matches", "use-matches"]
+  "pages": ["use-match", "use-matches", "use-live-match", "use-live-matches", "use-trending-matches", "use-odds", "use-regions"]
 }

@@ -8,13 +8,13 @@ import { matchToMatchCardProps } from "@/lib/mrdoge-adapters/match-card"
 import { toOddsLines } from "@/lib/mrdoge-adapters/odds-lines"
 import { toConflictCandidates, getConflictingIds } from "@/lib/mrdoge-adapters/conflicts"
 import { useLiveMatch } from "@/registry/mrdoge-ui/use-live-match/use-live-match"
-import { useLiveOdds } from "@/registry/mrdoge-ui/use-live-odds/use-live-odds"
+import { useOdds } from "@/registry/mrdoge-ui/use-odds/use-odds"
 import { useSharedOddsMatchId, TOTAL_GOALS_BET_TYPES } from "@/components/docs/demos/use-shared-demo-matches"
 
 export function OddsSelectorLinesDemo() {
   const matchId = useSharedOddsMatchId()
   const match = useLiveMatch({ matchId: matchId ?? undefined })
-  const markets = useLiveOdds({ matchId: matchId ?? undefined, betTypes: TOTAL_GOALS_BET_TYPES })
+  const markets = useOdds({ matchId: matchId ?? undefined, betTypes: TOTAL_GOALS_BET_TYPES })
   const [selectedLineIds, setSelectedLineIds] = useState<string[]>([])
 
   if (matchId === null || match === null || markets === null) {

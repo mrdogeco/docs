@@ -8,7 +8,7 @@ import { matchToMatchCardProps, toOddsOptions } from "@/lib/mrdoge-adapters/matc
 import { pickMostBalancedMarket } from "@/lib/mrdoge-adapters/odds-lines"
 import { toConflictCandidates, getConflictingIds } from "@/lib/mrdoge-adapters/conflicts"
 import { useLiveMatch } from "@/registry/mrdoge-ui/use-live-match/use-live-match"
-import { useLiveOdds } from "@/registry/mrdoge-ui/use-live-odds/use-live-odds"
+import { useOdds } from "@/registry/mrdoge-ui/use-odds/use-odds"
 import { useOddsMovement } from "@/registry/mrdoge-ui/use-odds-movement/use-odds-movement"
 import {
   useSharedOddsMatchId,
@@ -21,17 +21,17 @@ export function OddsSelectorBoardDemo() {
   const matchId = useSharedOddsMatchId()
   const match = useLiveMatch({ matchId: matchId ?? undefined })
 
-  const matchResultMarkets = useLiveOdds({ matchId: matchId ?? undefined, betTypes: MATCH_RESULT_BET_TYPES })
+  const matchResultMarkets = useOdds({ matchId: matchId ?? undefined, betTypes: MATCH_RESULT_BET_TYPES })
   const matchResult = matchResultMarkets?.[0]
   const matchResultMovement = useOddsMovement(matchResult)
   const [matchResultSelectedId, setMatchResultSelectedId] = useState<string | undefined>()
 
-  const totalGoalsMarkets = useLiveOdds({ matchId: matchId ?? undefined, betTypes: TOTAL_GOALS_BET_TYPES })
+  const totalGoalsMarkets = useOdds({ matchId: matchId ?? undefined, betTypes: TOTAL_GOALS_BET_TYPES })
   const totalGoals = totalGoalsMarkets ? pickMostBalancedMarket(totalGoalsMarkets) : undefined
   const totalGoalsMovement = useOddsMovement(totalGoals)
   const [totalGoalsSelectedId, setTotalGoalsSelectedId] = useState<string | undefined>()
 
-  const doubleChanceMarkets = useLiveOdds({ matchId: matchId ?? undefined, betTypes: DOUBLE_CHANCE_BET_TYPES })
+  const doubleChanceMarkets = useOdds({ matchId: matchId ?? undefined, betTypes: DOUBLE_CHANCE_BET_TYPES })
   const doubleChance = doubleChanceMarkets?.[0]
   const doubleChanceMovement = useOddsMovement(doubleChance)
   const [doubleChanceSelectedId, setDoubleChanceSelectedId] = useState<string | undefined>()

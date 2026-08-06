@@ -301,17 +301,17 @@
       ]
     },
     {
-      "name": "use-live-odds",
+      "name": "use-odds",
       "type": "registry:hook",
-      "title": "useLiveOdds",
-      "description": "Subscribes to a single match's live odds over WebSocket (Business tier) — every matching market updates in place as odds change.",
+      "title": "useOdds",
+      "description": "Subscribes to a single match's odds over WebSocket (Business tier) — pre-live or in-play, every matching market updates in place as odds change.",
       "dependencies": ["@mrdoge/react", "@mrdoge/node", "server-only"],
       "envVars": {
         "MRDOGE_ODDS_API_KEY": ""
       },
       "files": [
         {
-          "path": "registry/mrdoge-ui/use-live-odds/use-live-odds.ts",
+          "path": "registry/mrdoge-ui/use-odds/use-odds.ts",
           "type": "registry:hook"
         },
         {
@@ -367,6 +367,48 @@
       "files": [
         {
           "path": "registry/mrdoge-ui/use-matches/use-matches.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/mrdoge-ui/mrdoge-token-route/route.ts",
+          "type": "registry:page",
+          "target": "app/api/mrdoge/token/route.ts"
+        }
+      ]
+    },
+    {
+      "name": "use-regions",
+      "type": "registry:hook",
+      "title": "useRegions",
+      "description": "Every region, with event/competition counts when filtered. One-shot, not a subscription.",
+      "dependencies": ["@mrdoge/react", "@mrdoge/node", "server-only"],
+      "envVars": {
+        "MRDOGE_ODDS_API_KEY": ""
+      },
+      "files": [
+        {
+          "path": "registry/mrdoge-ui/use-regions/use-regions.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/mrdoge-ui/mrdoge-token-route/route.ts",
+          "type": "registry:page",
+          "target": "app/api/mrdoge/token/route.ts"
+        }
+      ]
+    },
+    {
+      "name": "use-live-matches",
+      "type": "registry:hook",
+      "title": "useLiveMatches",
+      "description": "Subscribes to matches over WebSocket, filtered by sports/regions/competitions — updates in place as matches start, finish, or change.",
+      "dependencies": ["@mrdoge/react", "@mrdoge/node", "server-only"],
+      "envVars": {
+        "MRDOGE_ODDS_API_KEY": ""
+      },
+      "files": [
+        {
+          "path": "registry/mrdoge-ui/use-live-matches/use-live-matches.ts",
           "type": "registry:hook"
         },
         {

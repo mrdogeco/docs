@@ -32,10 +32,12 @@ clock={{
 }}
 ```
 
-renders as `"45+2:12"`, correctly counting up through stoppage time
-instead of past 45/90. Ticking requires both the outer `status` and
-`clock.state` to be `"live"` — a paused or half-time match shows
-`displayLong`/`display` as a static label instead, e.g. `"Half-time"`.
+renders as `"47:12 +3"` — the clock itself keeps ticking uncapped past
+45/90 through stoppage; `stoppage` (the ref's announced allotment) is
+static, appended as-is rather than counted up. Ticking requires both the
+outer `status` and `clock.state` to be `"live"` — a paused or half-time
+match shows `displayLong`/`display` as a static label instead, e.g.
+`"Half-time"`.
 
 ## The competition dropdown
 
@@ -134,7 +136,7 @@ applies when `loading` is omitted or `false`.
       type: "(matchId: string) => void",
     },
     kickoff: {
-      description: 'Kickoff date/time, shown when status is "upcoming".',
+      description: 'Shown when status is "upcoming" (date and time) or "completed" (today\'s time, otherwise the date).',
       type: "Date | string",
     },
     home: {

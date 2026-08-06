@@ -6,13 +6,13 @@ import { OddsSelector } from "@/registry/mrdoge-ui/odds-selector/odds-selector"
 import { OddsSelectorSkeleton } from "@/registry/mrdoge-ui/odds-selector/odds-selector-skeleton"
 import { matchToMatchCardProps, toOddsOptions } from "@/lib/mrdoge-adapters/match-card"
 import { useLiveMatch } from "@/registry/mrdoge-ui/use-live-match/use-live-match"
-import { useLiveOdds } from "@/registry/mrdoge-ui/use-live-odds/use-live-odds"
+import { useOdds } from "@/registry/mrdoge-ui/use-odds/use-odds"
 import { useSharedOddsMatchId, MATCH_RESULT_BET_TYPES } from "@/components/docs/demos/use-shared-demo-matches"
 
 export function OddsSelectorDemo() {
   const matchId = useSharedOddsMatchId()
   const match = useLiveMatch({ matchId: matchId ?? undefined })
-  const markets = useLiveOdds({ matchId: matchId ?? undefined, betTypes: MATCH_RESULT_BET_TYPES })
+  const markets = useOdds({ matchId: matchId ?? undefined, betTypes: MATCH_RESULT_BET_TYPES })
   const [selectedId, setSelectedId] = useState<string | undefined>()
 
   if (matchId === null || match === null || markets === null) {

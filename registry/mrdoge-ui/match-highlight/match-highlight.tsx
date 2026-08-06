@@ -92,18 +92,20 @@ function formatKickoff(kickoff: Date | string, timeFormat: "12h" | "24h") {
   }
 }
 
-// Ticks every second while genuinely live (outer status AND clock.state
-// both "live"), deriving the running seconds from elapsedSeconds + drift
-// since referenceTime. `minute` freezes at the phase cap (45/90/...) once
-// stoppage starts, with `elapsedSeconds` continuing to grow past it — the
-// "+N" portion is derived from that gap (elapsedSeconds minus the capped
-// minute), not from `stoppage` itself, which is just the announced
-// allotment (e.g. ref signals "4 minutes added"), not a live position
-// within it — using it directly would make the ticker jump straight to
-// "+4" instead of counting up 0→1→2→3→4 as stoppage actually plays out.
-// Falls back to a static label whenever live interpolation isn't
-// possible — not live, or a sport with no continuous minute (basketball,
-// baseball, ...).
+// Today's kickoff time is more useful than the date; any other day, the
+// date is what tells the two matches apart.
+function formatFinishedDate(kickoff: Date | string, timeFormat: "12h" | "24h") {
+  const parsed = typeof kickoff === "string" ? new Date(kickoff) : kickoff
+  const isToday = parsed.toDateString() === new Date().toDateString()
+  const { date, time } = formatKickoff(parsed, timeFormat)
+  return isToday ? time : date
+}
+
+// Ticks every second from elapsedSeconds + drift since referenceTime,
+// uncapped past 45/90. stoppage is a static "+N" suffix, not counted up
+// — it's the ref's fixed allotment, not a live position within it.
+// Falls back to a static label when not ticking (not live, or a sport
+// with no continuous minute).
 function useClockLabel(status: MatchHighlightStatus, clock: MatchHighlightClock | undefined): string | null {
   const canTick = status === "live" && clock?.state === "live" && clock.elapsedSeconds != null && Boolean(clock.referenceTime)
   const [now, setNow] = useState(() => Date.now())
@@ -123,14 +125,10 @@ function useClockLabel(status: MatchHighlightStatus, clock: MatchHighlightClock 
   if (canTick) {
     const driftSeconds = (now - new Date(clock.referenceTime!).getTime()) / 1000
     const liveSeconds = Math.max(0, clock.elapsedSeconds! + driftSeconds)
-
-    if (clock.minute != null && clock.stoppage) {
-      const intoStoppage = Math.max(0, liveSeconds - clock.minute * 60)
-      const seconds = Math.floor(intoStoppage % 60)
-      return `${clock.minute}+${Math.floor(intoStoppage / 60)}:${String(seconds).padStart(2, "0")}`
-    }
     const seconds = Math.floor(liveSeconds % 60)
-    return `${Math.floor(liveSeconds / 60)}:${String(seconds).padStart(2, "0")}`
+    const minutes = Math.floor(liveSeconds / 60)
+    const base = `${minutes}:${String(seconds).padStart(2, "0")}`
+    return clock.stoppage ? `${base} +${clock.stoppage}` : base
   }
   return clock.displayLong ?? clock.display ?? null
 }
@@ -352,9 +350,14 @@ export function MatchHighlight(props: MatchHighlightProps) {
               <span>{kickoffParts.date}</span>
               <span>{kickoffParts.time}</span>
             </div>
+          ) : status === "completed" ? (
+            <div className="flex flex-col items-center text-xs font-medium tabular-nums text-muted-foreground">
+              <span>FT</span>
+              {kickoff ? <span>{formatFinishedDate(kickoff, timeFormat)}</span> : null}
+            </div>
           ) : (
             <span className={cn("text-xs font-medium tabular-nums text-muted-foreground", isTicking && "text-destructive")}>
-              {status === "upcoming" ? "Upcoming" : (clockLabel ?? (status === "completed" ? "FT" : null))}
+              {status === "upcoming" ? "Upcoming" : clockLabel}
             </span>
           )}
         </div>

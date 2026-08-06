@@ -2,7 +2,7 @@
 
 import { useLiveMatch } from "@/registry/mrdoge-ui/use-live-match/use-live-match"
 import { useMatch } from "@/registry/mrdoge-ui/use-match/use-match"
-import { useLiveOdds } from "@/registry/mrdoge-ui/use-live-odds/use-live-odds"
+import { useOdds } from "@/registry/mrdoge-ui/use-odds/use-odds"
 import { DEMO_MATCH_ID, FINISHED_MATCH_ID } from "@/components/docs/sample-data"
 import {
   useSharedUpcomingMatchId,
@@ -33,21 +33,21 @@ export function MrDogePrefetch() {
 
   const upcomingId = useSharedUpcomingMatchId()
   useMatch({ matchId: upcomingId ?? undefined })
-  useLiveOdds({ matchId: upcomingId ?? undefined, betTypes: MATCH_RESULT_BET_TYPES })
-  useLiveOdds({ matchId: upcomingId ?? undefined, betTypes: DOUBLE_CHANCE_BET_TYPES })
-  useLiveOdds({ matchId: upcomingId ?? undefined, betTypes: TOTAL_GOALS_BET_TYPES })
+  useOdds({ matchId: upcomingId ?? undefined, betTypes: MATCH_RESULT_BET_TYPES })
+  useOdds({ matchId: upcomingId ?? undefined, betTypes: DOUBLE_CHANCE_BET_TYPES })
+  useOdds({ matchId: upcomingId ?? undefined, betTypes: TOTAL_GOALS_BET_TYPES })
 
   const liveId = useSharedLiveMatchId()
   useLiveMatch({ matchId: liveId ?? undefined })
-  useLiveOdds({ matchId: liveId ?? undefined, betTypes: MATCH_RESULT_BET_TYPES })
-  useLiveOdds({ matchId: liveId ?? undefined, betTypes: DOUBLE_CHANCE_BET_TYPES })
-  useLiveOdds({ matchId: liveId ?? undefined, betTypes: TOTAL_GOALS_BET_TYPES })
+  useOdds({ matchId: liveId ?? undefined, betTypes: MATCH_RESULT_BET_TYPES })
+  useOdds({ matchId: liveId ?? undefined, betTypes: DOUBLE_CHANCE_BET_TYPES })
+  useOdds({ matchId: liveId ?? undefined, betTypes: TOTAL_GOALS_BET_TYPES })
 
   const oddsId = useSharedOddsMatchId()
   useLiveMatch({ matchId: oddsId ?? undefined })
-  useLiveOdds({ matchId: oddsId ?? undefined, betTypes: MATCH_RESULT_BET_TYPES })
-  useLiveOdds({ matchId: oddsId ?? undefined, betTypes: DOUBLE_CHANCE_BET_TYPES })
-  useLiveOdds({ matchId: oddsId ?? undefined, betTypes: TOTAL_GOALS_BET_TYPES })
+  useOdds({ matchId: oddsId ?? undefined, betTypes: MATCH_RESULT_BET_TYPES })
+  useOdds({ matchId: oddsId ?? undefined, betTypes: DOUBLE_CHANCE_BET_TYPES })
+  useOdds({ matchId: oddsId ?? undefined, betTypes: TOTAL_GOALS_BET_TYPES })
 
   return null
 }

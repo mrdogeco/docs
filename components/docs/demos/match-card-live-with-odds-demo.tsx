@@ -4,7 +4,7 @@ import { useState } from "react"
 import { MatchCard } from "@/registry/mrdoge-ui/match-card/match-card"
 import { matchToMatchCardProps } from "@/lib/mrdoge-adapters/match-card"
 import { useLiveMatch } from "@/registry/mrdoge-ui/use-live-match/use-live-match"
-import { useLiveOdds } from "@/registry/mrdoge-ui/use-live-odds/use-live-odds"
+import { useOdds } from "@/registry/mrdoge-ui/use-odds/use-odds"
 import { useOddsMovement } from "@/registry/mrdoge-ui/use-odds-movement/use-odds-movement"
 import {
   useSharedLiveMatchId,
@@ -20,7 +20,7 @@ function MatchCardOddsSlot({
   oddsPosition?: "bottom" | "right"
 }) {
   const match = useLiveMatch({ matchId: matchId ?? undefined })
-  const markets = useLiveOdds({ matchId: match?.id, betTypes: MATCH_RESULT_BET_TYPES })
+  const markets = useOdds({ matchId: match?.id, betTypes: MATCH_RESULT_BET_TYPES })
   // markets is null when no market matched (not loading) — preserve that
   // distinction rather than letting `null?.[0]` collapse it into undefined
   // (which would mean "still loading" and get stuck showing a skeleton).

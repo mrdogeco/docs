@@ -1,0 +1,24 @@
+---
+title: Matches Feed
+description: Today's matches, grouped by region — an accordion per region, competition sub-groups inside once opened.
+---
+
+import { MatchesFeedDemo } from "@/components/docs/demos/matches-feed-demo"
+
+<ExampleSection file="components/docs/demos/matches-feed.tsx">
+  <MatchesFeedDemo />
+</ExampleSection>
+
+## Props
+
+<TypeTable
+  type={{
+    sports: {
+      description: 'Restrict to specific sports, e.g. ["soccer"]. Omit for all sports.',
+      type: "string[]",
+    },
+    className: {
+      type: "string",
+    },
+  }}
+/>

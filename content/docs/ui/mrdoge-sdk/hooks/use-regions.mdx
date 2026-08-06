@@ -1,18 +1,17 @@
 ---
-title: useMatches
-description: A plain list of matches, not limited to today's most-viewed ones. One-shot, not a subscription.
+title: useRegions
+description: Every region, with event/competition counts when filtered. One-shot, not a subscription.
 ---
 
 import { InstallTabs } from "@/components/docs/install-tabs"
 
-Wraps `matches.list()`. Unlike
-[useTrendingMatches](/docs/ui/mrdoge-sdk/hooks/use-trending-matches), not
-limited to today's most-viewed matches, so it still returns results even
-when nothing matching your filters happens to be trending right now.
+Wraps `regions.list()`. `eventCount`/`competitionCount` are only populated
+on each region when at least one filter (`date`, `sports`, `status`) is
+passed — with no filters you get every region with no counts.
 
 ## Installation
 
-<InstallTabs name="use-matches" />
+<InstallTabs name="use-regions" />
 
 Installing this pulls in two files: the hook itself (a thin re-export
 from [`@mrdoge/react`](/docs/ui/mrdoge-sdk/installation), which does the
@@ -23,30 +22,21 @@ mints short-lived tokens using `@mrdoge/node` and your own
 ## Usage
 
 ```tsx
-import { useMatches } from "@/hooks/use-matches"
+import { useRegions } from "@/hooks/use-regions"
 
-const matches = useMatches({ sports: ["soccer"], status: ["upcoming"], limit: 20 })
+const regions = useRegions({ sports: ["soccer"], date: "2026-08-06" })
 ```
 
 Takes a single options object, like every real SDK method it wraps
-(`matches.list(params)`) — not positional arguments. Only resolves *which*
-matches — pair it with [useMatch](/docs/ui/mrdoge-sdk/hooks/use-match) to
-actually fetch one.
-
-<Callout title="status alone isn't enough">
-  A match stuck on `"upcoming"` past its real kickoff (delayed, postponed,
-  never updated) still matches that filter alone — pass `startDate` (and
-  `endDate` for a range) to rule those out.
-</Callout>
+(`regions.list(params)`) — not positional arguments. Only resolves *which*
+regions have matches — pair it with
+[useMatches](/docs/ui/mrdoge-sdk/hooks/use-matches)'s `regionIds` to
+actually fetch them.
 
 ## Parameters
 
 <TypeTable
   type={{
-    regionIds: {
-      description: "Restrict to matches in these regions.",
-      type: "number[]",
-    },
     sports: {
       description: 'Restrict to specific sports, e.g. ["soccer"]. Omit for all sports.',
       type: "string[]",
@@ -67,10 +57,6 @@ actually fetch one.
       description: "End of a date range, YYYY-MM-DD, inclusive.",
       type: "string",
     },
-    limit: {
-      description: "Result count. Server default 20, capped at 100.",
-      type: "number",
-    },
     timezone: {
       description: "IANA timezone for any timezone-dependent fields server-side.",
       type: "string",
@@ -84,7 +70,6 @@ actually fetch one.
 
 ## Returns
 
-`Match[] | null | undefined` — `undefined` while the request is in flight,
+`Region[] | null | undefined` — `undefined` while the request is in flight,
 `null` if it failed (no fallback data), otherwise the list. One-shot: this
-doesn't push live updates the way `useLiveMatch`/`useOdds` do — call it
-again (or remount) to refresh.
+doesn't push live updates — call it again (or remount) to refresh.

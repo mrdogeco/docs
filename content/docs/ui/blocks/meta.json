@@ -1,5 +1,5 @@
 {
   "title": "Blocks",
   "icon": "LayoutTemplate",
-  "pages": ["index"]
+  "pages": ["matches-feed", "match-detail"]
 }

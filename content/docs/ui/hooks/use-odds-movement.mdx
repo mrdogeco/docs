@@ -7,7 +7,7 @@ import { InstallTabs } from "@/components/docs/install-tabs"
 
 Movement isn't something the SDK computes or sends — `odds.subscribe`
 pushes a full replace-in-place snapshot on every change (see
-[useLiveOdds](/docs/ui/mrdoge-sdk/hooks/use-live-odds)), with no "this went up" flag
+[useOdds](/docs/ui/mrdoge-sdk/hooks/use-odds)), with no "this went up" flag
 attached. This hook remembers the previous snapshot's prices itself and
 diffs against the new one, entirely client-side.
 
@@ -15,8 +15,8 @@ diffs against the new one, entirely client-side.
 
 <InstallTabs name="use-odds-movement" />
 
-Pairs with [useLiveOdds](/docs/ui/mrdoge-sdk/hooks/use-live-odds) — pass it the same
-market. No extra SDK setup beyond what useLiveOdds already needs.
+Pairs with [useOdds](/docs/ui/mrdoge-sdk/hooks/use-odds) — pass it the same
+market. No extra SDK setup beyond what useOdds already needs.
 
 ## Usage
 
@@ -31,7 +31,7 @@ const movementById = useOddsMovement(market)
 <TypeTable
   type={{
     market: {
-      description: "The current market snapshot, e.g. from useLiveOdds. Pass undefined/null while loading or unavailable — the hook just returns an empty object.",
+      description: "The current market snapshot, e.g. from useOdds. Pass undefined/null while loading or unavailable — the hook just returns an empty object.",
       type: "Market | null | undefined",
       required: true,
     },

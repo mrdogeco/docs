@@ -58,7 +58,7 @@ Odds typically resolve after the match itself, via a separate
 show a skeleton in the odds area instead of leaving it empty:
 
 ```tsx
-const markets = useLiveOdds({ matchId, betTypes })
+const markets = useOdds({ matchId, betTypes })
 const market = markets?.[0]
 
 <MatchCard
@@ -112,7 +112,7 @@ Everything below applies when `loading` is omitted or `false`.
       required: true,
     },
     kickoff: {
-      description: 'Kickoff time, shown when status is "scheduled".',
+      description: 'Shown when status is "scheduled" (the time) or "finished" (today\'s time, otherwise the date).',
       type: "Date | string",
     },
     elapsed: {

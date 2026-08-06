@@ -20,13 +20,10 @@ function toTimeLabel(event: TimelineEvent): string | undefined {
   return event.captions[0] ? `${event.captions[0]}'` : undefined
 }
 
-// clock.phase/minute/display/displayLong only update on backend event
-// triggers — confirmed live against an eventless match stuck on "1st
-// Half" at 100+ real minutes elapsed. clock.elapsedSeconds is the one
-// field that's actually continuous, so it drives the 1st/2nd half split
-// below (generous buffer either side of 45 for stoppage). Extra
-// time/penalties aren't guessed from it — mapped by real sysname below
-// instead.
+// clock.phase/display/displayLong only update on backend event triggers
+// and can go stale. StartOfSecondHalf (tracked below) is the reliable
+// "2nd half started" signal; elapsedSeconds is only a last-resort
+// fallback for matches with no events to check at all.
 const SOCCER_PHASE_LABEL: Record<string, string> = {
   SOCCER_MATCH_FIRST_HALF: "1st Half",
   SOCCER_MATCH_SECOND_HALF: "2nd Half",
@@ -34,7 +31,9 @@ const SOCCER_PHASE_LABEL: Record<string, string> = {
   SOCCER_MATCH_EXTRA_SECOND_HALF: "Extra Time — 2nd Half",
   SOCCER_MATCH_PENALTIES: "Penalties",
 }
-const FIRST_HALF_ELAPSED_CUTOFF_SECONDS = 50 * 60
+// Only reached when there's no StartOfSecondHalf event to trust —
+// deliberately wide, since real 1st-half stoppage rarely approaches it.
+const FIRST_HALF_ELAPSED_CUTOFF_SECONDS = 70 * 60
 const SECOND_HALF_ELAPSED_CEILING_SECONDS = 115 * 60
 
 function phaseLabelFromElapsedSeconds(elapsedSeconds: number | null | undefined): string | undefined {
@@ -44,7 +43,28 @@ function phaseLabelFromElapsedSeconds(elapsedSeconds: number | null | undefined)
   return undefined
 }
 
-function toLivePhaseLabel(clock: { phase: string | null; display: string | null; displayLong: string | null; elapsedSeconds?: number | null } | null | undefined): string {
+type ClockLike = {
+  phase: string | null
+  state?: string | null
+  display: string | null
+  displayLong: string | null
+  elapsedSeconds?: number | null
+} | null | undefined
+
+function toLivePhaseLabel(clock: ClockLike, secondHalfStarted: boolean): string {
+  // elapsedSeconds is null during intermission — trust the backend's
+  // own "Half Time" label instead of guessing from minutes.
+  if (clock?.state === "intermission") return clock.displayLong ?? clock.display ?? "Half Time"
+
+  if (secondHalfStarted) {
+    // Confirmed via a real event — elapsed time only decides whether
+    // we've since moved into extra time.
+    if (clock?.elapsedSeconds != null && clock.elapsedSeconds > SECOND_HALF_ELAPSED_CEILING_SECONDS) {
+      return SOCCER_PHASE_LABEL[clock?.phase ?? ""] ?? clock?.displayLong ?? clock?.display ?? "2nd Half"
+    }
+    return "2nd Half"
+  }
+
   return (
     phaseLabelFromElapsedSeconds(clock?.elapsedSeconds) ??
     SOCCER_PHASE_LABEL[clock?.phase ?? ""] ??
@@ -54,8 +74,9 @@ function toLivePhaseLabel(clock: { phase: string | null; display: string | null;
   )
 }
 
-function isLivePastFirstHalf(elapsedSeconds: number | null | undefined): boolean {
-  return elapsedSeconds != null && elapsedSeconds > FIRST_HALF_ELAPSED_CUTOFF_SECONDS
+function isLivePastFirstHalf(clock: ClockLike, secondHalfStarted: boolean): boolean {
+  if (clock?.state === "intermission" || secondHalfStarted) return true
+  return clock?.elapsedSeconds != null && clock.elapsedSeconds > FIRST_HALF_ELAPSED_CUTOFF_SECONDS
 }
 
 // Per-event minute, parsed from captions[0] ("41", "45+3") — a fixed
@@ -84,9 +105,12 @@ export function matchToMatchTimelineProps(match: MatchDetail): MatchTimelineProp
   let htHomeScore = 0
   let htAwayScore = 0
   let halftimeMarked = false
+  let secondHalfStarted = false
 
   for (const event of match.timeline ?? []) {
     const kind = classify(event.type)
+
+    if (event.type === "StartOfSecondHalf") secondHalfStarted = true
 
     if (kind === "goal" || kind === "own-goal") {
       // An own goal credited to `side` benefits the opposite side's score.
@@ -134,7 +158,7 @@ export function matchToMatchTimelineProps(match: MatchDetail): MatchTimelineProp
   // Fallback HT marker once the match is clearly past the first half.
   if (
     !halftimeMarked &&
-    (isLivePastFirstHalf(match.stats?.clock?.elapsedSeconds) || match.status === "completed")
+    (isLivePastFirstHalf(match.stats?.clock, secondHalfStarted) || match.status === "completed")
   ) {
     entries.push({
       id: `${entries.length}`,
@@ -146,13 +170,15 @@ export function matchToMatchTimelineProps(match: MatchDetail): MatchTimelineProp
 
   entries.reverse()
 
-  if (match.status === "live") {
+  // During intermission, the HT divider above already says exactly this —
+  // a second "Half Time" banner here would just repeat it.
+  if (match.status === "live" && match.stats?.clock?.state !== "intermission") {
     entries.unshift({
       id: "live",
       side: "match",
       type: "divider",
       live: true,
-      description: `${toLivePhaseLabel(match.stats?.clock)} ${match.stats?.homeScore ?? 0} - ${match.stats?.awayScore ?? 0}`,
+      description: `${toLivePhaseLabel(match.stats?.clock, secondHalfStarted)} ${match.stats?.homeScore ?? 0} - ${match.stats?.awayScore ?? 0}`,
     })
   } else if (match.status === "completed") {
     entries.unshift({

@@ -91,6 +91,16 @@ function formatKickoff(kickoff: Date | string, timeFormat: "12h" | "24h") {
   })
 }
 
+// Today's kickoff time is more useful than the date; any other day, the
+// date is what tells the two matches apart.
+function formatFinishedDate(kickoff: Date | string, timeFormat: "12h" | "24h") {
+  const date = typeof kickoff === "string" ? new Date(kickoff) : kickoff
+  const isToday = date.toDateString() === new Date().toDateString()
+  return isToday
+    ? formatKickoff(date, timeFormat)
+    : date.toLocaleDateString(undefined, { day: "2-digit", month: "2-digit" })
+}
+
 const stoppedPlayLabel: Record<"paused" | "intermission" | "interrupted", string> = {
   paused: "Paused",
   intermission: "Intermission",
@@ -126,9 +136,16 @@ function StatusColumn({
 
   if (status === "finished") {
     return (
-      <span className="text-xs font-bold leading-tight text-muted-foreground tabular-nums">
-        {elapsed ?? "FT"}
-      </span>
+      <div className="flex flex-col items-center gap-0.5">
+        <span className="text-xs font-bold leading-tight text-muted-foreground tabular-nums">
+          {elapsed ?? "FT"}
+        </span>
+        {kickoff ? (
+          <span className="text-xs font-medium leading-tight text-muted-foreground/70 tabular-nums">
+            {formatFinishedDate(kickoff, timeFormat)}
+          </span>
+        ) : null}
+      </div>
     )
   }
 

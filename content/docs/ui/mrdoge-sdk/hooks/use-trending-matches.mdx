@@ -63,5 +63,5 @@ Takes a single options object, like every real SDK method it wraps
 
 `Match[] | null | undefined` — `undefined` while the request is in flight,
 `null` if it failed (no fallback data), otherwise the ranked list. One-shot:
-this doesn't push live updates the way `useLiveMatch`/`useLiveOdds` do —
+this doesn't push live updates the way `useLiveMatch`/`useOdds` do —
 call it again (or remount) to refresh.

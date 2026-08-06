@@ -8,7 +8,7 @@ import { matchToMatchCardProps } from "@/lib/mrdoge-adapters/match-card"
 import { toBetSlipPick } from "@/lib/mrdoge-adapters/bet-slip"
 import { getMrDogeClient } from "@/registry/mrdoge-ui/mrdoge-client/mrdoge-client"
 import { useMatch } from "@/registry/mrdoge-ui/use-match/use-match"
-import { useLiveOdds } from "@/registry/mrdoge-ui/use-live-odds/use-live-odds"
+import { useOdds } from "@/registry/mrdoge-ui/use-odds/use-odds"
 import { useOddsMovement } from "@/registry/mrdoge-ui/use-odds-movement/use-odds-movement"
 import { useMatches } from "@/registry/mrdoge-ui/use-matches/use-matches"
 import { MATCH_RESULT_BET_TYPES } from "@/components/docs/demos/use-shared-demo-matches"
@@ -57,7 +57,7 @@ function MultiGameSelector({
   onPickChange: (matchId: string, pick: BetSlipPick | undefined, clear: () => void) => void
 }) {
   const match = useMatch({ matchId })
-  const markets = useLiveOdds({ matchId, betTypes: MATCH_RESULT_BET_TYPES })
+  const markets = useOdds({ matchId, betTypes: MATCH_RESULT_BET_TYPES })
   const market = markets?.[0]
   const movement = useOddsMovement(market)
   const [selectedId, setSelectedId] = useState<string | undefined>()
