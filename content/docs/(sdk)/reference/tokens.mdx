@@ -43,7 +43,7 @@ return Response.json({ token, expiresAt });
 
 The JWT carries:
 
-- The parent key's **tier** (`free`, `starter`, `growth`, `business`)
+- The parent key's **tier** (`starter`, `growth`, `business`)
 - The parent key's **rate-limit class** (requests/min, subscriptions, connections)
 - A short expiry (`ttl`)
 
@@ -112,7 +112,7 @@ Then on the client:
 import { MrDoge } from "@mrdoge/client";
 
 const mrdoge = new MrDoge({
-  authEndpoint: "/api/mrdoge/token",
+  authEndpoint: "https://your-api.com/mrdoge/token",
 });
 ```
 

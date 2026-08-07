@@ -69,6 +69,17 @@ const OTHER_SOCIAL_LINKS: NonNullable<BaseLayoutProps["links"]> = [
   },
 ]
 
+// Its own app on its own subdomain, not a route under this domain.
+// `icon: false` (not just omitted) suppresses SidebarItem's own
+// icon-less-external fallback — it renders `icon ?? (external && <ExternalLink/>)`,
+// so only an explicit non-nullish icon value opts out.
+const DASHBOARD_LINK = { text: "Dashboard", url: "https://dashboard.mrdoge.co", external: true, icon: false }
+
+// Same fumadocs-ui ThemeSwitch used everywhere on this site — buttons
+// don't get a pointer cursor by default here (no Tailwind preflight rule
+// for it), so every render needs the override explicitly.
+const THEME_SWITCH = { className: "cursor-pointer" }
+
 /**
  * Home layout (`/`, `/ui`) — nav links + a single GitHub icon, no other
  * social icons. `variant` picks which repo the GitHub icon points at.
@@ -80,8 +91,10 @@ export function baseOptions(variant: "sdk" | "ui" = "sdk"): BaseLayoutProps {
       { text: "Documentation", url: "/docs" },
       { text: "Components", url: "/ui" },
       { text: "Pricing", url: "/#pricing" },
+      ...(variant === "ui" ? [] : [DASHBOARD_LINK]),
       githubLink(variant === "ui" ? UI_GITHUB : SDK_GITHUB),
     ],
+    themeSwitch: THEME_SWITCH,
   }
 }
 
@@ -99,9 +112,11 @@ export function docsOptions(isUiRoot: boolean): BaseLayoutProps {
         : [
             { text: "Developers", url: "/" },
             { text: "Pricing", url: "/#pricing" },
+            DASHBOARD_LINK,
           ]),
       githubLink(isUiRoot ? UI_GITHUB : SDK_GITHUB),
       ...OTHER_SOCIAL_LINKS,
     ],
+    themeSwitch: THEME_SWITCH,
   }
 }

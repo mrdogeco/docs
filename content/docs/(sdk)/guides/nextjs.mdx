@@ -10,11 +10,14 @@ JWTs so your API key never leaves the server.
 ## Install
 
 ```bash
-npm i @mrdoge/node @mrdoge/client
+npm i @mrdoge/node @mrdoge/react
 ```
 
-`@mrdoge/node` for the server (API key auth), `@mrdoge/client` for the
-browser (JWT auth).
+`@mrdoge/node` for the server (API key auth). `@mrdoge/react` is the
+recommended browser package — hooks wrapping `@mrdoge/client`, backed by
+a shared cache so multiple components watching the same match or list
+don't duplicate a subscription. Drop to `@mrdoge/client` directly for
+manual control outside React's render cycle.
 
 ## Server: mint tokens for the browser
 
@@ -36,6 +39,45 @@ export async function POST() {
 
 ## Browser: subscribe to live matches
 
+`@mrdoge/react` needs no Provider and no client instance of your own —
+it defaults to POSTing to `/api/mrdoge/token`, matching the route handler
+above out of the box:
+
+```tsx title="app/live/page.tsx"
+"use client";
+
+import { useLiveMatches } from "@mrdoge/react";
+
+export default function LivePage() {
+  const matches = useLiveMatches({ sports: ["soccer"] });
+
+  if (!matches) return <p>Loading…</p>;
+
+  return (
+    <ul>
+      {matches.map((m) => (
+        <li key={m.id}>
+          {m.homeTeam.name} {m.stats?.homeScore}–{m.stats?.awayScore}{" "}
+          {m.awayTeam.name}
+        </li>
+      ))}
+    </ul>
+  );
+}
+```
+
+Mount `useLiveMatches({ sports: ["soccer"] })` in ten different
+components and they share one `matches.subscribeLive()` call and one
+copy of the data — the first mount starts it, the last unmount cancels
+it. [`useLiveMatch(matchId)`](/docs/ui/mrdoge-sdk/hooks/use-live-match)
+is the single-match equivalent for a detail page — see the
+[full hooks list](/docs/ui/mrdoge-sdk/installation) for the rest.
+
+### Manual control
+
+Reach for `@mrdoge/client` directly when you need more than a hook gives
+you — subscribing outside a component, or driving your own cache:
+
 ```tsx title="app/live/page.tsx"
 "use client";
 
@@ -43,7 +85,7 @@ import { useEffect, useState } from "react";
 import { MrDoge, type Match } from "@mrdoge/client";
 
 const mrdoge = new MrDoge({
-  authEndpoint: "/api/mrdoge/token",
+  authEndpoint: "https://your-api.com/mrdoge/token",
 });
 
 export default function LivePage() {
@@ -74,8 +116,8 @@ export default function LivePage() {
         });
       });
 
-      sub.on("match.del", (matchId) => {
-        setMatches((prev) => prev.filter((m) => m.id !== matchId));
+      sub.on("match.del", ({ id }) => {
+        setMatches((prev) => prev.filter((m) => m.id !== id));
       });
     })();
 
@@ -108,13 +150,13 @@ SDK's reconnect loop is sleeping in backoff. Wire `pingOrReconnect()` to
 "use client";
 
 import { useEffect } from "react";
-import { mrdoge } from "@/lib/mrdoge";
+import { getMrDogeClient } from "@mrdoge/react"; // or your own MrDoge instance
 
 useEffect(() => {
   const onVisible = () => {
-    if (document.visibilityState === "visible") mrdoge.pingOrReconnect();
+    if (document.visibilityState === "visible") getMrDogeClient().pingOrReconnect();
   };
-  const onOnline = () => mrdoge.pingOrReconnect();
+  const onOnline = () => getMrDogeClient().pingOrReconnect();
   document.addEventListener("visibilitychange", onVisible);
   window.addEventListener("online", onOnline);
   return () => {

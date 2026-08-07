@@ -22,7 +22,7 @@ const { data, pagination } = await mrdoge.matches.list({
 
 | Field | Type | Notes |
 |-------|------|-------|
-| `sports` | `string[]` | One or more of `"soccer"`, `"basketball"`, `"tennis"`, `"volleyball"`, `"baseball"`, `"hockey"`, `"football"` |
+| `sports` | `string[]` | One or more of `"soccer"`, `"basketball"`, `"american_football"`, `"baseball"`, `"ice_hockey"`, `"volleyball"`, `"handball"`, `"tennis"` |
 | `competitionIds` | `number[]` | Filter to one or more competitions |
 | `regionIds` | `number[]` | Filter to one or more regions |
 | `teamIds` | `number[]` | Filter to matches involving any of the listed teams |
@@ -142,7 +142,7 @@ console.log("Snapshot:", sub.snapshot.length, "matches");
 
 // Stream deltas
 sub.on("match.upd", (match) => render(match));
-sub.on("match.del", (matchId) => removeFromUI(matchId));
+sub.on("match.del", ({ id }) => removeFromUI(id));
 
 // On any subscription closure (rate limit, auth expiry, server bounce, etc.)
 sub.on("closed", ({ reason, message }) => {
@@ -165,7 +165,7 @@ await sub.cancel();
 **Returns:** `Subscription<"matches.subscribeLive">` — see
 [subscriptions](/docs/reference/subscriptions).
 
-**Push events:** `match.upd` (full match payload), `match.del` (matchId string)
+**Push events:** `match.upd` (full match payload), `match.del` (`{ id: string }`)
 
 <Callout type="info">
   The SDK races HTTP cache against WebSocket connect for the initial snapshot

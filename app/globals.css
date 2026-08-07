@@ -149,7 +149,7 @@
   @apply px-4!;
 }
 #nd-nav > div {
-  @apply bg-fd-background/50! backdrop-blur-2xl! border-0!;
+  @apply bg-fd-background/50! backdrop-blur-2xl!;
 }
 
 /* #nd-subnav is a separate mobile-only (md:hidden) bar inside DocsLayout,

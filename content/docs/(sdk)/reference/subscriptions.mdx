@@ -69,8 +69,8 @@ sub.on("match.upd", (match) => {
   // match: Match — full payload with the latest fields
 });
 
-sub.on("match.del", (matchId) => {
-  // matchId: string — match dropped out of the filter window
+sub.on("match.del", ({ id }) => {
+  // id: string — match dropped out of the filter window
 });
 ```
 
@@ -162,7 +162,6 @@ cap:
 
 | Tier | Subs per connection |
 |------|---------------------|
-| Free | 5 |
 | Starter | 25 |
 | Growth | 100 |
 | Business | 500 |

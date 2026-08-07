@@ -26,7 +26,7 @@ The Mr. Doge SDK uses two auth modes:
 
 ## Get an API key
 
-Mint a key in your [dashboard](/dashboard/keys). Keys are prefixed `sk_live_…`,
+Mint a key in your [dashboard](https://dashboard.mrdoge.co/keys). Keys are prefixed `sk_live_…`,
 share your account's tier + rate limit, and count against the same usage
 quota. Treat them like passwords — never embed one in client-side code.
 
@@ -134,7 +134,7 @@ tier quota.
 import { MrDoge } from "@mrdoge/client";
 
 const mrdoge = new MrDoge({
-  authEndpoint: "/api/mrdoge/token",
+  authEndpoint: "https://your-api.com/mrdoge/token",
 });
 ```
 
@@ -149,7 +149,7 @@ calling a different API entirely), pass a `fetchToken`:
 ```ts
 const mrdoge = new MrDoge({
   fetchToken: async () => {
-    const res = await fetch("/api/mrdoge/token", {
+    const res = await fetch("https://your-api.com/mrdoge/token", {
       method: "POST",
       credentials: "include",       // forward the session cookie
       headers: {
@@ -171,7 +171,7 @@ For static headers, skip the custom `fetchToken` and use `authHeaders`:
 
 ```ts
 const mrdoge = new MrDoge({
-  authEndpoint: "/api/mrdoge/token",
+  authEndpoint: "https://your-api.com/mrdoge/token",
   authHeaders: {
     "X-App-Version": "1.2.3",
     "X-Client-Id": "web",
@@ -202,7 +202,7 @@ leeway is **30 seconds**; tune with `refreshLeewaySec`:
 
 ```ts
 const mrdoge = new MrDoge({
-  authEndpoint: "/api/mrdoge/token",
+  authEndpoint: "https://your-api.com/mrdoge/token",
   refreshLeewaySec: 60,    // refresh 60s before expiry
 });
 ```

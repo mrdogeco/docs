@@ -9,8 +9,12 @@ JWT-based auth pattern as the browser.
 ## Install
 
 ```bash
-npm i @mrdoge/client
+npm i @mrdoge/react
 ```
+
+`@mrdoge/react` wraps `@mrdoge/client` with hooks and a shared cache —
+recommended even on RN, for the same reason as the browser: components
+watching the same match/list don't duplicate a subscription.
 
 If you need to persist auth tokens across app launches, add AsyncStorage:
 
@@ -27,10 +31,13 @@ an example.
 
 ## Client setup
 
-```ts title="lib/mrdoge.ts"
-import { MrDoge } from "@mrdoge/client";
+Call `configureMrDoge()` once, before any hook runs — e.g. at your app's
+entry point:
 
-export const mrdoge = new MrDoge({
+```ts title="lib/mrdoge.ts"
+import { configureMrDoge } from "@mrdoge/react";
+
+configureMrDoge({
   fetchToken: async () => {
     const res = await fetch("https://your-api.com/mrdoge/token", {
       method: "POST",
@@ -46,7 +53,8 @@ export const mrdoge = new MrDoge({
 ```
 
 The custom `fetchToken` lets you forward your app's session — gate the
-Mr. Doge token mint by your own auth.
+Mr. Doge token mint by your own auth. Same options as `MrDogeOptions` in
+`@mrdoge/client`.
 
 ## Persist the token (optional)
 
@@ -54,9 +62,9 @@ For warm starts, cache the last token in AsyncStorage:
 
 ```ts
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { MrDoge } from "@mrdoge/client";
+import { configureMrDoge } from "@mrdoge/react";
 
-export const mrdoge = new MrDoge({
+configureMrDoge({
   fetchToken: async () => {
     // try cache first
     const cached = await AsyncStorage.getItem("mrdoge.token");
@@ -83,24 +91,50 @@ the token expires.
 
 ## Screen-aware subscription
 
-Mobile apps churn screens hard — always cancel subscriptions on unmount.
+```tsx title="screens/LiveScreen.tsx"
+import { View, Text } from "react-native";
+import { useLiveMatches } from "@mrdoge/react";
+
+export function LiveScreen() {
+  const matches = useLiveMatches({ sports: ["soccer"] });
+
+  return (
+    <View>
+      {(matches ?? []).map((m) => (
+        <Text key={m.id}>
+          {m.homeTeam.name} {m.stats?.homeScore}-{m.stats?.awayScore}{" "}
+          {m.awayTeam.name}
+        </Text>
+      ))}
+    </View>
+  );
+}
+```
+
+Mobile apps churn screens hard — `useLiveMatches` cancels the underlying
+subscription automatically once the last component using it unmounts, no
+manual cleanup to get wrong.
+
+### Manual control
+
+Reach for `getMrDogeClient()` (the same configured client the hooks use)
+when you need more than a hook gives you:
 
 ```tsx title="screens/LiveScreen.tsx"
 import { useEffect, useState } from "react";
 import { View, Text } from "react-native";
-import { mrdoge } from "../lib/mrdoge";
-import type { Match } from "@mrdoge/client";
+import { getMrDogeClient } from "@mrdoge/react";
+import type { Match, Subscription } from "@mrdoge/client";
 
 export function LiveScreen() {
   const [matches, setMatches] = useState<Match[]>([]);
 
   useEffect(() => {
     let cancelled = false;
-    let sub: Awaited<ReturnType<typeof mrdoge.matches.subscribeLive>> | null =
-      null;
+    let sub: Subscription<"matches.subscribeLive"> | null = null;
 
     (async () => {
-      sub = await mrdoge.matches.subscribeLive({ sports: ["soccer"] });
+      sub = await getMrDogeClient().matches.subscribeLive({ sports: ["soccer"] });
       if (cancelled) {
         sub.cancel();
         return;
@@ -119,8 +153,8 @@ export function LiveScreen() {
         });
       });
 
-      sub.on("match.del", (matchId) => {
-        setMatches((prev) => prev.filter((m) => m.id !== matchId));
+      sub.on("match.del", ({ id }) => {
+        setMatches((prev) => prev.filter((m) => m.id !== id));
       });
     })();
 
@@ -153,12 +187,10 @@ For best foreground UX, wire `AppState` to `pingOrReconnect()`:
 
 ```tsx title="lib/mrdoge.ts"
 import { AppState } from "react-native";
-import { MrDoge } from "@mrdoge/client";
-
-export const mrdoge = new MrDoge({ fetchToken });
+import { getMrDogeClient } from "@mrdoge/react";
 
 AppState.addEventListener("change", (state) => {
-  if (state === "active") mrdoge.pingOrReconnect();
+  if (state === "active") getMrDogeClient().pingOrReconnect();
 });
 ```
 
@@ -179,16 +211,18 @@ SDK refetches via your `fetchToken` callback transparently.
 
 ## TanStack Query interop
 
-If you use TanStack Query, fetch via the SDK and cache with `staleTime`:
+`@mrdoge/react`'s own hooks already share a cache — reach for TanStack
+Query instead only if you want Mr. Doge data unified into a cache layer
+you're already using for everything else:
 
 ```ts
 import { useQuery } from "@tanstack/react-query";
-import { mrdoge } from "../lib/mrdoge";
+import { getMrDogeClient } from "@mrdoge/react";
 
 export function useMatches(sport: string) {
   return useQuery({
     queryKey: ["matches", sport],
-    queryFn: () => mrdoge.matches.list({ sports: [sport], limit: 50 }),
+    queryFn: () => getMrDogeClient().matches.list({ sports: [sport], limit: 50 }),
     staleTime: 60_000,
   });
 }

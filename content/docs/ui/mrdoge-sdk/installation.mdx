@@ -68,7 +68,7 @@ first mount starts it, the last unmount cancels it. See
 import { configureMrDoge } from "@mrdoge/react"
 
 // Call once, before any hook runs — e.g. at the top of your app's entry file.
-configureMrDoge({ authEndpoint: "/api/mrdoge/token", locale: "pt-BR" })
+configureMrDoge({ authEndpoint: "https://your-api.com/mrdoge/token", locale: "pt-BR" })
 ```
 
 Same options as `MrDogeOptions` in `@mrdoge/client`. Omit this entirely

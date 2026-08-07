@@ -122,8 +122,8 @@ router.get("/api/matches/live", async (req, res) => {
   sub.on("match.upd", (match) => {
     res.write(`data: ${JSON.stringify({ type: "upd", match })}\n\n`);
   });
-  sub.on("match.del", (matchId) => {
-    res.write(`data: ${JSON.stringify({ type: "del", matchId })}\n\n`);
+  sub.on("match.del", ({ id }) => {
+    res.write(`data: ${JSON.stringify({ type: "del", matchId: id })}\n\n`);
   });
 
   req.on("close", () => sub.cancel());

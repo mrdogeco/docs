@@ -4,99 +4,47 @@ description: Pick the package that fits your runtime — server, browser, or edg
 icon: Package
 ---
 
-The Mr. Doge SDK ships as four packages. **Pick one** — they all expose the
-same resource surface; the difference is how you authenticate and what
-runtime they target.
+The Mr. Doge SDK ships as four packages. **Pick one** — they all expose
+the same resource surface; the difference is how you authenticate and
+what runtime they target.
 
 ## Which package?
 
 <Cards>
   <Card title="@mrdoge/node" description="Use on your backend. Authenticates with sk_live_… API keys. Both HTTP and WebSocket." />
   <Card title="@mrdoge/client" description="Use in browsers, React Native, or any client where you must NOT embed an API key. Auth via short-lived JWTs." />
+  <Card title="@mrdoge/react" description="Using React? Start here instead — hooks wrapping @mrdoge/client, backed by a shared cache. See the dedicated installation guide." />
   <Card title="@mrdoge/http" description="Use in serverless / edge runtimes (Lambda, Cloudflare Workers, Vercel Edge). Pure fetch, zero deps." />
-  <Card title="@mrdoge/protocol" description="Schemas and TypeScript types only. Useful for codegen, validation, or building tools on top of the protocol." />
 </Cards>
 
 ## Install
 
-<Tabs items={["@mrdoge/node", "@mrdoge/client", "@mrdoge/http"]}>
+<Tabs items={["@mrdoge/node", "@mrdoge/client", "@mrdoge/react", "@mrdoge/http"]}>
   <Tab value="@mrdoge/node">
-    <Tabs items={["npm", "pnpm", "yarn", "bun"]} groupId="package-manager" persist>
-      <Tab value="npm">
 ```bash
-npm i @mrdoge/node
+npm install @mrdoge/node
 ```
-      </Tab>
-      <Tab value="pnpm">
-```bash
-pnpm add @mrdoge/node
-```
-      </Tab>
-      <Tab value="yarn">
-```bash
-yarn add @mrdoge/node
-```
-      </Tab>
-      <Tab value="bun">
-```bash
-bun add @mrdoge/node
-```
-      </Tab>
-    </Tabs>
   </Tab>
   <Tab value="@mrdoge/client">
-    <Tabs items={["npm", "pnpm", "yarn", "bun"]} groupId="package-manager" persist>
-      <Tab value="npm">
 ```bash
-npm i @mrdoge/client
+npm install @mrdoge/client
 ```
-      </Tab>
-      <Tab value="pnpm">
+  </Tab>
+  <Tab value="@mrdoge/react">
 ```bash
-pnpm add @mrdoge/client
+npm install @mrdoge/react
 ```
-      </Tab>
-      <Tab value="yarn">
-```bash
-yarn add @mrdoge/client
-```
-      </Tab>
-      <Tab value="bun">
-```bash
-bun add @mrdoge/client
-```
-      </Tab>
-    </Tabs>
   </Tab>
   <Tab value="@mrdoge/http">
-    <Tabs items={["npm", "pnpm", "yarn", "bun"]} groupId="package-manager" persist>
-      <Tab value="npm">
 ```bash
-npm i @mrdoge/http
+npm install @mrdoge/http
 ```
-      </Tab>
-      <Tab value="pnpm">
-```bash
-pnpm add @mrdoge/http
-```
-      </Tab>
-      <Tab value="yarn">
-```bash
-yarn add @mrdoge/http
-```
-      </Tab>
-      <Tab value="bun">
-```bash
-bun add @mrdoge/http
-```
-      </Tab>
-    </Tabs>
   </Tab>
 </Tabs>
 
 ## Create a client
 
-<Tabs items={["@mrdoge/node", "@mrdoge/client", "@mrdoge/http"]}>
+<Tabs items={["@mrdoge/node", "@mrdoge/client", "@mrdoge/react", "@mrdoge/http"]}>
   <Tab value="@mrdoge/node">
 ```ts
 import { MrDoge } from "@mrdoge/node";
@@ -116,12 +64,30 @@ const { data: matches } = await mrdoge.matches.list({
 import { MrDoge } from "@mrdoge/client";
 
 const mrdoge = new MrDoge({
-  // your backend route that mints short-lived JWTs
-  authEndpoint: "/api/mrdoge/token",
+  authEndpoint: "https://your-api.com/mrdoge/token",
 });
 
 const sub = await mrdoge.matches.subscribeLive({ sports: ["soccer"] });
 sub.on("match.upd", (match) => render(match));
+```
+  </Tab>
+  <Tab value="@mrdoge/react">
+```tsx
+import { useLiveMatches } from "@mrdoge/react";
+
+function LiveMatches() {
+  const matches = useLiveMatches({ sports: ["soccer"] });
+
+  if (!matches) return <p>Loading…</p>;
+
+  return (
+    <ul>
+      {matches.map((m) => (
+        <li key={m.id}>{m.homeTeam.name} vs {m.awayTeam.name}</li>
+      ))}
+    </ul>
+  );
+}
 ```
   </Tab>
   <Tab value="@mrdoge/http">
@@ -143,7 +109,7 @@ const { data: recs } = await mrdoge.call("ai.recommendations.list", {
 
 ## Get an API key
 
-Head to your [dashboard](/dashboard/keys) to mint an `sk_live_…` key.
+Head to your [dashboard](https://dashboard.mrdoge.co/keys) to mint an `sk_live_…` key.
 Keys share your account's tier and rate limit, and you can mint additional
 keys per environment so you can revoke one without affecting the others.
 

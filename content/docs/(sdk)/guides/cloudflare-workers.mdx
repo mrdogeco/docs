@@ -20,7 +20,7 @@ import { createHttpClient } from "@mrdoge/http";
 
 export default {
   async fetch(req: Request, env: Env): Promise<Response> {
-    const doge = createHttpClient({ apiKey: env.MRDOGE_KEY });
+    const doge = createHttpClient({ apiKey: env.MRDOGE_API_KEY });
 
     const matches = await doge.call("matches.list", {
       sports: ["soccer"],
@@ -32,11 +32,11 @@ export default {
 } satisfies ExportedHandler<Env>;
 
 interface Env {
-  MRDOGE_KEY: string;
+  MRDOGE_API_KEY: string;
 }
 ```
 
-Configure secrets via `wrangler secret put MRDOGE_KEY`.
+Configure secrets via `wrangler secret put MRDOGE_API_KEY`.
 
 ## Token-mint endpoint on the edge
 
@@ -47,7 +47,7 @@ export default {
   async fetch(req: Request, env: Env): Promise<Response> {
     if (req.method !== "POST") return new Response("method not allowed", { status: 405 });
 
-    const doge = createHttpClient({ apiKey: env.MRDOGE_KEY });
+    const doge = createHttpClient({ apiKey: env.MRDOGE_API_KEY });
     const result = await doge.call("tokens.create", { ttl: 600 });
 
     return Response.json(result, {
@@ -70,7 +70,7 @@ async function cachedMatches(sport: string, env: Env): Promise<Match[]> {
   const cached = await caches.default.match(cacheKey);
   if (cached) return cached.json();
 
-  const doge = createHttpClient({ apiKey: env.MRDOGE_KEY });
+  const doge = createHttpClient({ apiKey: env.MRDOGE_API_KEY });
   const { data } = await doge.call("matches.list", { sports: [sport] });
 
   const response = new Response(JSON.stringify(data), {

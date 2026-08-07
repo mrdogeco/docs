@@ -70,7 +70,7 @@ const sub = await mrdoge.matches.subscribeLive({ sports: ["soccer"] });
 console.log(sub.snapshot); // already populated, no waiting
 
 sub.on("match.upd", (match) => render(match));
-sub.on("match.del", (matchId) => removeFromUI(matchId));
+sub.on("match.del", ({ id }) => removeFromUI(id));
 ```
 
 If the WS fails after HTTP won, the subscription closes with

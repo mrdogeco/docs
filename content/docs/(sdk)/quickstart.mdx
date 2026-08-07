@@ -5,7 +5,7 @@ icon: Rocket
 ---
 
 This guide assumes you have an API key. Don't have one yet?
-[Mint one in the dashboard](/dashboard/keys).
+[Mint one in the dashboard](https://dashboard.mrdoge.co/keys).
 
 <Steps>
 
@@ -88,8 +88,8 @@ sub.on("match.upd", (match) => {
   );
 });
 
-sub.on("match.del", (matchId) => {
-  console.log("[del]", matchId);
+sub.on("match.del", ({ id }) => {
+  console.log("[del]", id);
 });
 
 // later, when you're done:
@@ -130,7 +130,7 @@ for (const r of recs) {
 
 <Callout type="info">
   AI recommendations are gated to the Business tier.
-  [Upgrade your plan](/dashboard/billing) if you get a `forbidden` error.
+  [Upgrade your plan](https://dashboard.mrdoge.co/billing) if you get a `forbidden` error.
 </Callout>
 
 </Step>
