@@ -2,6 +2,8 @@ import Image from "next/image"
 import Link from "next/link"
 import { SiGithub, SiReddit, SiX, SiInstagram } from "react-icons/si"
 import { FaLinkedin, } from "react-icons/fa"
+import { cn } from "@/lib/utils"
+import { bungee } from "@/lib/fonts"
 
 const LINK_GROUPS = [
   {
@@ -9,7 +11,7 @@ const LINK_GROUPS = [
     items: [
       { title: "Documentation", href: "/docs" },
       { title: "Components", href: "/ui" },
-      { title: "Pricing", href: "/#pricing" },
+      { title: "Pricing", href: "/pricing" },
     ],
   },
   {
@@ -38,20 +40,20 @@ const SOCIAL_LINKS = [
 
 export function Footer() {
   return (
-    <footer className="sm:mt-24 border-t">
+    <footer className="dark sm:mt-24 border-t bg-background text-foreground">
       <div className="mx-auto max-w-(--fd-layout-width) px-4 pt-16">
         <div className="grid gap-12 md:grid-cols-5">
           <div className="md:col-span-2">
             <Link href="/" aria-label="Home" className="block size-fit">
               <Image
-                src="/logo/light.svg"
+                src="/assets/mrdoge-logo-light.svg"
                 alt="Mr. Doge"
                 width={108}
                 height={24}
                 className="dark:hidden"
               />
               <Image
-                src="/logo/dark.svg"
+                src="/assets/mrdoge-logo-dark.svg"
                 alt="Mr. Doge"
                 width={108}
                 height={24}
@@ -108,13 +110,13 @@ export function Footer() {
       <div className="mx-auto max-w-(--fd-layout-width) space-y-3 px-4 pb-12">
         <p className="text-xs leading-relaxed text-muted-foreground/70">
           The Mr. Doge SDK provides sports data, odds, and AI-generated
-          recommendations as statistical output — not guarantees of any
+          recommendations as statistical output, not guarantees of any
           outcome. Past model performance is not indicative of future
           results. If you build products on top of this data, including
           real-money betting products, you are responsible for complying
           with the gambling and gaming laws of every jurisdiction you
           operate in. Mr. Doge does not itself accept, hold, or process
-          real-money wagers. Gambling can be addictive — if you or someone
+          real-money wagers. Gambling can be addictive: if you or someone
           you know is struggling, please seek help.
         </p>
         <p className="text-xs leading-relaxed text-muted-foreground/70">
@@ -124,9 +126,61 @@ export function Footer() {
           endorsed by, or sponsored by any league, club, or sports
           organization. These marks appear solely for editorial
           identification, to help end users recognize the matches, teams,
-          and competitions the data covers — the same posture applies to
+          and competitions the data covers. The same posture applies to
           any product built on top of this data.
         </p>
+        <p className="text-xs leading-relaxed text-muted-foreground/70">
+          The sunglasses in the hero are based on a{" "}
+          <Link
+            href="https://sketchfab.com/3d-models/rayban-sunglasses-6c37ef3c6bd2481d94324b3555259e03"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline underline-offset-2 hover:text-foreground"
+          >
+            3D model
+          </Link>{" "}
+          by{" "}
+          <Link
+            href="https://sketchfab.com/aayushveni"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline underline-offset-2 hover:text-foreground"
+          >
+            aayushveni
+          </Link>
+          , licensed under{" "}
+          <Link
+            href="https://creativecommons.org/licenses/by/4.0/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline underline-offset-2 hover:text-foreground"
+          >
+            CC BY 4.0
+          </Link>
+          .
+        </p>
+      </div>
+
+      {/* Giant edge-to-edge wordmark. Full-bleed on purpose (outside the
+          layout-width container above) so it spans the actual footer
+          width, not just its content column. font-size alone (even with
+          vw units) only approximates a target width — different text
+          renders at different natural widths, so it never lines up
+          exactly edge to edge. `textLength` + `lengthAdjust` stretch the
+          glyphs themselves to an exact width instead, and the SVG's own
+          width:100% scaling makes that responsive at every breakpoint. */}
+      <div aria-hidden className="mx-auto max-w-(--fd-layout-width) overflow-hidden select-none">
+        <svg viewBox="0 0 1000 220" className="block h-auto w-full">
+          <text
+            x="0"
+            y="180"
+            textLength="1000"
+            lengthAdjust="spacingAndGlyphs"
+            className={cn(bungee.className, "fill-foreground/15 text-[190px] font-extrabold")}
+          >
+            MR. DOGE
+          </text>
+        </svg>
       </div>
     </footer>
   )

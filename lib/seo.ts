@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 
-// Ported from old_mrdoge-co's lib/seo.ts — same buildMetadata() shape
+// Ported from old_mrdoge-co's lib/seo.ts. Same buildMetadata() shape
 // (canonical URL + OpenGraph + Twitter card on every page). Dropped the
 // `keywords` field the old version had: Google has ignored the meta
 // keywords tag since ~2009, it's dead weight.
@@ -17,7 +17,7 @@ interface BuildMetadataInput {
   title: string
   description: string
   path?: string
-  /** Relative path under /public, e.g. "/og.png". Omit until a real one exists — no OG image beats a broken one. */
+  /** Relative path under /public, e.g. "/og.png". Omit until a real one exists: no OG image beats a broken one. */
   image?: string
 }
 

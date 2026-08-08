@@ -7,14 +7,14 @@ const NAV_TITLE = {
   title: (
     <>
       <Image
-        src="/logo/light.svg"
+        src="/assets/mrdoge-logo-light.svg"
         alt="Mr. Doge"
         width={108}
         height={24}
         className="dark:hidden"
       />
       <Image
-        src="/logo/dark.svg"
+        src="/assets/mrdoge-logo-dark.svg"
         alt="Mr. Doge"
         width={108}
         height={24}
@@ -26,7 +26,9 @@ const NAV_TITLE = {
 }
 
 const SDK_GITHUB = "https://github.com/mrdogeco/sdk"
-const UI_GITHUB = "https://github.com/mrdogeco/ui"
+// mrdoge-ui's source lives in this repo (mrdogeco/docs), not a separate
+// mrdogeco/ui repo — the registry/mrdoge-ui/* files are right here.
+const UI_GITHUB = "https://github.com/mrdogeco/docs"
 
 function githubLink(url: string) {
   return {
@@ -71,17 +73,17 @@ const OTHER_SOCIAL_LINKS: NonNullable<BaseLayoutProps["links"]> = [
 
 // Its own app on its own subdomain, not a route under this domain.
 // `icon: false` (not just omitted) suppresses SidebarItem's own
-// icon-less-external fallback — it renders `icon ?? (external && <ExternalLink/>)`,
+// icon-less-external fallback: it renders `icon ?? (external && <ExternalLink/>)`,
 // so only an explicit non-nullish icon value opts out.
 const DASHBOARD_LINK = { text: "Dashboard", url: "https://dashboard.mrdoge.co", external: true, icon: false }
 
-// Same fumadocs-ui ThemeSwitch used everywhere on this site — buttons
+// Same fumadocs-ui ThemeSwitch used everywhere on this site. Buttons
 // don't get a pointer cursor by default here (no Tailwind preflight rule
 // for it), so every render needs the override explicitly.
 const THEME_SWITCH = { className: "cursor-pointer" }
 
 /**
- * Home layout (`/`, `/ui`) — nav links + a single GitHub icon, no other
+ * Home layout (`/`, `/ui`): nav links + a single GitHub icon, no other
  * social icons. `variant` picks which repo the GitHub icon points at.
  */
 export function baseOptions(variant: "sdk" | "ui" = "sdk"): BaseLayoutProps {
@@ -90,7 +92,7 @@ export function baseOptions(variant: "sdk" | "ui" = "sdk"): BaseLayoutProps {
     links: [
       { text: "Documentation", url: "/docs" },
       { text: "Components", url: "/ui" },
-      { text: "Pricing", url: "/#pricing" },
+      { text: "Pricing", url: "/pricing" },
       ...(variant === "ui" ? [] : [DASHBOARD_LINK]),
       githubLink(variant === "ui" ? UI_GITHUB : SDK_GITHUB),
     ],
@@ -99,7 +101,7 @@ export function baseOptions(variant: "sdk" | "ui" = "sdk"): BaseLayoutProps {
 }
 
 /**
- * Docs layout — root-aware. The SDK root shows Developers/Pricing; the UI
+ * Docs layout, root-aware. The SDK root shows Developers/Pricing; the UI
  * root doesn't (those are SDK-specific). The GitHub icon always points at
  * whichever repo matches the currently active root.
  */
@@ -111,7 +113,7 @@ export function docsOptions(isUiRoot: boolean): BaseLayoutProps {
         ? []
         : [
             { text: "Developers", url: "/" },
-            { text: "Pricing", url: "/#pricing" },
+            { text: "Pricing", url: "/pricing" },
             DASHBOARD_LINK,
           ]),
       githubLink(isUiRoot ? UI_GITHUB : SDK_GITHUB),

@@ -24,7 +24,7 @@ export default async function Page(props: PageProps) {
 
   return (
     <DocsPage toc={page.data.toc} full={page.data.full}>
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col-reverse items-start gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
         <DocsTitle>{page.data.title}</DocsTitle>
         <PageActions slug={page.slugs} />
       </div>
@@ -41,7 +41,7 @@ export default async function Page(props: PageProps) {
 }
 
 // The "ui" root has its own route (app/docs/ui/[[...slug]]) so it doesn't
-// nest inside this layout — exclude it here to avoid both routes trying to
+// nest inside this layout. Exclude it here to avoid both routes trying to
 // statically generate the same paths.
 export function generateStaticParams() {
   return source.generateParams().filter((p) => p.slug?.[0] !== "ui")

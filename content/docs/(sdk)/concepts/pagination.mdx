@@ -5,7 +5,7 @@ description: Keyset cursors, the listAll helper, and progressive rendering for l
 
 List endpoints (`matches.list`, `ai.recommendations.list`) use **keyset
 cursor pagination**. Each page returns a cursor pointing to the next, and
-the cursor is drift-safe — rows added or removed between pages won't
+the cursor is drift-safe: rows added or removed between pages won't
 cause duplicates or gaps.
 
 ## The response shape
@@ -41,17 +41,17 @@ while (true) {
 
 <Callout type="info">
   Cursors are **opaque base64 strings**. Don't parse, decode, or modify
-  them — just pass them back to the next request.
+  them, just pass them back to the next request.
 </Callout>
 
 ## The `listAll` helper
 
-For most cases, use `listAll` instead — it walks the cursors for you:
+For most cases, use `listAll` instead: it walks the cursors for you:
 
 ```ts
 const all = await mrdoge.matches.listAll({
   sports: ["soccer"],
-  // no `cursor` — listAll manages it
+  // no `cursor`, listAll manages it
 });
 
 console.log(all.length); // every match across all pages
@@ -82,7 +82,7 @@ await mrdoge.matches.listAll(
 );
 ```
 
-This is how the Mr. Doge mobile app renders the matches feed — the first
+This is how the Mr. Doge mobile app renders the matches feed: the first
 100 matches show up immediately, the rest stream in.
 
 ## Cancellation
@@ -106,17 +106,17 @@ try {
 }
 ```
 
-`listAll` cancels mid-page — the in-flight request is aborted via fetch's
+`listAll` cancels mid-page: the in-flight request is aborted via fetch's
 native `AbortSignal`. Already-fetched pages are not returned. See
 [error handling](/docs/concepts/errors#abort).
 
 ## Page size
 
 `limit` caps at **100** for `matches.list` and `ai.recommendations.list`.
-Other list methods have different caps — check
+Other list methods have different caps: check
 [the reference](/docs/reference/matches) for each.
 
-Oversized `limit` values are rejected at validation time — the server
+Oversized `limit` values are rejected at validation time. The server
 returns `invalid_params`.
 
 ## Why keyset and not offset?
@@ -127,7 +127,7 @@ Offset pagination breaks when rows shift between requests:
 > at index 50 is now at index 51, you fetch index 50 again → duplicate.*
 
 Keyset cursors point to the **last seen row**, not an index. Adding rows
-above the cursor doesn't affect subsequent pages — no duplicates, no gaps.
+above the cursor doesn't affect subsequent pages: no duplicates, no gaps.
 
 ## Next
 

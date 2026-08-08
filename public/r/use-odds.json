@@ -2,7 +2,7 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "use-odds",
   "title": "useOdds",
-  "description": "Subscribes to a single match's odds over WebSocket (Business tier) — pre-live or in-play, every matching market updates in place as odds change.",
+  "description": "Subscribes to a single match's odds over WebSocket (Business tier): pre-live or in-play, every matching market updates in place as odds change.",
   "dependencies": [
     "@mrdoge/react",
     "@mrdoge/node",
@@ -11,7 +11,7 @@
   "files": [
     {
       "path": "registry/mrdoge-ui/use-odds/use-odds.ts",
-      "content": "// Re-exported from @mrdoge/react — every component subscribing to the same\n// matchId + betTypes shares one underlying WS subscription and one copy of\n// the data. Covers both pre-live and in-play odds — whichever markets are\n// currently posted.\nexport { useOdds, type UseOddsOptions } from \"@mrdoge/react\"\n",
+      "content": "// Re-exported from @mrdoge/react. Every component subscribing to the same\n// matchId + betTypes shares one underlying WS subscription and one copy of\n// the data. Covers both pre-live and in-play odds, whichever markets are\n// currently posted.\nexport { useOdds, type UseOddsOptions } from \"@mrdoge/react\"\n",
       "type": "registry:hook"
     },
     {

@@ -18,7 +18,7 @@ const TOTALS = ["SOCCER_UNDER_OVER", "SOCCER_UNDER_OVER_PRELIVE"]
 const BTTS = ["SOCCER_BOTH_TEAMS_TO_SCORE", "SOCCER_BOTH_TEAMS_TO_SCORE_PRELIVE"]
 const BTTS_YES_CODES = ["Y", "GG"]
 
-// Over/Under outcomes only carry a generic "O"/"U" code — no threshold in
+// Over/Under outcomes only carry a generic "O"/"U" code, no threshold in
 // it. The threshold lives in the caption instead ("Over 1.5", "Under
 // 1.5"), so that's what has to be parsed to compare thresholds.
 function parseThreshold(caption: string | null | undefined): number | undefined {
@@ -49,17 +49,17 @@ export function toConflictCandidates(matchId: string, markets: Market[]): Confli
   return candidates
 }
 
-// Pairwise incompatibility check — the three rule families this adapter
+// Pairwise incompatibility check: the three rule families this adapter
 // knows about. Symmetric: conflicts(a, b) === conflicts(b, a).
 function conflicts(a: ConflictCandidate, b: ConflictCandidate): boolean {
   if (a.matchId !== b.matchId) return false
 
-  // Double Chance is just two of Match Result's three outcomes combined —
+  // Double Chance is just two of Match Result's three outcomes combined:
   // the two markets describe overlapping information about the same
   // result, not independent events. Even a "compatible" pair (Home win +
   // "Home or Away") is a wasted leg, not a real parlay combination, so
   // any Match Result selection blocks the entire Double Chance market and
-  // vice versa — not just the specific pairs that are outright impossible.
+  // vice versa, not just the specific pairs that are outright impossible.
   const isMrDcPair =
     (MATCH_RESULT_TYPES.includes(a.betType) && b.betType === DOUBLE_CHANCE) ||
     (MATCH_RESULT_TYPES.includes(b.betType) && a.betType === DOUBLE_CHANCE)
@@ -71,16 +71,16 @@ function conflicts(a: ConflictCandidate, b: ConflictCandidate): boolean {
     const bIsOver = b.code.startsWith("O")
 
     if (aIsOver === bIsOver) {
-      // Same side at different thresholds, e.g. Over 1.5 + Over 2.5 — the
+      // Same side at different thresholds, e.g. Over 1.5 + Over 2.5: the
       // higher threshold winning always means the lower one wins too, so
       // the pair is never a genuinely new combination, just a redundant
       // (or actively worse) parlay leg.
       return a.threshold !== b.threshold
     }
 
-    // Opposite sides — Over-at-T1 and Under-at-T2 are only both true when
+    // Opposite sides: Over-at-T1 and Under-at-T2 are only both true when
     // goals can land strictly between the two thresholds, e.g. Over 1.5 +
-    // Under 4.5 (2, 3, or 4 goals) — impossible once T1 >= T2, e.g. Under
+    // Under 4.5 (2, 3, or 4 goals). Impossible once T1 >= T2, e.g. Under
     // 1.5 + Over 4.5.
     const overThreshold = aIsOver ? a.threshold : b.threshold
     const underThreshold = aIsOver ? b.threshold : a.threshold
@@ -105,7 +105,7 @@ function conflicts(a: ConflictCandidate, b: ConflictCandidate): boolean {
  * Given the ids currently selected and every candidate available (across
  * however many markets/matches are in play), returns the ids of
  * not-yet-selected candidates that conflict with at least one current
- * selection — e.g. for an Odds Selector's `disabledIds`. Same-match
+ * selection, e.g. for an Odds Selector's `disabledIds`. Same-match
  * scoping is baked into the comparison, not left to caller discipline.
  */
 export function getConflictingIds(selectedIds: string[], candidates: ConflictCandidate[]): Set<string> {
@@ -123,7 +123,7 @@ export function getConflictingIds(selectedIds: string[], candidates: ConflictCan
 /**
  * Convenience wrapper for consumers who only have already-built
  * `BetSlipPick[]` in hand (e.g. loaded from storage, no live `Market`
- * data around) — checks every pick against every other pick already in
+ * data around). Checks every pick against every other pick already in
  * the slip and returns the ids of any that conflict with each other, for
  * e.g. BetSlip's `conflictingPickIds`. Picks missing `matchId`/`betType`/
  * `code` (built by hand rather than via the Bet Slip Adapter) are skipped.

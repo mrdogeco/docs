@@ -1,14 +1,14 @@
 ---
 title: Authentication
-description: API keys for servers, short-lived JWTs for browsers — every detail.
+description: API keys for servers and short-lived JWTs for browsers, in full detail.
 icon: KeyRound
 ---
 
 The Mr. Doge SDK uses two auth modes:
 
-1. **API key** (`sk_live_…`) — server-to-server, long-lived,
+1. **API key** (`sk_live_…`): server-to-server, long-lived,
    used by `@mrdoge/node` and `@mrdoge/http`.
-2. **JWT** — short-lived token your backend mints via `@mrdoge/node`'s
+2. **JWT**: short-lived token your backend mints via `@mrdoge/node`'s
    `tokens.create()` and hands to your frontend's `@mrdoge/client`.
 
 <Cards>
@@ -20,7 +20,7 @@ The Mr. Doge SDK uses two auth modes:
   Browser/mobile auth **always requires both packages**: `@mrdoge/node` on
   your server to mint tokens (it holds the `sk_live_…` key), and
   `@mrdoge/client` on the frontend (it never sees the key). There's no way
-  to skip the backend — Mr. Doge does not accept API keys directly from
+  to skip the backend. Mr. Doge does not accept API keys directly from
   browsers.
 </Callout>
 
@@ -28,7 +28,7 @@ The Mr. Doge SDK uses two auth modes:
 
 Mint a key in your [dashboard](https://dashboard.mrdoge.co/keys). Keys are prefixed `sk_live_…`,
 share your account's tier + rate limit, and count against the same usage
-quota. Treat them like passwords — never embed one in client-side code.
+quota. Treat them like passwords: never embed one in client-side code.
 
 ## Server-to-server
 
@@ -53,7 +53,7 @@ Content-Type: application/json
 { "jsonrpc": "2.0", "id": "…", "method": "matches.list", "params": {…} }
 ```
 
-API keys don't expire — they're valid until manually revoked from the
+API keys don't expire. They're valid until manually revoked from the
 dashboard. Treat them like passwords. Rotate periodically (every 90 days
 is a sensible baseline).
 
@@ -68,7 +68,7 @@ is a sensible baseline).
 `@mrdoge/client` never sees the API key. Your backend mints a short-lived
 JWT, the SDK fetches it, and refreshes it before expiry.
 
-### Step 1 — mint tokens on your backend
+### Step 1: mint tokens on your backend
 
 Expose a route that calls `mrdoge.tokens.create()`:
 
@@ -83,7 +83,7 @@ export async function POST() {
 }
 ```
 
-The response **must** match this shape — `@mrdoge/client` expects it:
+The response **must** match this shape: `@mrdoge/client` expects it:
 
 ```ts
 type TokenResponse = {
@@ -99,9 +99,9 @@ type TokenResponse = {
 | `ttl` | `number` | Seconds. Bounded **60–86400**. Default **600** (10 min). |
 
 For other backends (Express, Nest, plain Node), see the
-[guides](/docs/guides) — the route handler is the same shape.
+[guides](/docs/guides); the route handler is the same shape.
 
-### Step 2 — gate the mint route by your own auth
+### Step 2: gate the mint route by your own auth
 
 Anyone who can POST to your token route can use Mr. Doge with your tier's
 quota. Gate it by your app's session:
@@ -125,10 +125,10 @@ export async function POST() {
 
 For public/anonymous apps (e.g. a marketing widget), skip the session
 check but consider rate-limiting the route itself (e.g. with Vercel
-Firewall or Cloudflare Rate Limiting) — uncapped, scrapers will burn your
+Firewall or Cloudflare Rate Limiting). Uncapped, scrapers will burn your
 tier quota.
 
-### Step 3 — consume from your frontend
+### Step 3: consume from your frontend
 
 ```ts
 import { MrDoge } from "@mrdoge/client";
@@ -138,8 +138,8 @@ const mrdoge = new MrDoge({
 });
 ```
 
-The SDK POSTs to `authEndpoint` whenever it needs a fresh token — first
-connect, after expiry, after a reconnect — automatically.
+The SDK POSTs to `authEndpoint` automatically whenever it needs a fresh
+token: first connect, after expiry, after a reconnect.
 
 ### Custom `fetchToken` for advanced flows
 
@@ -162,8 +162,8 @@ const mrdoge = new MrDoge({
 });
 ```
 
-`fetchToken` is just `() => Promise<{ token: string; expiresAt: string }>`
-— do whatever you need to produce that shape.
+`fetchToken` is just `() => Promise<{ token: string; expiresAt: string }>`.
+Do whatever you need to produce that shape.
 
 ### `authHeaders` shortcut
 
@@ -196,7 +196,7 @@ ops, raise it for high-traffic anonymous flows.
 
 ### Refresh timing
 
-`@mrdoge/client` refreshes proactively — it calls your `fetchToken` /
+`@mrdoge/client` refreshes proactively: it calls your `fetchToken` /
 `authEndpoint` shortly **before** the current token expires. Default
 leeway is **30 seconds**; tune with `refreshLeewaySec`:
 
@@ -211,7 +211,7 @@ const mrdoge = new MrDoge({
 
 The SDK retries the in-flight request once with a freshly minted token. If
 the second attempt also returns `unauthorized`, it surfaces
-`UnauthorizedError` to your code. You'll typically never see this — the
+`UnauthorizedError` to your code. You'll typically never see this since the
 proactive refresh covers most cases.
 
 ### What the JWT carries
@@ -220,7 +220,7 @@ The JWT inherits:
 
 - The minting key's **tier** (starter, growth, business)
 - The minting key's **rate-limit class** (requests/min, subscriptions, connections)
-- The minting key's **identity** — tokens are scoped to the API key that minted them
+- The minting key's **identity**: tokens are scoped to the API key that minted them
 - A short expiry (`ttl`)
 
 The JWT **cannot**:
@@ -235,7 +235,7 @@ Even if leaked, the blast radius is bounded by the TTL.
 
 ### Anonymous public widget
 
-No user auth — just rate-limit the route:
+No user auth: just rate-limit the route:
 
 ```ts
 export async function POST(req: Request) {
@@ -272,7 +272,7 @@ MRDOGE_API_KEY=sk_live_…
 MRDOGE_API_KEY=sk_live_…
 ```
 
-The SDK doesn't need to know which environment it's in — it auths with
+The SDK doesn't need to know which environment it's in: it auths with
 whatever key you give it. Test keys hit sandbox markets; live keys hit
 production.
 
@@ -287,7 +287,7 @@ Authorization: Bearer sk_live_…  or  Bearer <JWT>
   </Tab>
   <Tab value="WebSocket">
 The first frame after `connect` is an `auth` method call. The SDK handles
-this automatically — you'll only see it in DevTools.
+this automatically; you'll only see it in DevTools.
 ```json
 { "jsonrpc": "2.0", "id": "1", "method": "auth", "params": { "apiKey": "sk_live_…" } }
 ```
@@ -314,7 +314,7 @@ Rotate immediately if:
 - An employee with key access leaves
 - You see suspicious usage in the dashboard
 
-The dashboard surfaces last-used timestamps per key — useful for spotting
+The dashboard surfaces last-used timestamps per key, useful for spotting
 unused (or compromised) keys.
 
 ## Errors
@@ -380,7 +380,7 @@ Auth failures return:
 { "jsonrpc": "2.0", "id": "1", "error": { "code": "unauthorized", "message": "..." } }
 ```
 
-(The HTTP status is `200` even on errors — the JSON-RPC envelope carries
+(The HTTP status is `200` even on errors. The JSON-RPC envelope carries
 the failure. Standard JSON-RPC behaviour.)
 
 ## Next

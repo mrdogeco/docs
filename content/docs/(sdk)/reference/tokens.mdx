@@ -9,7 +9,7 @@ limit. Use it to keep `sk_live_…` server-side while letting
 
 <Callout type="info">
   `tokens.create` is only on `@mrdoge/node`. The browser SDK can't mint
-  tokens — that would defeat the purpose.
+  tokens: that would defeat the purpose.
 </Callout>
 
 ## `tokens.create`
@@ -47,7 +47,7 @@ The JWT carries:
 - The parent key's **rate-limit class** (requests/min, subscriptions, connections)
 - A short expiry (`ttl`)
 
-The client SDK uses it like an API key for the duration — but it can't be
+The client SDK uses it like an API key for the duration, but it can't be
 used to mint more tokens, and it dies at expiry. Even if leaked, the blast
 radius is bounded.
 
@@ -74,7 +74,7 @@ Browser            Your backend            Mr. Doge API
 
 ## Refresh
 
-`@mrdoge/client` refreshes the token automatically before it expires — call
+`@mrdoge/client` refreshes the token automatically before it expires: call
 your `authEndpoint` again, get a fresh token, use it on the next WebSocket
 reconnect or HTTP call.
 
@@ -83,8 +83,8 @@ You don't need to do anything in your code. The `refreshLeewaySec` option
 
 Set `ttl` to balance:
 
-- **Short TTL (60–300s)** — tighter security, more refresh round-trips
-- **Long TTL (3600–86400s)** — fewer round-trips, longer blast radius if leaked
+- **Short TTL (60–300s)**: tighter security, more refresh round-trips
+- **Long TTL (3600–86400s)**: fewer round-trips, longer blast radius if leaked
 
 The default `ttl: 600` (10 minutes) is a good starting point.
 

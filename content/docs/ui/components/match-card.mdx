@@ -20,10 +20,10 @@ Pass `odds` to render an odds row using the same options as
 (shown second below).
 
 `oddsPosition="right"` falls back to stacked below a `32rem` container
-width — a CSS container query, tracking the card's own width rather than
+width: a CSS container query, tracking the card's own width rather than
 the viewport. Resize your browser to see it switch on the row card above.
 
-This example subscribes to live odds (Business tier) — if none are
+This example subscribes to live odds (Business tier). If none are
 available for a match, its odds row doesn't render.
 
 <ExampleSection file="components/docs/demos/match-card-live-with-odds-demo.tsx">
@@ -33,7 +33,7 @@ available for a match, its odds row doesn't render.
 ### Selecting an option
 
 Odds selection is controlled, the same pattern as
-[Odds Selector](/docs/ui/components/odds-selector#props) — Match Card
+[Odds Selector](/docs/ui/components/odds-selector#props). Match Card
 holds no selection state itself. Track the selected id and pass it back
 in:
 
@@ -47,7 +47,7 @@ const [selectedOddsId, setSelectedOddsId] = useState<string>()
 />
 ```
 
-Pressing the selected option again deselects it — `onSelectOdds` fires
+Pressing the selected option again deselects it: `onSelectOdds` fires
 with `undefined`, so `setSelectedOddsId` needs no extra logic. Omit both
 props and the row stays clickable, but nothing renders as selected.
 
@@ -67,7 +67,7 @@ const market = markets?.[0]
 />
 ```
 
-Only set it on a card that actually uses odds — omit both `odds` and
+Only set it on a card that actually uses odds; omit both `odds` and
 `oddsLoading` otherwise. `loading` (below) accepts the same
 `oddsLoading`/`oddsPosition`, so the skeleton can reserve odds space
 before the match itself has loaded.
@@ -91,13 +91,13 @@ their data loads.
 
 MatchCard takes plain props, so it works with any data source. See the
 [Match Card Adapter](/docs/ui/mrdoge-sdk/usage#match-card) for the real function
-mapping a `matches.get()`/`odds.list()` response onto these props — the
+mapping a `matches.get()`/`odds.list()` response onto these props. It's the
 one behind both examples above.
 
 ## Props
 
 `loading: true` is mutually exclusive with every other prop except
-`oddsLoading` and `oddsPosition` — see [Loading](#loading) above.
+`oddsLoading` and `oddsPosition`; see [Loading](#loading) above.
 Everything below applies when `loading` is omitted or `false`.
 
 <TypeTable
@@ -209,7 +209,7 @@ Everything below applies when `loading` is omitted or `false`.
 ### MatchCardSkeleton
 
 `<MatchCard loading />` renders this internally, but it's also exported on
-its own — `import { MatchCardSkeleton } from "@/components/match-card"` —
+its own (`import { MatchCardSkeleton } from "@/components/match-card"`)
 for a loading list of several cards before any of them have data yet.
-Takes `className`, `oddsLoading`, and `oddsPosition` — same meaning as on
+Takes `className`, `oddsLoading`, and `oddsPosition`, same meaning as on
 `loading` above.

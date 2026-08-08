@@ -5,7 +5,7 @@ description: Today's most-viewed matches, ranked server-side by views. One-shot,
 
 import { InstallTabs } from "@/components/docs/install-tabs"
 
-Wraps `matches.trending()` — today's matches with `views > 0`, ordered by
+Wraps `matches.trending()`: today's matches with `views > 0`, ordered by
 views descending.
 
 ## Installation
@@ -16,7 +16,7 @@ Installing this pulls in two files: the hook itself (a thin re-export
 from [`@mrdoge/react`](/docs/ui/mrdoge-sdk/installation), which does the
 real work) and a Next.js route at `app/api/mrdoge/token/route.ts` that
 mints short-lived tokens using `@mrdoge/node` and your own
-`MRDOGE_ODDS_API_KEY` — the browser client never sees the raw key.
+`MRDOGE_ODDS_API_KEY`. The browser client never sees the raw key.
 
 ## Usage
 
@@ -27,8 +27,8 @@ const matches = useTrendingMatches({ sports: ["soccer"], limit: 5 })
 ```
 
 Takes a single options object, like every real SDK method it wraps
-(`matches.trending(params)`) — not positional arguments. Only resolves
-*which* matches — pair it with
+(`matches.trending(params)`), not positional arguments. Only resolves
+*which* matches; pair it with
 [useLiveMatch](/docs/ui/mrdoge-sdk/hooks/use-live-match) or
 [useMatch](/docs/ui/mrdoge-sdk/hooks/use-match) to actually fetch one.
 
@@ -61,7 +61,7 @@ Takes a single options object, like every real SDK method it wraps
 
 ## Returns
 
-`Match[] | null | undefined` — `undefined` while the request is in flight,
+`Match[] | null | undefined`: `undefined` while the request is in flight,
 `null` if it failed (no fallback data), otherwise the ranked list. One-shot:
-this doesn't push live updates the way `useLiveMatch`/`useOdds` do —
+this doesn't push live updates the way `useLiveMatch`/`useOdds` do;
 call it again (or remount) to refresh.

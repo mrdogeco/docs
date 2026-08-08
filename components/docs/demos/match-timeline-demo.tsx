@@ -9,8 +9,9 @@ import { matchToMatchTimelineProps } from "@/lib/mrdoge-adapters/match-timeline"
 import { getMrDogeClient } from "@/registry/mrdoge-ui/mrdoge-client/mrdoge-client"
 import { useLiveMatch } from "@/registry/mrdoge-ui/use-live-match/use-live-match"
 import { useSharedLiveOrCompletedMatchId } from "@/components/docs/demos/use-shared-demo-matches"
+import { FINISHED_MATCH_ID } from "@/components/docs/sample-data"
 
-// matches.subscribe only pushes stats.upd/status.upd — there's no
+// matches.subscribe only pushes stats.upd/status.upd. There's no
 // timeline.upd, so useLiveMatch's own snapshot never gets new events
 // once a match is subscribed. Polling just the timeline field (a cheap
 // partial fetch via `select`) while live is the workaround.
@@ -43,19 +44,35 @@ function useLiveTimeline(matchId: string | undefined, isLive: boolean) {
 
 export function MatchTimelineDemo() {
   // Prefers a genuinely live match; falls back to a fixed completed match
-  // if nothing's live right now (e.g. quiet hours) — an upcoming match
+  // if nothing's live right now (e.g. quiet hours): an upcoming match
   // would just trade one empty timeline for another.
-  const matchId = useSharedLiveOrCompletedMatchId()
+  const resolvedId = useSharedLiveOrCompletedMatchId()
+
+  // A live match can resolve before it has any goals/cards yet (e.g. it
+  // just kicked off) — a duller demo than the guaranteed-populated
+  // finished match. Once we see that, switch to it instead.
+  const [fallbackToFinished, setFallbackToFinished] = useState(false)
+  const matchId = fallbackToFinished ? FINISHED_MATCH_ID : resolvedId
   const match = useLiveMatch({ matchId })
   const liveTimeline = useLiveTimeline(matchId, match?.status === "live")
-
-  if (match === null) {
-    return <p className="text-sm text-fd-muted-foreground">Couldn't load this match right now.</p>
-  }
 
   const timeline = match
     ? matchToMatchTimelineProps({ ...match, timeline: liveTimeline ?? match.timeline })
     : null
+
+  // "Real" excludes the synthetic live-score/HT/FT divider entries Match
+  // Timeline always injects for a live or completed match — those aren't
+  // an actual reported event.
+  const hasRealEntries = timeline?.entries.some((entry) => entry.type !== "divider") ?? false
+  useEffect(() => {
+    if (!fallbackToFinished && match?.status === "live" && !hasRealEntries) {
+      setFallbackToFinished(true)
+    }
+  }, [fallbackToFinished, match?.status, hasRealEntries])
+
+  if (match === null) {
+    return <p className="text-sm text-fd-muted-foreground">Couldn't load this match right now.</p>
+  }
 
   return (
     <div className="flex w-full max-w-sm flex-col gap-3">

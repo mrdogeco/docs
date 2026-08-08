@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils"
 
 /**
  * Same DOM shape as OddsSelector's own "card" variant (label bar + button
- * grid), sized from the same text tokens (text-xs/text-sm line-heights) —
+ * grid), sized from the same text tokens (text-xs/text-sm line-heights):
  * matches the real rendered height exactly once options load, rather than
  * a guessed pixel value that drifts out of sync.
  */
@@ -42,7 +42,7 @@ export function OddsSelectorSkeleton({
 
 /**
  * Placeholder for a lines table (one row per market, two columns per row).
- * Real row count is dynamic — however many lines a match currently has —
+ * Real row count is dynamic (however many lines a match currently has),
  * so this renders a reasonable generic count while loading rather than
  * trying to predict the exact number.
  */

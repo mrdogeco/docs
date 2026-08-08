@@ -1,6 +1,6 @@
 ---
 title: Cloudflare Workers
-description: Edge-runtime SDK with @mrdoge/http — zero Node dependencies.
+description: Edge-runtime SDK with @mrdoge/http, zero Node dependencies.
 ---
 
 `@mrdoge/http` is purpose-built for edge runtimes: zero Node-specific
@@ -83,11 +83,11 @@ async function cachedMatches(sport: string, env: Env): Promise<Match[]> {
 
 ## What `@mrdoge/http` can't do
 
-- **No subscriptions** — `matches.subscribeLive` and `matches.subscribe`
+- **No subscriptions**: `matches.subscribeLive` and `matches.subscribe`
   throw `method_not_found`. Use `matches.getLive` for one-shot snapshots, or
   hold the subscription in a Worker Durable Object if you need persistent
   live data.
-- **No `auth`/`subscription.cancel`** — those are WebSocket protocol methods
+- **No `auth`/`subscription.cancel`**: those are WebSocket protocol methods
   that have no HTTP meaning.
 
 For everything else (lists, gets, AI picks, tokens), `@mrdoge/http` is

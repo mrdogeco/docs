@@ -16,11 +16,11 @@ import {
 /**
  * Mounted once at the /docs/ui layout root, so it stays alive across
  * client-side navigation between component pages. Warms the shared
- * @mrdoge/react cache — matches and their odds — as soon as any docs page
+ * @mrdoge/react cache (matches and their odds) as soon as any docs page
  * loads, so navigating to a page that reuses the same match/market reads
  * it from cache instantly instead of showing a fresh loading skeleton.
  *
- * Doesn't cover Bet Slip's multi-game example — it needs several
+ * Doesn't cover Bet Slip's multi-game example: it needs several
  * *distinct* upcoming matches, not the one shared upcoming match
  * everything else here uses.
  */
@@ -28,7 +28,7 @@ export function MrDogePrefetch() {
   useLiveMatch({ matchId: DEMO_MATCH_ID })
   useMatch({ matchId: FINISHED_MATCH_ID })
   // Match Timeline/Stats List's fallback subscribes (not one-shot fetches)
-  // this same match — a different cache key, warmed separately.
+  // this same match, a different cache key, warmed separately.
   useLiveMatch({ matchId: FINISHED_MATCH_ID })
 
   const upcomingId = useSharedUpcomingMatchId()

@@ -3,7 +3,7 @@ title: Matches
 description: List, get, search, and subscribe to live matches across every major sport.
 ---
 
-The `matches` resource is the workhorse of the SDK — every other resource
+The `matches` resource is the workhorse of the SDK. Every other resource
 hangs off it.
 
 ## `matches.list`
@@ -27,11 +27,11 @@ const { data, pagination } = await mrdoge.matches.list({
 | `regionIds` | `number[]` | Filter to one or more regions |
 | `teamIds` | `number[]` | Filter to matches involving any of the listed teams |
 | `status` | `MatchStatus[]` | `["upcoming"]`, `["live"]`, `["completed"]`, or combinations |
-| `date` | `string` | `YYYY-MM-DD` — matches on this day |
+| `date` | `string` | `YYYY-MM-DD`, matches on this day |
 | `startDate` / `endDate` | `string` | Range filter |
 | `cursor` | `string` | Pagination cursor (opaque) |
 | `limit` | `number` | Max 100 |
-| `select` | `MatchSelect` | Field selector — see [selectors](#selectors) |
+| `select` | `MatchSelect` | Field selector, see [selectors](#selectors) |
 | `locale` | `string` | `"en"`, `"pt-BR"`, `"es"` |
 | `timezone` | `string` | IANA timezone (e.g. `"America/Sao_Paulo"`) |
 
@@ -63,7 +63,7 @@ const all = await mrdoge.matches.listAll(
 | `onPage` | `(page, accumulated) => void` | Called per page for progressive rendering |
 | `signal` | `AbortSignal` | Cancel the walk mid-page |
 
-**Returns:** `Match[]` — every match across all pages.
+**Returns:** `Match[]`, every match across all pages.
 
 ## `matches.get`
 
@@ -77,11 +77,11 @@ const match = await mrdoge.matches.get({ id: "match_abc123" });
 
 | Field | Type | Notes |
 |-------|------|-------|
-| `id` | `string` | Match ID — strings, not numbers |
+| `id` | `string` | Match ID, strings, not numbers |
 | `select` | `MatchDetailSelect` | Field selector |
 | `locale` | `string` | Localization |
 
-**Returns:** `MatchDetail` — includes stats, markets, and current clock.
+**Returns:** `MatchDetail`, includes stats, markets, and current clock.
 
 ## `matches.trending`
 
@@ -98,7 +98,7 @@ const trending = await mrdoge.matches.trending({
 
 | Field | Type | Notes |
 |-------|------|-------|
-| `sports` | `string[]` | Optional — defaults to all sports |
+| `sports` | `string[]` | Optional, defaults to all sports |
 | `status` | `MatchStatus[]` | Optional |
 | `limit` | `number` | Max 50, default 5 |
 | `select` | `MatchSelect` | Field selector |
@@ -121,7 +121,7 @@ const results = await mrdoge.matches.search({
 | Field | Type | Notes |
 |-------|------|-------|
 | `query` | `string` | Min 2 chars |
-| `sports` | `string[]` | Optional — narrow by one or more sports |
+| `sports` | `string[]` | Optional, narrow by one or more sports |
 | `status` | `MatchStatus[]` | Optional |
 | `limit` | `number` | Max 20 |
 | `select` | `MatchSelect` | Field selector |
@@ -137,7 +137,7 @@ const sub = await mrdoge.matches.subscribeLive({
   sports: ["soccer"],
 });
 
-// Initial state — already populated from the HTTP cold-start cache
+// Initial state, already populated from the HTTP cold-start cache
 console.log("Snapshot:", sub.snapshot.length, "matches");
 
 // Stream deltas
@@ -160,22 +160,22 @@ await sub.cancel();
 | `sports` | `string[]` | Optional |
 | `regionIds` | `number[]` | Optional |
 | `competitionIds` | `number[]` | Optional |
-| `select` | `MatchSelect` | Field selector — applies to snapshot AND every delta |
+| `select` | `MatchSelect` | Field selector, applies to snapshot AND every delta |
 
-**Returns:** `Subscription<"matches.subscribeLive">` — see
+**Returns:** `Subscription<"matches.subscribeLive">`, see
 [subscriptions](/docs/reference/subscriptions).
 
 **Push events:** `match.upd` (full match payload), `match.del` (`{ id: string }`)
 
 <Callout type="info">
-  The SDK races HTTP cache against WebSocket connect for the initial snapshot
-  — `sub.snapshot` is populated in ~100ms instead of ~1.5s.
+  The SDK races HTTP cache against WebSocket connect for the initial snapshot.
+  `sub.snapshot` is populated in ~100ms instead of ~1.5s.
   [Read the cold-start details →](/docs/concepts/transports#the-subscribelive-race)
 </Callout>
 
 ## `matches.subscribe`
 
-Deep subscription for a single match — every stat update and status
+Deep subscription for a single match: every stat update and status
 transition. For live order-book deltas on the same match, pair this with
 [`odds.subscribe`](/docs/reference/odds#oddssubscribe).
 
@@ -195,7 +195,7 @@ sub.on("status.upd", ({ status }) => onPhaseChange(status));
 | Field | Type | Notes |
 |-------|------|-------|
 | `matchId` | `string` | Required |
-| `select` | `MatchDetailSelect` | Field selector — applies to snapshot and `stats.upd` |
+| `select` | `MatchDetailSelect` | Field selector, applies to snapshot and `stats.upd` |
 
 **Returns:** `Subscription<"matches.subscribe">`
 
@@ -204,7 +204,7 @@ sub.on("status.upd", ({ status }) => onPhaseChange(status));
 ## `matches.getLive`
 
 One-shot snapshot of all live matches matching the filters. No subscription,
-no deltas — useful for cron jobs or edge runtimes.
+no deltas. Useful for cron jobs or edge runtimes.
 
 ```ts
 const snapshot = await mrdoge.matches.getLive({ sports: ["soccer"] });
@@ -233,7 +233,7 @@ type Match = {
   sport: { id: number; name: SportName } | null;
   competition: { id: number; name: string };
   region: { id: number; name: string };
-  stats?: MatchStats | null;        // sport-discriminated — see below
+  stats?: MatchStats | null;        // sport-discriminated, see below
   timeline?: TimelineEvent[];       // sport-tagged event log
 };
 
@@ -244,13 +244,13 @@ type SportName =
 
 ### Where are the markets?
 
-Markets live on the dedicated `odds.*` resource — see
+Markets live on the dedicated `odds.*` resource. See
 [odds.list / odds.subscribe](/docs/reference/odds). The split keeps the
 `Match` payload lean: customers who render scores and stats only don't pay
 bandwidth for an order book they never use. Pull markets when you need
 them via `mrdoge.odds.list({ matchId })`.
 
-## `MatchStats` — sport-discriminated
+## `MatchStats`: sport-discriminated
 
 `MatchStats` is a **discriminated union** on `stats.sport`. Common
 fields (`clock`, `periods`, `homeScore`, `awayScore`) are typed without
@@ -258,10 +258,10 @@ narrowing. Sport-specific fields require a narrow:
 
 ```ts
 sub.on("match.upd", (match) => {
-  // Common — always typed
+  // Common, always typed
   console.log(match.stats?.homeScore, match.stats?.clock?.display);
 
-  // Sport-specific — TS narrows on `stats.sport`
+  // Sport-specific, TS narrows on `stats.sport`
   if (match.stats?.sport === "tennis") {
     console.log(
       `${match.stats.homeCurrentGamePoints} - ${match.stats.awayCurrentGamePoints}`,
@@ -338,13 +338,13 @@ type TennisStats = {
   homeScore: number; awayScore: number;     // sets won
   /** Games won in the in-progress set. */
   homeGamesInCurrentSet?: number; awayGamesInCurrentSet?: number;
-  /** Current game points — "0" / "15" / "30" / "40" / "AD". */
+  /** Current game points: "0" / "15" / "30" / "40" / "AD". */
   homeCurrentGamePoints?: string; awayCurrentGamePoints?: string;
   /** Who's serving (mutually exclusive). */
   homeServes?: boolean; awayServes?: boolean;
   /** True when the current game is a tiebreak. */
   isInTieBreak?: boolean;
-  /** Match format — 3 (best-of-3) or 5 (best-of-5). */
+  /** Match format: 3 (best-of-3) or 5 (best-of-5). */
   numberOfSets?: number;
   /** Court surface code (provider-specific). */
   courtType?: number;
@@ -352,7 +352,7 @@ type TennisStats = {
 ```
 
 The data feed uses `player1` / `player2` but the SDK normalizes to
-`home` / `away` — player1 maps to home.
+`home` / `away`: player1 maps to home.
 
   </Tab>
   <Tab value="Basketball">
@@ -385,7 +385,7 @@ type BaseballStats = {
 };
 ```
 
-Baseball matches typically return `timeline: []` — the data feed doesn't
+Baseball matches typically return `timeline: []`. The data feed doesn't
 emit baseball events today.
 
   </Tab>
@@ -443,23 +443,23 @@ type AmericanFootballStats = {
 
 ## Timeline
 
-`match.timeline` is a sport-tagged event log — every notable in-match
+`match.timeline` is a sport-tagged event log: every notable in-match
 event in chronological order. Sibling to `stats`, not nested inside it:
 
 ```ts
 type TimelineEvent = {
-  /** Event kind — sport-specific. See per-sport unions below. */
+  /** Event kind: sport-specific. See per-sport unions below. */
   type: string;
-  /** Normalized side — "home" / "away" / "match" (game-level events). */
+  /** Normalized side: "home" / "away" / "match" (game-level events). */
   side: "home" | "away" | "match";
-  /** Phase code — "1H" / "Q1" / "S1" / "P1" / "TB" / "OT" / … */
+  /** Phase code: "1H" / "Q1" / "S1" / "P1" / "TB" / "OT" / … */
   phase: string;
   /** Sport- and type-specific display strings. Positional, see below. */
   captions: string[];
   /**
    * Time offset from match start, in seconds. Populated for sports where
    * the data feed tracks per-event time (soccer, ice hockey, handball).
-   * `0` for sports without per-event timing (tennis — game-by-game order
+   * `0` for sports without per-event timing (tennis: game-by-game order
    * is preserved by array index; basketball / football boundary events).
    * Always read events in array order; the field is for display only.
    */
@@ -508,7 +508,7 @@ if (match.sport?.name === "soccer") {
 - **Hockey / Handball `GoalWithoutScorer`**: `[matchMinute, teamName]`
 - **Basketball / Football `EndOf<N>Quarter`**: `[homeScore, awayScore]`
 
-Other event types follow the same convention — the first element is
+Other event types follow the same convention: the first element is
 typically a time marker; remaining elements are team / player / score
 data.
 
@@ -525,11 +525,11 @@ one schema. Each numeric field's semantics depend on the sport:
 | `remainingSeconds` | `null` (count-up) | Seconds left on the period clock | `null` |
 | `periodDurationSeconds` | `null` (no fixed half length) | 720s NBA quarter, 1200s NHL period, etc. | `null` |
 | `minute` | Running match minute (soccer only) | `null` | `null` |
-| `stoppage` | Added/injury time minutes (soccer only) — `null` outside stoppage | `null` | `null` |
+| `stoppage` | Added/injury time minutes (soccer only), `null` outside stoppage | `null` | `null` |
 | `display` | `"44'"`, `"45+3'"`, `"HT"`, `"FT"` | `"Q3 7:42"`, `"OT 0:34"`, `"FT"` | `"Set 4"`, `"9º Inning"` |
 
 The `display` / `displayLong` strings are pre-formatted and localized by
-the server — render them directly for the lazy path. For custom clocks,
+the server. Render them directly for the lazy path. For custom clocks,
 read the numeric fields and switch on `clock.state`.
 
 ## Default limits
@@ -541,11 +541,11 @@ Each method has a server-enforced default and maximum on `limit`:
 | `matches.list` | 20 | 100 |
 | `matches.trending` | 5 | 50 |
 | `matches.search` | 10 | 20 |
-| `matches.getLive` | unbounded snapshot | — |
+| `matches.getLive` | unbounded snapshot | N/A |
 
 ## Selectors
 
-GraphQL-style projection — request only the fields you need. Reduces
+GraphQL-style projection: request only the fields you need. Reduces
 payload size, deserialization time, and re-render cost.
 
 ```ts
@@ -564,10 +564,10 @@ const { data } = await mrdoge.matches.list({
 Selectors apply to every match-bearing method:
 
 - `matches.list`, `matches.get`, `matches.trending`, `matches.search`,
-  `matches.getLive` — applies to the response
-- `matches.subscribeLive` — applies to the initial **snapshot** AND every
+  `matches.getLive`: applies to the response
+- `matches.subscribeLive`: applies to the initial **snapshot** AND every
   `match.upd` push for the lifetime of the subscription
-- `matches.subscribe` — same for `stats.upd` and `odds.upd` deltas
+- `matches.subscribe`: same for `stats.upd` and `odds.upd` deltas
 
 The `select` type (`MatchSelect` or `MatchDetailSelect`) walks the
 response shape recursively, so autocomplete drives every key. Selector
@@ -581,11 +581,11 @@ rules:
 
 The server caches the full response shape **once**, then projects per
 request. Two calls with different `select` shapes share the same upstream
-fetch and cache entry — you don't pay a cache miss for picking different
+fetch and cache entry: you don't pay a cache miss for picking different
 fields.
 
 This means feature-flag-driven selectors (e.g. one component renders
-`homeScore`, another renders `homeScore` + `clock.display`) are free — no
+`homeScore`, another renders `homeScore` + `clock.display`) are free, no
 extra round-trips.
 
 ### Subscriptions: bandwidth savings compound
@@ -599,7 +599,7 @@ projects each delta before sending.
 ## Next
 
 <Cards>
-  <Card href="/docs/reference/odds" title="Odds →" description="odds.list / odds.subscribe — live order books per match." />
+  <Card href="/docs/reference/odds" title="Odds →" description="odds.list / odds.subscribe: live order books per match." />
   <Card href="/docs/reference/recommendations" title="AI Recommendations →" description="Edge-scored picks with reasoning and Kelly sizing." />
   <Card href="/docs/reference/subscriptions" title="Subscriptions →" description="Event handlers, lifecycle, cancellation." />
 </Cards>

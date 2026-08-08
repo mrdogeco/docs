@@ -3,26 +3,31 @@ import type { OddsOption } from "@/registry/mrdoge-ui/odds-selector/odds-selecto
 import type { MatchTimelineEntry } from "@/registry/mrdoge-ui/match-timeline/match-timeline"
 import type { BetSlipPick } from "@/registry/mrdoge-ui/bet-slip/bet-slip"
 
-// A specific, curated real match — not "whatever's live right now" — so the
+// A specific, curated real match, not "whatever's live right now", so the
 // live demo pages (see registry/mrdoge-ui/use-live-match/use-live-match.ts)
 // are predictable.
 export const DEMO_MATCH_ID = "45293428"
 
-// 2026 World Cup Final (Spain 1-0 Argentina, after extra time) — a
+// 2026 World Cup Final (Spain 1-0 Argentina, after extra time). A
 // completed match with a full stats/timeline history, for Match
 // Highlight's "completed" example.
 export const FINISHED_MATCH_ID = "47170270"
 
 // Curated set of real, completed matches for build-time SSG showcases
-// (mrdoge.co's homepage components teaser) — fetched via
+// (mrdoge.co's homepage components teaser), fetched via
 // lib/mrdoge-server.ts's fetchShowcaseMatches. FINISHED_MATCH_ID leads the
 // list since it doubles as the single-match demo used elsewhere.
 export const SHOWCASE_MATCH_IDS = [FINISHED_MATCH_ID, "47170287", "46934657"]
 
+// Two more curated matches, just for the /ui gallery's Match Highlight
+// cards — kept separate from SHOWCASE_MATCH_IDS so the homepage's
+// components teaser doesn't pick them up too.
+export const MATCH_HIGHLIGHT_IDS = ["46876846", "46878402"]
+
 // Typed against the real SDK response shape (satisfies Market[]/TimelineEvent[]/etc),
 // so a schema change in @mrdoge/protocol shows up here as a build failure
 // instead of a silent inaccuracy. Content is still hand-picked for a good
-// demo — only the shape is compiler-verified.
+// demo; only the shape is compiler-verified.
 export const sampleMarkets = [
   {
     id: "market-1",
@@ -61,10 +66,10 @@ export const sampleOdds: OddsOption[] = [
 ]
 
 export const sampleTimeline: MatchTimelineEntry[] = [
-  { id: "1", time: "12'", type: "goal", side: "home", description: "Goal — Silva" },
-  { id: "2", time: "34'", type: "yellow-card", side: "away", description: "Yellow card — Reyes" },
+  { id: "1", time: "12'", type: "goal", side: "home", description: "Goal: Silva" },
+  { id: "2", time: "34'", type: "yellow-card", side: "away", description: "Yellow card: Reyes" },
   { id: "3", time: "58'", type: "substitution", side: "home", description: "Silva off, Costa on" },
-  { id: "4", time: "77'", type: "goal", side: "away", description: "Goal — Reyes" },
+  { id: "4", time: "77'", type: "goal", side: "away", description: "Goal: Reyes" },
 ]
 
 export const samplePicks: BetSlipPick[] = [

@@ -5,7 +5,7 @@ description: Diffs each line's price against its previous snapshot, so an Odds S
 
 import { InstallTabs } from "@/components/docs/install-tabs"
 
-Movement isn't something the SDK computes or sends — `odds.subscribe`
+Movement isn't something the SDK computes or sends. `odds.subscribe`
 pushes a full replace-in-place snapshot on every change (see
 [useOdds](/docs/ui/mrdoge-sdk/hooks/use-odds)), with no "this went up" flag
 attached. This hook remembers the previous snapshot's prices itself and
@@ -15,7 +15,7 @@ diffs against the new one, entirely client-side.
 
 <InstallTabs name="use-odds-movement" />
 
-Pairs with [useOdds](/docs/ui/mrdoge-sdk/hooks/use-odds) — pass it the same
+Pairs with [useOdds](/docs/ui/mrdoge-sdk/hooks/use-odds); pass it the same
 market. No extra SDK setup beyond what useOdds already needs.
 
 ## Usage
@@ -31,7 +31,7 @@ const movementById = useOddsMovement(market)
 <TypeTable
   type={{
     market: {
-      description: "The current market snapshot, e.g. from useOdds. Pass undefined/null while loading or unavailable — the hook just returns an empty object.",
+      description: "The current market snapshot, e.g. from useOdds. Pass undefined/null while loading or unavailable; the hook just returns an empty object.",
       type: "Market | null | undefined",
       required: true,
     },
@@ -40,12 +40,12 @@ const movementById = useOddsMovement(market)
 
 ## Returns
 
-`Record<string, "up" | "down" | "flat">` — keyed by line id. In
+`Record<string, "up" | "down" | "flat">`, keyed by line id. In
 practice only `"up"` and `"down"` are ever produced; `"flat"` exists on
 the type (`OddsMovement`, from `@mrdoge/react`, structurally the same
 type Odds Selector's own `movement` prop takes) but this hook never
 emits it. A line only gets an entry once there's a previous price to compare
-against — the first snapshot ever seen for a given id has nothing to
+against. The first snapshot ever seen for a given id has nothing to
 diff, and an unchanged price isn't given an entry either. A color that
 never goes away would just be noise; ids missing from the result should
 render with the default price color.

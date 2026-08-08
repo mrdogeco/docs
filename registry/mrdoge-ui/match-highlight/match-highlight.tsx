@@ -8,7 +8,7 @@ import { EntityImage } from "@/registry/mrdoge-ui/entity-image/entity-image"
 import { MatchCardCompact, type MatchCardCompactTeam } from "@/registry/mrdoge-ui/match-card-compact/match-card-compact"
 import { Popover, PopoverContent, PopoverTitle, PopoverTrigger } from "@/components/ui/popover"
 
-/** Mirrors match.status directly — no "scheduled"/"finished" relabeling. */
+/** Mirrors match.status directly, no "scheduled"/"finished" relabeling. */
 export type MatchHighlightStatus = "upcoming" | "live" | "completed"
 
 export interface MatchHighlightTeam {
@@ -20,13 +20,13 @@ export interface MatchHighlightTeam {
 }
 
 export interface MatchHighlightClock {
-  /** Finer-grained than the outer `status`, which only has "live" — not paused/intermission/interrupted. */
+  /** Finer-grained than the outer `status`, which only has "live", not paused/intermission/interrupted. */
   state: "scheduled" | "live" | "paused" | "intermission" | "interrupted" | "finished"
-  /** Short label, e.g. "45+2'", "HT", "FT" — used if displayLong is absent. */
+  /** Short label, e.g. "45+2'", "HT", "FT". Used if displayLong is absent. */
   display?: string | null
   /** Verbose label meant for a detail header, e.g. "Half-time", "Full Time", "2nd Half". Preferred over `display`. */
   displayLong?: string | null
-  /** Seconds elapsed as of `referenceTime` — paired together to tick a live timer client-side. Without both, falls back to `displayLong`/`display` as a static label. */
+  /** Seconds elapsed as of `referenceTime`, paired together to tick a live timer client-side. Without both, falls back to `displayLong`/`display` as a static label. */
   elapsedSeconds?: number | null
   referenceTime?: string | null
   /** Running match minute (soccer), already capped at the phase max. `null` for sports without one. */
@@ -44,7 +44,7 @@ export interface MatchHighlightCompetitionMatch {
   id: string
   home: MatchCardCompactTeam
   away: MatchCardCompactTeam
-  /** Pre-formatted, e.g. "2-1" or "18:00" — whatever's meaningful for that match's own status. */
+  /** Pre-formatted, e.g. "2-1" or "18:00": whatever's meaningful for that match's own status. */
   info?: string
 }
 
@@ -57,12 +57,12 @@ export interface MatchHighlightDataProps {
   /**
    * Other matches today in the same competition. Pass together with
    * `onOpenCompetitionMatches` to turn the competition name into a
-   * dropdown — omit either and it renders as plain, non-interactive text.
+   * dropdown; omit either and it renders as plain, non-interactive text.
    * `undefined` while the dropdown is open and still loading, `null` if
    * the fetch failed or there simply aren't any.
    */
   competitionMatches?: MatchHighlightCompetitionMatch[] | null
-  /** Called every time the dropdown opens — fetch `competitionMatches` lazily here rather than eagerly on every render. */
+  /** Called every time the dropdown opens; fetch `competitionMatches` lazily here rather than eagerly on every render. */
   onOpenCompetitionMatches?: () => void
   onSelectCompetitionMatch?: (matchId: string) => void
   kickoff?: Date | string
@@ -77,7 +77,7 @@ export interface MatchHighlightDataProps {
 }
 
 interface MatchHighlightLoadingProps {
-  /** Renders a skeleton with the same dimensions instead — no other prop is needed. */
+  /** Renders a skeleton with the same dimensions instead; no other prop is needed. */
   loading: true
   className?: string
 }
@@ -102,8 +102,8 @@ function formatFinishedDate(kickoff: Date | string, timeFormat: "12h" | "24h") {
 }
 
 // Ticks every second from elapsedSeconds + drift since referenceTime,
-// uncapped past 45/90. stoppage is a static "+N" suffix, not counted up
-// — it's the ref's fixed allotment, not a live position within it.
+// uncapped past 45/90. stoppage is a static "+N" suffix, not counted up;
+// it's the ref's fixed allotment, not a live position within it.
 // Falls back to a static label when not ticking (not live, or a sport
 // with no continuous minute).
 function useClockLabel(status: MatchHighlightStatus, clock: MatchHighlightClock | undefined): string | null {
@@ -116,7 +116,7 @@ function useClockLabel(status: MatchHighlightStatus, clock: MatchHighlightClock 
     return () => clearInterval(id)
   }, [canTick])
 
-  // Once the match is really over, ignore the clock entirely — it can be
+  // Once the match is really over, ignore the clock entirely: it can be
   // frozen on a stale in-progress reading (e.g. "125'" from extra time)
   // if the last push arrived right before the match ended. `status` is
   // authoritative here; the caller falls back to a plain "FT" instead.
@@ -134,7 +134,7 @@ function useClockLabel(status: MatchHighlightStatus, clock: MatchHighlightClock 
 }
 
 // The stats row's height is always reserved, whether or not this
-// particular team actually has cards/corners to show — otherwise two
+// particular team actually has cards/corners to show. Otherwise two
 // live matches (one with stats posted, one without) render at different
 // heights, and so does the same match before/after its first stats push.
 function TeamColumn({ team, showStats }: { team: MatchHighlightTeam; showStats: boolean }) {
@@ -261,7 +261,7 @@ function CompetitionRow({
 }
 
 // Mirrors the real markup row-for-row (same icon sizes, same reserved
-// stats-row height) rather than approximating with generic bars — so
+// stats-row height) rather than approximating with generic bars, so
 // there's no layout shift once real data replaces it, regardless of
 // which status the match turns out to have.
 export function MatchHighlightSkeleton({ className }: { className?: string }) {
@@ -269,13 +269,13 @@ export function MatchHighlightSkeleton({ className }: { className?: string }) {
     <div className={cn("@container w-full rounded-xl border bg-card p-3", className)}>
       <div className="flex items-center justify-center gap-1.5">
         <span className="size-3.5 shrink-0 animate-pulse rounded-full bg-muted" />
-        {/* h-4, not h-3 — matches text-xs' real 1rem line-height, not just its font-size */}
+        {/* h-4, not h-3: matches text-xs' real 1rem line-height, not just its font-size */}
         <span className="h-4 w-20 animate-pulse rounded bg-muted" />
       </div>
       <div className="mt-3 flex items-center justify-center gap-3 @sm:gap-6">
         <div className="flex flex-1 flex-col items-center gap-2">
           <span className="size-12 animate-pulse rounded-full bg-muted @sm:size-14" />
-          {/* h-5, not h-3 — matches text-sm's real 1.25rem line-height, not just its font-size */}
+          {/* h-5, not h-3: matches text-sm's real 1.25rem line-height, not just its font-size */}
           <span className="h-5 w-16 animate-pulse rounded bg-muted" />
           <span className="h-4 w-10 animate-pulse rounded bg-muted" />
         </div>

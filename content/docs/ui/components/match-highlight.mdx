@@ -1,6 +1,6 @@
 ---
 title: Match Highlight
-description: Detailed match header for a match page — teams, score, live clock, cards, and corners.
+description: Detailed match header for a match page, teams, score, live clock, cards, and corners.
 ---
 
 import { MatchHighlightDemo } from "@/components/docs/demos/match-highlight-demo"
@@ -10,10 +10,10 @@ import { InstallTabs } from "@/components/docs/install-tabs"
   <MatchHighlightDemo />
 </ExampleSection>
 
-A bigger, page-header version of [Match Card](/docs/ui/components/match-card) —
+A bigger, page-header version of [Match Card](/docs/ui/components/match-card):
 teams, score, and status, plus a genuinely ticking live clock and
 cards/corners below each team (soccer-specific, shown here for demo
-purposes — omit them for other sports). Meant for the top of a match
+purposes; omit them for other sports). Meant for the top of a match
 detail page, not a list row.
 
 ## The live clock
@@ -32,23 +32,23 @@ clock={{
 }}
 ```
 
-renders as `"47:12 +3"` — the clock itself keeps ticking uncapped past
+renders as `"47:12 +3"`: the clock itself keeps ticking uncapped past
 45/90 through stoppage; `stoppage` (the ref's announced allotment) is
 static, appended as-is rather than counted up. Ticking requires both the
-outer `status` and `clock.state` to be `"live"` — a paused or half-time
+outer `status` and `clock.state` to be `"live"`; a paused or half-time
 match shows `displayLong`/`display` as a static label instead, e.g.
 `"Half-time"`.
 
 ## The competition dropdown
 
 Pass `competitionMatches` together with `onOpenCompetitionMatches` and the
-competition name becomes a button — clicking it calls
+competition name becomes a button. Clicking it calls
 `onOpenCompetitionMatches` (fetch lazily there, only once it's actually
 opened) and opens a dropdown listing `competitionMatches`, each row
-showing crests and names — see
+showing crests and names; see
 [MatchHighlightCompetitionMatch](#matchhighlightcompetitionmatch) below.
 `onSelectCompetitionMatch` fires with the clicked match's id; what to do
-with it — navigate, swap the highlighted match, both — is up to you (the
+with it (navigate, swap the highlighted match, both) is up to you (the
 example above swaps the card). Omit either prop and the competition name
 renders as plain, non-interactive text with no chevron.
 
@@ -96,11 +96,11 @@ Match Highlight takes plain props, so it works with any data source. See
 the [Match Highlight Adapter](/docs/ui/mrdoge-sdk/usage#match-highlight)
 for the real functions mapping a `matches.get()`/`matches.subscribe()`
 response (and a `matches.list()` response, for the competition dropdown)
-onto these props — the ones behind the example above.
+onto these props. These are the ones behind the example above.
 
 ## Props
 
-`loading: true` is mutually exclusive with every other prop — see
+`loading: true` is mutually exclusive with every other prop; see
 [MatchHighlightSkeleton](#matchhighlightskeleton) below. Everything below
 applies when `loading` is omitted or `false`.
 
@@ -111,7 +111,7 @@ applies when `loading` is omitted or `false`.
       type: "boolean",
     },
     status: {
-      description: "Mirrors match.status directly — no separate \"scheduled\"/\"finished\" relabeling.",
+      description: "Mirrors match.status directly, no separate \"scheduled\"/\"finished\" relabeling.",
       type: '"upcoming" | "live" | "completed"',
       required: true,
     },
@@ -124,7 +124,7 @@ applies when `loading` is omitted or `false`.
       type: "MatchHighlightRegion",
     },
     competitionMatches: {
-      description: <>Other matches today in the same competition, for the dropdown — see <a href="#the-competition-dropdown">The competition dropdown</a> above and <a href="#matchhighlightcompetitionmatch">MatchHighlightCompetitionMatch</a> below.</>,
+      description: <>Other matches today in the same competition, for the dropdown. See <a href="#the-competition-dropdown">The competition dropdown</a> above and <a href="#matchhighlightcompetitionmatch">MatchHighlightCompetitionMatch</a> below.</>,
       type: "MatchHighlightCompetitionMatch[] | null",
     },
     onOpenCompetitionMatches: {
@@ -158,7 +158,7 @@ applies when `loading` is omitted or `false`.
       type: "number",
     },
     clock: {
-      description: <>Drives the live timer and status label — see <a href="#the-live-clock">The live clock</a> above and <a href="#matchhighlightclock">MatchHighlightClock</a> below.</>,
+      description: <>Drives the live timer and status label. See <a href="#the-live-clock">The live clock</a> above and <a href="#matchhighlightclock">MatchHighlightClock</a> below.</>,
       type: "MatchHighlightClock",
     },
     timeFormat: {
@@ -183,15 +183,15 @@ applies when `loading` is omitted or `false`.
       type: "string",
     },
     yellowCards: {
-      description: "Soccer-specific — omit for other sports. Shown below the team, once status is not \"upcoming\".",
+      description: "Soccer-specific, omit for other sports. Shown below the team, once status is not \"upcoming\".",
       type: "number",
     },
     redCards: {
-      description: "Soccer-specific — omit for other sports. Shown below the team, once status is not \"upcoming\".",
+      description: "Soccer-specific, omit for other sports. Shown below the team, once status is not \"upcoming\".",
       type: "number",
     },
     corners: {
-      description: "Soccer-specific — omit for other sports. Shown below the team, once status is not \"upcoming\".",
+      description: "Soccer-specific, omit for other sports. Shown below the team, once status is not \"upcoming\".",
       type: "number",
     },
   }}
@@ -220,17 +220,17 @@ applies when `loading` is omitted or `false`.
       required: true,
     },
     home: {
-      description: "{ name: string; logoUrl?: string } — rendered as a crest via Match Card Compact.",
+      description: "{ name: string; logoUrl?: string }, rendered as a crest via Match Card Compact.",
       type: "MatchCardCompactTeam",
       required: true,
     },
     away: {
-      description: "{ name: string; logoUrl?: string } — rendered as a crest via Match Card Compact.",
+      description: "{ name: string; logoUrl?: string }, rendered as a crest via Match Card Compact.",
       type: "MatchCardCompactTeam",
       required: true,
     },
     info: {
-      description: 'Pre-formatted, e.g. "2-1" or "18:00" — whatever\'s meaningful for that match\'s own status.',
+      description: 'Pre-formatted, e.g. "2-1" or "18:00", whatever\'s meaningful for that match\'s own status.',
       type: "string",
     },
   }}
@@ -241,20 +241,20 @@ applies when `loading` is omitted or `false`.
 <TypeTable
   type={{
     state: {
-      description: <>Finer than the outer status — see <a href="#the-live-clock">The live clock</a> above.</>,
+      description: <>Finer than the outer status; see <a href="#the-live-clock">The live clock</a> above.</>,
       type: '"scheduled" | "live" | "paused" | "intermission" | "interrupted" | "finished"',
       required: true,
     },
     display: {
-      description: <>Short label, e.g. "45+2'", "HT", "FT" — used if <code>displayLong</code> is absent. Shown as a static label when not ticking — see <a href="#the-live-clock">The live clock</a> above.</>,
+      description: <>Short label, e.g. "45+2'", "HT", "FT", used if <code>displayLong</code> is absent. Shown as a static label when not ticking; see <a href="#the-live-clock">The live clock</a> above.</>,
       type: "string | null",
     },
     displayLong: {
-      description: <>Verbose label meant for a detail header, e.g. "Half-time", "Full Time", "2nd Half". Preferred over <code>display</code> — see <a href="#the-live-clock">The live clock</a> above.</>,
+      description: <>Verbose label meant for a detail header, e.g. "Half-time", "Full Time", "2nd Half". Preferred over <code>display</code>; see <a href="#the-live-clock">The live clock</a> above.</>,
       type: "string | null",
     },
     elapsedSeconds: {
-      description: <>Seconds elapsed as of <code>referenceTime</code> — paired together to derive the live ticker. See <a href="#the-live-clock">The live clock</a> above.</>,
+      description: <>Seconds elapsed as of <code>referenceTime</code>, paired together to derive the live ticker. See <a href="#the-live-clock">The live clock</a> above.</>,
       type: "number | null",
     },
     referenceTime: {
@@ -266,7 +266,7 @@ applies when `loading` is omitted or `false`.
       type: "number | null",
     },
     stoppage: {
-      description: <>Announced stoppage allotment in minutes, e.g. <code>3</code> for "90+3'". Soccer only — see <a href="#the-live-clock">The live clock</a> above.</>,
+      description: <>Announced stoppage allotment in minutes, e.g. <code>3</code> for "90+3'". Soccer only; see <a href="#the-live-clock">The live clock</a> above.</>,
       type: "number | null",
     },
   }}
@@ -275,7 +275,7 @@ applies when `loading` is omitted or `false`.
 ### MatchHighlightSkeleton
 
 `<MatchHighlight loading />` renders this internally, but it's also
-exported on its own — `import { MatchHighlightSkeleton } from
-"@/components/match-highlight"` — for a loading list of several highlights
+exported on its own (`import { MatchHighlightSkeleton } from
+"@/components/match-highlight"`) for a loading list of several highlights
 before any of them have data yet. Takes `className`, same meaning as on
 `loading` above.

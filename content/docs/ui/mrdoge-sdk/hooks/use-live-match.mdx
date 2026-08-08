@@ -1,6 +1,6 @@
 ---
 title: useLiveMatch
-description: Subscribes to a single match over WebSocket — score, status, and clock update in real time as the match progresses.
+description: Subscribes to a single match over WebSocket, score, status, and clock update in real time as the match progresses.
 ---
 
 import { InstallTabs } from "@/components/docs/install-tabs"
@@ -17,7 +17,7 @@ Installing this pulls in two files: the hook itself (a thin re-export
 from [`@mrdoge/react`](/docs/ui/mrdoge-sdk/installation), which does the
 real work) and a Next.js route at `app/api/mrdoge/token/route.ts` that
 mints short-lived tokens using `@mrdoge/node` and your own
-`MRDOGE_ODDS_API_KEY` — the browser client never sees the raw key.
+`MRDOGE_ODDS_API_KEY`. The browser client never sees the raw key.
 
 ## Usage
 
@@ -28,14 +28,14 @@ const match = useLiveMatch({ matchId })
 ```
 
 Takes a single options object, like every real SDK method it wraps
-(`matches.subscribe(params)`) — not positional arguments.
+(`matches.subscribe(params)`), not positional arguments.
 
 ## Parameters
 
 <TypeTable
   type={{
     matchId: {
-      description: "The match to subscribe to. Pass undefined to skip subscribing — e.g. while some other lookup is still resolving which match to show.",
+      description: "The match to subscribe to. Pass undefined to skip subscribing, e.g. while some other lookup is still resolving which match to show.",
       type: "string | undefined",
       required: true,
     },
@@ -44,9 +44,9 @@ Takes a single options object, like every real SDK method it wraps
 
 ## Returns
 
-`MatchDetail | null | undefined` — `undefined` while loading (or while
-`matchId` is `undefined`), `null` if the subscribe failed (no fallback data
-— an honest empty state beats a fake one), otherwise the current snapshot,
+`MatchDetail | null | undefined`: `undefined` while loading (or while
+`matchId` is `undefined`), `null` if the subscribe failed (no fallback data;
+an honest empty state beats a fake one), otherwise the current snapshot,
 updated in place as `stats.upd` / `status.upd` events arrive. Feed it into
 [`matchToMatchCardProps`](/docs/ui/mrdoge-sdk/usage#match-card) or
 [`matchToMatchHighlightProps`](/docs/ui/mrdoge-sdk/usage#match-highlight)

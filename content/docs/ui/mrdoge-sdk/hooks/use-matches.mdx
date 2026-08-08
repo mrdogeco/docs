@@ -18,7 +18,7 @@ Installing this pulls in two files: the hook itself (a thin re-export
 from [`@mrdoge/react`](/docs/ui/mrdoge-sdk/installation), which does the
 real work) and a Next.js route at `app/api/mrdoge/token/route.ts` that
 mints short-lived tokens using `@mrdoge/node` and your own
-`MRDOGE_ODDS_API_KEY` — the browser client never sees the raw key.
+`MRDOGE_ODDS_API_KEY`. The browser client never sees the raw key.
 
 ## Usage
 
@@ -29,13 +29,13 @@ const matches = useMatches({ sports: ["soccer"], status: ["upcoming"], limit: 20
 ```
 
 Takes a single options object, like every real SDK method it wraps
-(`matches.list(params)`) — not positional arguments. Only resolves *which*
-matches — pair it with [useMatch](/docs/ui/mrdoge-sdk/hooks/use-match) to
+(`matches.list(params)`), not positional arguments. Only resolves *which*
+matches; pair it with [useMatch](/docs/ui/mrdoge-sdk/hooks/use-match) to
 actually fetch one.
 
 <Callout title="status alone isn't enough">
   A match stuck on `"upcoming"` past its real kickoff (delayed, postponed,
-  never updated) still matches that filter alone — pass `startDate` (and
+  never updated) still matches that filter alone; pass `startDate` (and
   `endDate` for a range) to rule those out.
 </Callout>
 
@@ -84,7 +84,7 @@ actually fetch one.
 
 ## Returns
 
-`Match[] | null | undefined` — `undefined` while the request is in flight,
+`Match[] | null | undefined`: `undefined` while the request is in flight,
 `null` if it failed (no fallback data), otherwise the list. One-shot: this
-doesn't push live updates the way `useLiveMatch`/`useOdds` do — call it
+doesn't push live updates the way `useLiveMatch`/`useOdds` do; call it
 again (or remount) to refresh.

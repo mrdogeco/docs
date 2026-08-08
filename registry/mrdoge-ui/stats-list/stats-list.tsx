@@ -5,17 +5,17 @@ export interface StatsListEntry {
   /** Pre-formatted for display, e.g. "62%", "14", "Yamal (3)". */
   home: string
   away: string
-  /** Raw numeric values for the two sides — every row is a comparison bar, sized from these. */
+  /** Raw numeric values for the two sides: every row is a comparison bar, sized from these. */
   homeValue: number
   awayValue: number
 }
 
 export interface StatsListProps {
-  /** Rows in display order. Sport-specific — see the adapter for which stats each sport contributes. */
+  /** Rows in display order. Sport-specific: see the adapter for which stats each sport contributes. */
   entries: StatsListEntry[]
   /**
    * Omits the comparison bar under every row, keeping just the numbers
-   * and label — for entries where the two sides aren't a meaningful
+   * and label, for entries where the two sides aren't a meaningful
    * proportional split, e.g. two different players' individual totals.
    *
    * @defaultValue true
@@ -74,9 +74,9 @@ export function StatsListSkeleton({ rowCount = 4, className }: { rowCount?: numb
       {Array.from({ length: rowCount }).map((_, index) => (
         <li key={index} className="flex flex-col gap-1.5 py-2.5">
           <div className="flex items-center justify-between gap-3">
-            {/* h-5, not h-3 — matches text-sm's real 1.25rem line-height, not just its font-size */}
+            {/* h-5, not h-3: matches text-sm's real 1.25rem line-height, not just its font-size */}
             <span className="h-5 w-6 animate-pulse rounded bg-muted" />
-            {/* h-4, not h-3 — matches text-xs' real 1rem line-height, not just its font-size */}
+            {/* h-4, not h-3: matches text-xs' real 1rem line-height, not just its font-size */}
             <span className="h-4 w-24 animate-pulse rounded bg-muted" />
             <span className="h-5 w-6 animate-pulse rounded bg-muted" />
           </div>
@@ -90,7 +90,7 @@ export function StatsListSkeleton({ rowCount = 4, className }: { rowCount?: numb
   )
 }
 
-/** Renders nothing when `entries` is empty — same convention as Match Timeline, leaves messaging (e.g. "no stats for this match") to the caller, since only the caller knows why. */
+/** Renders nothing when `entries` is empty, same convention as Match Timeline: leaves messaging (e.g. "no stats for this match") to the caller, since only the caller knows why. */
 export function StatsList({ entries, showBars = true, className }: StatsListProps) {
   return (
     <ul className={cn("flex flex-col", className)}>

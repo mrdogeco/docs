@@ -1,6 +1,6 @@
 ---
 title: Stats List
-description: Generic home/away match stats comparison bars — one row per stat, sport-agnostic.
+description: Generic home/away match stats comparison bars, one row per stat, sport-agnostic.
 ---
 
 import { StatsListDemo } from "@/components/docs/demos/stats-list-demo"
@@ -11,10 +11,10 @@ import { InstallTabs } from "@/components/docs/install-tabs"
 </ExampleSection>
 
 <Callout title="Coverage varies by sport">
-  Which stats show up depends entirely on what the data source reports
-   — see [the adapter](#use-with-the-mr-doge-sdk) below for
+  Which stats show up depends entirely on what the data source reports.
+  See [the adapter](#use-with-the-mr-doge-sdk) below for
   exactly what each sport contributes today. Stats List itself renders
-  nothing for an empty `entries` array — decide what "no stats" should
+  nothing for an empty `entries` array; decide what "no stats" should
   look like at the call site, same as
   [Match Timeline](/docs/ui/components/match-timeline) with an empty
   list.
@@ -38,7 +38,7 @@ import { StatsList } from "@/components/stats-list"
 />
 ```
 
-`homeValue`/`awayValue` size the two bars — the side with the greater
+`homeValue`/`awayValue` size the two bars: the side with the greater
 value gets a bold label and a solid bar; the other stays muted. Bars
 animate when values change, e.g. from a live subscription.
 
@@ -53,7 +53,7 @@ source. See the
 real functions mapping a match's `stats` (from
 `matches.get()`/`matches.subscribe()`) onto this prop, across all 8
 sports the SDK covers, plus a second function for the player-level
-section — the ones behind the example above.
+section. These are the ones behind the example above.
 
 ## Props
 
@@ -93,12 +93,12 @@ section — the ones behind the example above.
       required: true,
     },
     homeValue: {
-      description: "Raw numeric value for this side — sizes the comparison bar.",
+      description: "Raw numeric value for this side, sizes the comparison bar.",
       type: "number",
       required: true,
     },
     awayValue: {
-      description: "Raw numeric value for this side — sizes the comparison bar.",
+      description: "Raw numeric value for this side, sizes the comparison bar.",
       type: "number",
       required: true,
     },
@@ -107,6 +107,6 @@ section — the ones behind the example above.
 
 ### StatsListSkeleton
 
-`import { StatsListSkeleton } from "@/components/stats-list"` — for a
+`import { StatsListSkeleton } from "@/components/stats-list"` for a
 loading state before the real entries have arrived. Takes `rowCount`
 (default 5) and `className`.

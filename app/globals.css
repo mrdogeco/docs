@@ -148,8 +148,24 @@
 #nd-nav nav {
   @apply px-4!;
 }
+/* More glass, less opaque plate: lower background opacity so more of
+   what's underneath shows through, backdrop-saturate boosts the color of
+   that blurred-through content (the actual "frosted glass" look, not
+   just blur on its own), and the inset top highlight + soft drop shadow
+   read as a pane of glass catching light rather than a flat bar. */
 #nd-nav > div {
-  @apply bg-fd-background/50! backdrop-blur-2xl!;
+  @apply border-b-0! bg-fd-background/30! backdrop-blur-2xl! backdrop-saturate-150! shadow-[inset_0_1px_0_0_rgba(255,255,255,0.15),0_8px_30px_-12px_rgba(0,0,0,0.25)]!;
+}
+
+/* sticky (in-flow, only pins once you scroll to it) -> fixed (viewport-
+   anchored from the start). Fumadocs sets no left/right on its own
+   sticky positioning since sticky elements are already 100% width by
+   default in normal flow; fixed elements aren't, so inset-x-0 is what
+   actually makes "full width" true here, not just the position change.
+   Deliberately no content offset to compensate — it floats over
+   whatever's beneath it. */
+#nd-nav {
+  @apply fixed! inset-x-0! top-0!;
 }
 
 /* #nd-subnav is a separate mobile-only (md:hidden) bar inside DocsLayout,

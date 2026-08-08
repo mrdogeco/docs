@@ -1,6 +1,6 @@
 ---
 title: useLiveMatches
-description: Subscribes to matches over WebSocket, filtered by sports/regions/competitions — updates in place as matches start, finish, or change.
+description: Subscribes to matches over WebSocket, filtered by sports/regions/competitions. Updates in place as matches start, finish, or change.
 ---
 
 import { InstallTabs } from "@/components/docs/install-tabs"
@@ -9,7 +9,7 @@ Wraps `matches.subscribeLive()`. Pushes `match.upd`/`match.del` events in
 place as matches start, finish, or their score/clock changes, for as long
 as the component stays mounted. Unlike
 [useMatches](/docs/ui/mrdoge-sdk/hooks/use-matches), always reflects the
-current live roster rather than a one-shot snapshot — the right choice
+current live roster rather than a one-shot snapshot: the right choice
 when you need real clocks/scores on a list, not just which matches exist.
 
 ## Installation
@@ -20,7 +20,7 @@ Installing this pulls in two files: the hook itself (a thin re-export
 from [`@mrdoge/react`](/docs/ui/mrdoge-sdk/installation), which does the
 real work) and a Next.js route at `app/api/mrdoge/token/route.ts` that
 mints short-lived tokens using `@mrdoge/node` and your own
-`MRDOGE_ODDS_API_KEY` — the browser client never sees the raw key.
+`MRDOGE_ODDS_API_KEY`. The browser client never sees the raw key.
 
 ## Usage
 
@@ -31,7 +31,7 @@ const matches = useLiveMatches({ sports: ["soccer"], regionIds: [1] })
 ```
 
 Takes a single options object, like every real SDK method it wraps
-(`matches.subscribeLive(params)`) — not positional arguments.
+(`matches.subscribeLive(params)`), not positional arguments.
 
 ## Parameters
 
@@ -54,7 +54,7 @@ Takes a single options object, like every real SDK method it wraps
 
 ## Returns
 
-`Match[] | null | undefined` — `undefined` while loading, `null` if the
-subscribe failed (no fallback data — an honest empty state beats a fake
+`Match[] | null | undefined`: `undefined` while loading, `null` if the
+subscribe failed (no fallback data; an honest empty state beats a fake
 one), otherwise the current live roster, updated in place as
 `match.upd`/`match.del` events arrive.

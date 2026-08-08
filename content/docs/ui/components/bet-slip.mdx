@@ -1,6 +1,6 @@
 ---
 title: Bet Slip
-description: Panel for selected picks — single or parlay mode, with an optional stake input and conflict warnings.
+description: Panel for selected picks, single or parlay mode, with an optional stake input and conflict warnings.
 ---
 
 import { BetSlipDemo } from "@/components/docs/demos/bet-slip-demo"
@@ -11,21 +11,21 @@ import { InstallTabs } from "@/components/docs/install-tabs"
   <BetSlipDemo />
 </ExampleSection>
 
-A pick is basically a selected odds line — every panel above the slip is
+A pick is basically a selected odds line: every panel above the slip is
 an [Odds Selector](/docs/ui/components/odds-selector). Match Result and
 Double Chance describe the same result two ways, so picking one blocks
-the other market entirely — see [Conflicts](#conflicts) below for the
+the other market entirely. See [Conflicts](#conflicts) below for the
 warn-instead-of-block alternative.
 
 <Callout title="No real-money language">
-  Stake and payout are neutral terms by design — this is a UI building
+  Stake and payout are neutral terms by design. This is a UI building
   block for any betting app, not a real-money wagering flow. Compute the
   payout math however your product needs to.
 </Callout>
 
 ## Multi-game parlay
 
-The example above is a same-game parlay — every pick shares one match. A
+The example above is a same-game parlay: every pick shares one match. A
 parlay can just as often span several different matches instead, each in
 its own group. This example resolves 3 separate upcoming matches, each a
 real [Match Card](/docs/ui/components/match-card) with its own odds row:
@@ -43,12 +43,12 @@ real [Match Card](/docs/ui/components/match-card) with its own odds row:
 BetSlip takes plain props, so it works with any data source. See the
 [Bet Slip Adapter](/docs/ui/mrdoge-sdk/usage#bet-slip) for the real
 function building a `BetSlipPick` from a match, market, and selected line
-id — the one behind both examples above, including the `home`/`away`
+id. It's the one behind both examples above, including the `home`/`away`
 team crests shown per match group.
 
 ### Conflicts
 
-BetSlip can only ever *flag* a conflicting pick — it has no "add pick"
+BetSlip can only ever *flag* a conflicting pick: it has no "add pick"
 affordance of its own, so preventing one from being added in the first
 place is an Odds Selector (or host-app) concern. Pass
 `conflictingPickIds` for the warn-instead-of-block case, e.g. picks
@@ -72,7 +72,7 @@ the full rule set.
 <TypeTable
   type={{
     picks: {
-      description: <>Selected picks — grouped into a <a href="#betslipmatchgroup">BetSlipMatchGroup</a> per distinct matchId. See <a href="#betslippick">BetSlipPick</a> below.</>,
+      description: <>Selected picks, grouped into a <a href="#betslipmatchgroup">BetSlipMatchGroup</a> per distinct matchId. See <a href="#betslippick">BetSlipPick</a> below.</>,
       type: "BetSlipPick[]",
       required: true,
     },
@@ -81,7 +81,7 @@ the full rule set.
       type: "(id: string) => void",
     },
     mode: {
-      description: '"single" (default) treats every pick independently and shows "Singles" in the header once there\'s at least one pick. "parlay" combines them into one bet with a combined price and shows "Parlay" instead. The header switch to change this only renders once there are 2+ picks — same as sportsbooks, a parlay needs 2 legs.',
+      description: '"single" (default) treats every pick independently and shows "Singles" in the header once there\'s at least one pick. "parlay" combines them into one bet with a combined price and shows "Parlay" instead. The header switch to change this only renders once there are 2+ picks, same as sportsbooks: a parlay needs 2 legs.',
       type: '"single" | "parlay"',
     },
     onModeChange: {
@@ -89,7 +89,7 @@ the full rule set.
       type: '(mode: "single" | "parlay") => void',
     },
     stake: {
-      description: 'Parlay mode\'s combined stake. Controlled — BetSlip holds no state of its own. The stake row (and combined payout) only renders when onStakeChange is passed and mode is "parlay".',
+      description: 'Parlay mode\'s combined stake. Controlled: BetSlip holds no state of its own. The stake row (and combined payout) only renders when onStakeChange is passed and mode is "parlay".',
       type: "string",
     },
     onStakeChange: {
@@ -97,7 +97,7 @@ the full rule set.
       type: "(value: string) => void",
     },
     pickStakes: {
-      description: <>Single mode's stakes, one per pick, keyed by pick id — rendered as its own input below each pick row (see <a href="#betslippickrow">BetSlipPickRow</a>'s stake below) rather than one shared amount. Only used when mode is "single".</>,
+      description: <>Single mode's stakes, one per pick, keyed by pick id, rendered as its own input below each pick row (see <a href="#betslippickrow">BetSlipPickRow</a>'s stake below) rather than one shared amount. Only used when mode is "single".</>,
       type: "Record<string, string>",
     },
     onPickStakeChange: {
@@ -105,11 +105,11 @@ the full rule set.
       type: "(id: string, value: string) => void",
     },
     conflictingPickIds: {
-      description: <>Ids from picks that conflict with another pick in the slip — computed externally (e.g. via the <a href="/docs/ui/mrdoge-sdk/usage#conflicts">Conflict Adapter</a>) and rendered as a warning. See <a href="#conflicts">Conflicts</a> above.</>,
+      description: <>Ids from picks that conflict with another pick in the slip, computed externally (e.g. via the <a href="/docs/ui/mrdoge-sdk/usage#conflicts">Conflict Adapter</a>) and rendered as a warning. See <a href="#conflicts">Conflicts</a> above.</>,
       type: "string[]",
     },
     onSubmit: {
-      description: 'Called when the submit button is pressed. Renders the button only when this is passed — BetSlip has no idea what "submitting" means for your product; auth and the actual request are yours, reported back via submitState.',
+      description: 'Called when the submit button is pressed. Renders the button only when this is passed. BetSlip has no idea what "submitting" means for your product; auth and the actual request are yours, reported back via submitState.',
       type: "() => void",
     },
     submitLabel: {
@@ -125,7 +125,7 @@ the full rule set.
       type: '"idle" | "loading" | "success" | "error"',
     },
     submitError: {
-      description: 'Shown above the button when submitState is "error". BetSlip has no toast/notification system of its own — this is just a plain inline message, so use your own if you have one.',
+      description: 'Shown above the button when submitState is "error". BetSlip has no toast/notification system of its own; this is just a plain inline message, so use your own if you have one.',
       type: "string",
     },
     className: {
@@ -160,11 +160,11 @@ the full rule set.
       required: true,
     },
     movement: {
-      description: <>Colors the price — "down" (shortening, more likely) green, "up" (drifting, less likely) red, "flat" or omitted stays the default color. Static here — for live data, see <a href="/docs/ui/hooks/use-odds-movement">useOddsMovement</a>.</>,
+      description: <>Colors the price: "down" (shortening, more likely) green, "up" (drifting, less likely) red, "flat" or omitted stays the default color. Static here; for live data, see <a href="/docs/ui/hooks/use-odds-movement">useOddsMovement</a>.</>,
       type: '"up" | "down" | "flat"',
     },
     unavailable: {
-      description: "True once the underlying line is no longer available — dims the row and shows a strike-through price. Doesn't remove the pick; that stays a user action via onRemovePick.",
+      description: "True once the underlying line is no longer available. Dims the row and shows a strike-through price. Doesn't remove the pick; that stays a user action via onRemovePick.",
       type: "boolean",
     },
     home: {
@@ -174,6 +174,10 @@ the full rule set.
     away: {
       description: "The away team, alongside home.",
       type: "{ name: string; logoUrl?: string }",
+    },
+    kickoff: {
+      description: <>Shown right-aligned in the match group header via <a href="#betslipmatchgroup">BetSlipMatchGroup</a>, e.g. "Aug 9".</>,
+      type: "Date | string",
     },
     matchId: {
       description: <>Groups picks from the same match together, and is required (with betType/code) for conflict-checking via the <a href="/docs/ui/mrdoge-sdk/usage#conflicts">Conflict Adapter</a>. Picks without one each render in their own group.</>,
@@ -197,8 +201,8 @@ the full rule set.
 ### BetSlipMatchGroup
 
 `<BetSlip>` renders this internally once per distinct `matchId` in
-`picks`, but it's also exported on its own — `import {
-BetSlipMatchGroup } from "@/components/bet-slip"` — for composing your
+`picks`, but it's also exported on its own (`import {
+BetSlipMatchGroup } from "@/components/bet-slip"`) for composing your
 own layout around a match's crests and its selections.
 
 <TypeTable
@@ -215,6 +219,10 @@ own layout around a match's crests and its selections.
       type: "string",
       required: true,
     },
+    kickoff: {
+      description: 'Right-aligned in the header when set, e.g. "Aug 9".',
+      type: "Date | string",
+    },
     children: {
       description: <>Typically one <a href="#betslippickrow">BetSlipPickRow</a> per pick in the group.</>,
       type: "ReactNode",
@@ -225,7 +233,7 @@ own layout around a match's crests and its selections.
 
 ### BetSlipPickRow
 
-One selection line within a match group — market, selection, price, and
+One selection line within a match group: market, selection, price, and
 a remove button. Doesn't render team or event info itself; that's
 [BetSlipMatchGroup](#betslipmatchgroup)'s job, shown once per match
 rather than once per pick. Also exported on its own for composing
@@ -233,10 +241,10 @@ outside a group entirely.
 
 `connected` (default true) draws the circle-and-line connector; set it
 to false for a group of picks that are grouped for display but aren't
-one combined bet (e.g. singles from the same match) — the circle stays,
+one combined bet (e.g. singles from the same match). The circle stays,
 the connecting lines don't, and a divider separates rows instead.
 
-The same circle also doubles as a settlement indicator — pass `result`
+The same circle also doubles as a settlement indicator: pass `result`
 (and `prevResult`, for the line above it) once a pick is settled to
 reuse this row for a post-placement history view instead of the active
 betslip.
@@ -255,15 +263,15 @@ betslip.
       type: "boolean",
     },
     position: {
-      description: '"single" (default) for a standalone pick. "first"/"middle"/"last" position it within a group of several legs, in order — pass these when connected too, so the connector lines land in the right places.',
+      description: '"single" (default) for a standalone pick. "first"/"middle"/"last" position it within a group of several legs, in order; pass these when connected too, so the connector lines land in the right places.',
       type: '"single" | "first" | "middle" | "last"',
     },
     connected: {
-      description: 'Default true — draws the circle-and-line connector down the left side between legs of the same group. Set false for a group of picks that are displayed together but aren\'t one combined bet.',
+      description: 'Default true. Draws the circle-and-line connector down the left side between legs of the same group. Set false for a group of picks that are displayed together but aren\'t one combined bet.',
       type: "boolean",
     },
     result: {
-      description: 'Settled outcome — colors the connector icon (and, via prevResult on the next row, its line) instead of the default neutral outline circle. Omit (or null) for an unsettled pick, e.g. still in the active slip.',
+      description: 'Settled outcome. Colors the connector icon (and, via prevResult on the next row, its line) instead of the default neutral outline circle. Omit (or null) for an unsettled pick, e.g. still in the active slip.',
       type: '"won" | "lost" | "push" | null',
     },
     prevResult: {
@@ -271,7 +279,7 @@ betslip.
       type: '"won" | "lost" | "push" | null',
     },
     stake: {
-      description: "This row's own stake input value, rendered below the selection when onStakeChange is passed — BetSlip wires this up itself in single mode via pickStakes/onPickStakeChange.",
+      description: "This row's own stake input value, rendered below the selection when onStakeChange is passed. BetSlip wires this up itself in single mode via pickStakes/onPickStakeChange.",
       type: "string",
     },
     onStakeChange: {

@@ -20,7 +20,7 @@ export const metadata: Metadata = buildMetadata({
   path: "/",
 })
 
-// Same build-time showcase fetch as /ui (see lib/mrdoge-server.ts) — this
+// Same build-time showcase fetch as /ui (see lib/mrdoge-server.ts). This
 // route has no dynamic APIs either, so it stays statically rendered.
 export default async function Home() {
   const showcases = await fetchShowcaseMatches(SHOWCASE_MATCH_IDS)
@@ -30,7 +30,7 @@ export default async function Home() {
       <SdkHero />
       <SdkFeatures />
       <SdkQuickstart />
-      <SdkPricing />
+      <SdkPricing compareHref="/pricing#comparison" />
       <SdkAppShowcase />
       <SdkComponentsTeaser showcases={showcases} />
       <SdkCta />

@@ -22,7 +22,7 @@ interface Tier {
   inheritsFrom?: string
   features: string[]
   popular?: boolean
-  /** Stripe Price UUIDs (DB) — checked out at dashboard.mrdoge.co/checkout/[priceId]. Keep in sync with mrdoge-dashboard's lib/sdk-prices.ts. */
+  /** Stripe Price UUIDs (DB), checked out at dashboard.mrdoge.co/checkout/[priceId]. Keep in sync with mrdoge-dashboard's lib/sdk-prices.ts. */
   priceId: { monthly: string; annual: string }
 }
 
@@ -47,7 +47,7 @@ const TIERS: Tier[] = [
     key: "growth",
     label: "Growth",
     description:
-      "For production apps. Live match state and stats — no odds yet.",
+      "For production apps. Live match state and stats, no odds yet.",
     price: "$59.90",
     annualPrice: "$44.99",
     annualTotal: "$539.90",
@@ -65,7 +65,7 @@ const TIERS: Tier[] = [
     key: "business",
     label: "Business",
     description:
-      "For high-volume products. Live odds, AI recommendations, and per-match streams — everything included.",
+      "For high-volume products. Live odds, AI recommendations, and per-match streams: everything included.",
     price: "$199.90",
     originalPrice: "$299.90",
     discountBadge: "Limited-time price",
@@ -84,12 +84,18 @@ const TIERS: Tier[] = [
 
 const DASHBOARD_URL = "https://dashboard.mrdoge.co"
 
-export function SdkPricing() {
+export function SdkPricing({ compareHref }: { compareHref?: string } = {}) {
   const [frequency, setFrequency] = useState<Frequency>("monthly")
   const isMonthly = frequency === "monthly"
 
   return (
-    <section id="pricing" className="mx-auto w-full max-w-5xl px-6 py-16">
+    <section id="pricing" className="relative mx-auto w-full max-w-5xl px-6 py-16">
+      {/* Same sunset radial backdrop as mrdoge.ai's pricing section — low
+          enough opacity to read on both light and dark theme. */}
+      <div
+        aria-hidden
+        className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_60%_50%_at_50%_30%,rgba(236,72,153,0.08),transparent_70%)]"
+      />
       <div className="flex flex-col gap-3 text-center">
         <span className="text-sm font-medium tracking-wide text-muted-foreground uppercase">
           Pricing
@@ -155,6 +161,14 @@ export function SdkPricing() {
           </Link>
         </Button>
       </div>
+
+      {compareHref && (
+        <p className="mt-8 text-center text-sm text-muted-foreground">
+          <Link href={compareHref} className="font-medium text-foreground underline underline-offset-4 hover:no-underline">
+            See how we compare to other sports data APIs
+          </Link>
+        </p>
+      )}
     </section>
   )
 }
@@ -162,16 +176,18 @@ export function SdkPricing() {
 function TierCard({ tier, isMonthly }: { tier: Tier; isMonthly: boolean }) {
   const showDiscount = isMonthly && tier.originalPrice
 
-  return (
+  const card = (
     <div
       className={cn(
-        "relative flex h-full flex-col rounded-2xl border p-6",
-        tier.popular && "border-foreground",
+        "relative flex h-full flex-col rounded-2xl p-6",
+        tier.popular ? "bg-card" : "border",
       )}
     >
       {tier.popular && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-          <Badge>Most popular</Badge>
+          <div className="rounded-full bg-gradient-to-r from-[#EC4899] to-[#FAAF45] px-3 py-1 text-[10px] font-bold tracking-[0.2em] text-white uppercase shadow-lg shadow-[#EC4899]/30">
+            Most popular
+          </div>
         </div>
       )}
 
@@ -185,7 +201,9 @@ function TierCard({ tier, isMonthly }: { tier: Tier; isMonthly: boolean }) {
             {tier.originalPrice}
           </span>
           {tier.discountBadge && (
-            <Badge variant="secondary">{tier.discountBadge}</Badge>
+            <Badge variant="secondary" className="bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
+              {tier.discountBadge}
+            </Badge>
           )}
         </div>
       )}
@@ -219,8 +237,17 @@ function TierCard({ tier, isMonthly }: { tier: Tier; isMonthly: boolean }) {
           </li>
         )}
         {tier.features.map((feature) => (
-          <li key={feature} className="flex items-start gap-2 text-sm">
-            <Check className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
+          <li key={feature} className="flex items-start gap-2.5 text-sm">
+            <span
+              className={cn(
+                "mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full",
+                tier.popular
+                  ? "bg-gradient-to-br from-[#EC4899] to-[#FAAF45] text-white"
+                  : "bg-muted text-muted-foreground",
+              )}
+            >
+              <Check className="size-2.5 stroke-[3]" />
+            </span>
             <span>{feature}</span>
           </li>
         ))}
@@ -237,6 +264,24 @@ function TierCard({ tier, isMonthly }: { tier: Tier; isMonthly: boolean }) {
           <ArrowRight />
         </Link>
       </Button>
+    </div>
+  )
+
+  if (!tier.popular) return card
+
+  return (
+    <div className="relative">
+      {/* Gradient border, via an inset -1px layer behind the card. */}
+      <div
+        aria-hidden
+        className="absolute -inset-px rounded-2xl bg-gradient-to-br from-[#EC4899] via-[#FAAF45] to-[#FADFAD]"
+      />
+      {/* Outer glow. */}
+      <div
+        aria-hidden
+        className="absolute -inset-4 -z-10 rounded-[1.75rem] bg-gradient-to-br from-[#EC4899]/30 via-[#FAAF45]/15 to-transparent blur-2xl"
+      />
+      {card}
     </div>
   )
 }

@@ -3,7 +3,7 @@ title: Next.js
 description: Full-stack Next.js with route handlers for token minting and browser-side subscriptions.
 ---
 
-Next.js is the recommended path — server components for one-shot reads,
+Next.js is the recommended path: server components for one-shot reads,
 client components for live subscriptions, and a route handler that mints
 JWTs so your API key never leaves the server.
 
@@ -14,7 +14,7 @@ npm i @mrdoge/node @mrdoge/react
 ```
 
 `@mrdoge/node` for the server (API key auth). `@mrdoge/react` is the
-recommended browser package — hooks wrapping `@mrdoge/client`, backed by
+recommended browser package: hooks wrapping `@mrdoge/client`, backed by
 a shared cache so multiple components watching the same match or list
 don't duplicate a subscription. Drop to `@mrdoge/client` directly for
 manual control outside React's render cycle.
@@ -39,8 +39,8 @@ export async function POST() {
 
 ## Browser: subscribe to live matches
 
-`@mrdoge/react` needs no Provider and no client instance of your own —
-it defaults to POSTing to `/api/mrdoge/token`, matching the route handler
+`@mrdoge/react` needs no Provider and no client instance of your own.
+It defaults to POSTing to `/api/mrdoge/token`, matching the route handler
 above out of the box:
 
 ```tsx title="app/live/page.tsx"
@@ -68,15 +68,15 @@ export default function LivePage() {
 
 Mount `useLiveMatches({ sports: ["soccer"] })` in ten different
 components and they share one `matches.subscribeLive()` call and one
-copy of the data — the first mount starts it, the last unmount cancels
+copy of the data: the first mount starts it, the last unmount cancels
 it. [`useLiveMatch(matchId)`](/docs/ui/mrdoge-sdk/hooks/use-live-match)
-is the single-match equivalent for a detail page — see the
+is the single-match equivalent for a detail page. See the
 [full hooks list](/docs/ui/mrdoge-sdk/installation) for the rest.
 
 ### Manual control
 
 Reach for `@mrdoge/client` directly when you need more than a hook gives
-you — subscribing outside a component, or driving your own cache:
+you: subscribing outside a component, or driving your own cache:
 
 ```tsx title="app/live/page.tsx"
 "use client";
@@ -173,7 +173,7 @@ for full mechanics.
 
 ## Server components: one-shot reads
 
-For SSR / RSC, use `@mrdoge/node` directly — no client component, no
+For SSR / RSC, use `@mrdoge/node` directly: no client component, no
 hydration cost:
 
 ```tsx title="app/recommendations/page.tsx"
@@ -214,7 +214,7 @@ Pair with `export const revalidate = 60` for ISR.
 MRDOGE_API_KEY=sk_live_…
 ```
 
-Don't prefix with `NEXT_PUBLIC_` — that exposes the key to the bundle.
+Don't prefix with `NEXT_PUBLIC_`: that exposes the key to the bundle.
 
 ## Edge runtime
 

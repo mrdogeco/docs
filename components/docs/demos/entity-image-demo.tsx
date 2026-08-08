@@ -4,8 +4,8 @@ import { EntityImage } from "@/registry/mrdoge-ui/entity-image/entity-image"
 import { useMatch } from "@/registry/mrdoge-ui/use-match/use-match"
 import { FINISHED_MATCH_ID } from "@/components/docs/sample-data"
 
-// Public, unauthenticated, cached CDN — not part of the Team/Region shape
-// itself. See /docs/reference/images.
+// Public, unauthenticated, cached CDN. Not part of the Team/Region shape
+// itself; see /docs/reference/images.
 function teamLogoUrl(teamId: number) {
   return `https://api.mrdoge.co/images/teams/${teamId}.png`
 }

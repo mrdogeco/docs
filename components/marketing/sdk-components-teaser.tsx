@@ -6,12 +6,12 @@ import { MatchCard } from "@/registry/mrdoge-ui/match-card/match-card"
 import { matchToMatchCardPropsWithOdds } from "@/lib/mrdoge-adapters/match-card"
 import type { ShowcaseMatch } from "@/lib/mrdoge-server"
 
-// Quick teaser for mrdoge-ui, the companion component library — same
+// Quick teaser for mrdoge-ui, the companion component library. Same
 // MatchCard rendered on the /ui gallery itself (components/home-gallery.tsx),
 // same real matches + odds when the build-time fetch succeeded, static
 // here (no odds-selection state wired up) since this is just proof, not a
 // full demo. Any match whose fetch failed is skipped rather than falling
-// back to sample data — a stack of real matches with one fake one mixed in
+// back to sample data: a stack of real matches with one fake one mixed in
 // would be worse than just showing fewer real cards.
 export function SdkComponentsTeaser({ showcases }: { showcases: (ShowcaseMatch | null)[] }) {
   return (
@@ -24,8 +24,8 @@ export function SdkComponentsTeaser({ showcases }: { showcases: (ShowcaseMatch |
           Build the UI too.
         </h2>
         <p className="mx-auto max-w-2xl text-muted-foreground">
-          Open-source, copy-paste React components — match cards, odds
-          selectors, bet slips — built for this SDK&apos;s data shape.
+          Open-source, copy-paste React components: match cards, odds
+          selectors, bet slips, built for this SDK&apos;s data shape.
         </p>
       </div>
 

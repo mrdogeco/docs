@@ -1,10 +1,10 @@
 ---
 title: Images
-description: Public CDN endpoints for team and region logos — cached, immutable, no auth required.
+description: Public CDN endpoints for team and region logos, cached, immutable, no auth required.
 ---
 
 The Mr. Doge platform serves team and region logos at stable public URLs.
-No API key, no auth header, no SDK call — render them directly from `<img>`
+No API key, no auth header, no SDK call. Render them directly from `<img>`
 or `<Image>` tags.
 
 ## Endpoints
@@ -24,7 +24,7 @@ Every response sets:
 Cache-Control: public, max-age=31536000, immutable
 ```
 
-That's **one year, immutable** — safe to cache aggressively on CDNs,
+That's **one year, immutable**: safe to cache aggressively on CDNs,
 service workers, and browser caches. The IDs are stable identifiers, so an
 update to a team's logo will only land when a new image is uploaded
 server-side (which happens infrequently and is treated as a new asset).
@@ -32,7 +32,7 @@ server-side (which happens infrequently and is treated as a new asset).
 ## Use with the SDK
 
 The `Team` and `Region` shapes returned by the SDK don't include the image
-URL directly — construct it from the `id`:
+URL directly, so construct it from the `id`:
 
 ```ts
 import { MrDoge } from "@mrdoge/node";
@@ -124,7 +124,7 @@ import { Image } from "react-native";
 ```
 
 `expo-image` honours `Cache-Control` properly and dedupes concurrent loads
-of the same URL — recommended over `react-native`'s built-in `Image` for
+of the same URL. Recommended over `react-native`'s built-in `Image` for
 production apps.
   </Tab>
 </Tabs>
@@ -157,7 +157,7 @@ const [src, setSrc] = useState(`https://api.mrdoge.co/images/teams/${team.id}.pn
   </Tab>
 </Tabs>
 
-A colored circle with the team's initials is a common fallback — works
+A colored circle with the team's initials is a common fallback: works
 without needing a generic asset:
 
 ```tsx
@@ -193,7 +193,7 @@ function TeamLogo({ team }: { team: { id: number; name: string } }) {
   endpoints. For competition branding, use the region's flag or the home
   team's logo as a contextual fallback.
 - **No player headshots.** Player references inside `MatchStats` are
-  name-only — no per-player imagery.
+  name-only, no per-player imagery.
 
 ## Performance notes
 
@@ -201,7 +201,7 @@ function TeamLogo({ team }: { team: { id: number; name: string } }) {
   the browser/SW layer. Cold-fetch is a single round-trip; subsequent
   loads come from cache.
 - **No auth round-trip.** The endpoint is excluded from API-key auth
-  middleware — no `Authorization` header required.
+  middleware. No `Authorization` header required.
 - **Concurrent dedup.** When many UI cards mount simultaneously and
   request the same URL, both browsers and `expo-image` dedupe to a single
   fetch.

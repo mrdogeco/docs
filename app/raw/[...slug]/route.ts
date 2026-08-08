@@ -20,7 +20,7 @@ export async function GET(
 }
 
 export function generateStaticParams() {
-  // /raw/[...slug] requires at least one segment — source.generateParams()
+  // /raw/[...slug] requires at least one segment. source.generateParams()
   // includes the root index page (slug: []), which doesn't match a
   // required catch-all and fails the whole export otherwise.
   return source.generateParams().filter((p) => p.slug && p.slug.length > 0)

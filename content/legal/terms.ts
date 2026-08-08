@@ -1,6 +1,6 @@
 import type { LegalData } from "@/components/legal/legal-page"
 
-// Ported from old_mrdoge-co's (landing)/terms/page.tsx — the entity info,
+// Ported from old_mrdoge-co's (landing)/terms/page.tsx. The entity info,
 // eligibility, acceptable use, IP, liability, and governing-law sections
 // are still accurate as written. What changed since: the SDK moved off
 // pay-as-you-go credits onto the current Starter/Growth/Business
@@ -12,7 +12,7 @@ import type { LegalData } from "@/components/legal/legal-page"
 export const termsData: LegalData = {
   title: "Terms of Service",
   lastUpdated: "August 8, 2026",
-  noticeTitle: "⚠️ Important Notice",
+  noticeTitle: "Important Notice",
   noticeText:
     "Mr. Doge provides sports odds data and API services for informational and development purposes. You are responsible for ensuring your use of our API complies with all applicable laws in your jurisdiction.",
   sections: [
@@ -87,7 +87,7 @@ export const termsData: LegalData = {
         {
           id: "tiers",
           title: "Subscription Tiers",
-          content: "Mr. Doge SDK access is sold on three subscription tiers — Starter, Growth, and Business. Key points:",
+          content: "Mr. Doge SDK access is sold on three subscription tiers: Starter, Growth, and Business. Key points:",
           items: [
             "Each tier unlocks a different set of API methods, request-rate limits, and WebSocket subscription caps",
             "Subscriptions are billed monthly or annually, in advance, through Stripe",
@@ -161,7 +161,7 @@ export const termsData: LegalData = {
         "Bulk-archiving the data for redistribution, white-label, or aggregator products",
         "Embedding the SDK in a software product where the data is the primary value proposition for that product's customers",
       ],
-      note: "Routine consumption inside a single application you operate — for example, powering an app, website, or internal dashboard for your own end-users — does not require an Enterprise license. Contact support@mrdoge.co for Enterprise terms or if you are unsure whether your use case requires one.",
+      note: "Routine consumption inside a single application you operate (for example, powering an app, website, or internal dashboard for your own end-users) does not require an Enterprise license. Contact support@mrdoge.co for Enterprise terms or if you are unsure whether your use case requires one.",
     },
     {
       id: "data-accuracy",

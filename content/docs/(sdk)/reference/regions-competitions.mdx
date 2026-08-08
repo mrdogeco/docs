@@ -3,7 +3,7 @@ title: Regions & Competitions
 description: The geographic and competition catalogue underpinning matches and teams.
 ---
 
-`regions` and `competitions` are the discovery endpoints — use them to
+`regions` and `competitions` are the discovery endpoints. Use them to
 build sport/region/competition pickers.
 
 ## `regions.list`
@@ -124,14 +124,14 @@ const regions = await mrdoge.regions.list({
   status: ["live"],
 });
 
-// 3. user picks region — show its competitions
+// 3. user picks region, show its competitions
 const competitions = await mrdoge.competitions.list({
   sports: [sport],
   regionIds: [chosenRegion.id],
   status: ["live"],
 });
 
-// 4. user picks competition — show matches
+// 4. user picks competition, show matches
 const { data: matches } = await mrdoge.matches.list({
   competitionIds: [chosenCompetition.id],
   status: ["live"],

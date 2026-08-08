@@ -3,7 +3,7 @@ title: Subscriptions
 description: Lifecycle, events, and cancellation for live WebSocket subscriptions.
 ---
 
-Subscriptions are long-lived WebSocket channels — the server pushes events
+Subscriptions are long-lived WebSocket channels: the server pushes events
 to you as data changes. The SDK abstracts framing, auth, and reconnection.
 
 ## Subscription handle
@@ -21,7 +21,7 @@ class Subscription<M> {
 }
 ```
 
-Listen via `.on()` — never via constructor callbacks.
+Listen via `.on()`, never via constructor callbacks.
 
 ## Methods that return subscriptions
 
@@ -36,7 +36,7 @@ Listen via `.on()` — never via constructor callbacks.
 
 ## Snapshot delivery
 
-The first thing every subscription delivers is `snapshot` — the current
+The first thing every subscription delivers is `snapshot`: the current
 state matching your filters.
 
 ```ts
@@ -53,7 +53,7 @@ event with the canonical state:
 
 ```ts
 sub.on("snapshot", (snapshot) => {
-  // optional — fires once when WS catches up with the HTTP snapshot,
+  // optional, fires once when WS catches up with the HTTP snapshot,
   // or after a reconnect
 });
 ```
@@ -66,11 +66,11 @@ sub.on("snapshot", (snapshot) => {
 const sub = await mrdoge.matches.subscribeLive({ sports: ["soccer"] });
 
 sub.on("match.upd", (match) => {
-  // match: Match — full payload with the latest fields
+  // match: Match, full payload with the latest fields
 });
 
 sub.on("match.del", ({ id }) => {
-  // id: string — match dropped out of the filter window
+  // id: string, match dropped out of the filter window
 });
 ```
 
@@ -80,7 +80,7 @@ sub.on("match.del", ({ id }) => {
 const sub = await mrdoge.matches.subscribe({ matchId: "match_abc" });
 
 sub.on("stats.upd", (stats) => {
-  // stats: MatchStats — full latest state, replace not merge
+  // stats: MatchStats, full latest state, replace not merge
 });
 
 sub.on("status.upd", ({ status }) => {
@@ -94,7 +94,7 @@ sub.on("status.upd", ({ status }) => {
 const sub = await mrdoge.odds.subscribe({ matchId: "match_abc" });
 
 sub.on("odds.upd", (markets) => {
-  // markets: Market[] — full refreshed book, replace not merge
+  // markets: Market[], full refreshed book, replace not merge
 });
 ```
 
@@ -185,15 +185,15 @@ backoff:
 4. New snapshot delivered via the `snapshot` event
 5. Deltas resume on the same `Subscription` handle
 
-You don't need to do anything — your `match.upd` / `stats.upd` etc.
+You don't need to do anything. Your `match.upd` / `stats.upd` etc.
 listeners keep firing.
 
-### `pingOrReconnect()` — focus-aware wake-up
+### `pingOrReconnect()`: focus-aware wake-up
 
 The SDK can't subscribe to OS-level focus signals on its own (no DOM or
 React Native runtime dependency). When the device comes back from a long
 background or a network drop, the WebSocket may be dead while the SDK's
-reconnect loop is still mid-backoff sleep — meaning the first user
+reconnect loop is still mid-backoff sleep, meaning the first user
 interaction pays that backoff delay.
 
 Wire `mrdoge.pingOrReconnect()` to your platform's focus event. It's a
@@ -217,7 +217,7 @@ window.addEventListener("online", () => mrdoge.pingOrReconnect());
 Server-side consumers (`@mrdoge/node`) have no focus concept and don't
 need this.
 
-Never throws — failures fall through to the SDK's normal reconnect
+Never throws. Failures fall through to the SDK's normal reconnect
 machinery.
 
 ## Next

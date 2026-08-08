@@ -20,7 +20,7 @@ export function OddsSelectorDemo() {
   }
 
   const market = markets?.[0]
-  // Odds close once the match ends — same as matchToMatchCardProps, drop
+  // Odds close once the match ends, same as matchToMatchCardProps: drop
   // them rather than freeze on the last live value.
   const showOdds = match?.status !== "completed"
 

@@ -11,7 +11,7 @@ npm i @mrdoge/node express
 
 ## Singleton client
 
-Create one client per process and reuse it across requests — the SDK pools
+Create one client per process and reuse it across requests. The SDK pools
 the WebSocket and rate-limit state automatically.
 
 ```ts title="lib/mrdoge.ts"
@@ -48,7 +48,7 @@ export default router;
 
 ## Route: mint a token for the browser
 
-Pair Express with `@mrdoge/client` in the browser — your backend never
+Pair Express with `@mrdoge/client` in the browser: your backend never
 exposes the API key:
 
 ```ts title="routes/token.ts"

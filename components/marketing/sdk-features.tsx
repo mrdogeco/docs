@@ -4,7 +4,7 @@ const FEATURES = [
   {
     icon: Zap,
     title: "Built for speed",
-    body: "~200ms first paint and low-latency live updates — fast by default. The SDK races HTTP cache against WebSocket on cold start, so your UI never waits for a handshake.",
+    body: "~200ms first paint and low-latency live updates, fast by default. The SDK races HTTP cache against WebSocket on cold start, so your UI never waits for a handshake.",
   },
   {
     icon: Cable,
@@ -35,7 +35,7 @@ const FEATURES = [
 
 export function SdkFeatures() {
   return (
-    <section className="mx-auto w-full max-w-5xl px-6 py-16">
+    <section className="mx-auto w-full max-w-5xl px-6 pb-16 pt-32">
       <div className="flex flex-col gap-3 text-center">
         <span className="text-sm font-medium tracking-wide text-muted-foreground uppercase">
           What&apos;s in the box

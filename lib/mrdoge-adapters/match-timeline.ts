@@ -1,10 +1,10 @@
 import type { MatchDetail, TimelineEvent } from "@mrdoge/protocol"
 import type { MatchTimelineEntry, MatchTimelineProps } from "@/registry/mrdoge-ui/match-timeline/match-timeline"
 
-// Soccer only — classify() and the phase labels below use soccer's own
+// Soccer only. classify() and the phase labels below use soccer's own
 // event/phase sysnames. Other sports just get zero entries for now.
 
-// Matched by prefix — lower-tier competitions report goals/cards without
+// Matched by prefix. Lower-tier competitions report goals/cards without
 // a named player ("GoalWithoutScorer" vs "GoalWithScorer"). "GoalWith"
 // specifically, not "GoalKick" (a real, different event).
 function classify(type: string): "goal" | "own-goal" | "yellow-card" | "red-card" | "penalty" | null {
@@ -27,12 +27,12 @@ function toTimeLabel(event: TimelineEvent): string | undefined {
 const SOCCER_PHASE_LABEL: Record<string, string> = {
   SOCCER_MATCH_FIRST_HALF: "1st Half",
   SOCCER_MATCH_SECOND_HALF: "2nd Half",
-  SOCCER_MATCH_EXTRA_FIRST_HALF: "Extra Time — 1st Half",
-  SOCCER_MATCH_EXTRA_SECOND_HALF: "Extra Time — 2nd Half",
+  SOCCER_MATCH_EXTRA_FIRST_HALF: "Extra Time - 1st Half",
+  SOCCER_MATCH_EXTRA_SECOND_HALF: "Extra Time - 2nd Half",
   SOCCER_MATCH_PENALTIES: "Penalties",
 }
-// Only reached when there's no StartOfSecondHalf event to trust —
-// deliberately wide, since real 1st-half stoppage rarely approaches it.
+// Only reached when there's no StartOfSecondHalf event to trust.
+// Deliberately wide, since real 1st-half stoppage rarely approaches it.
 const FIRST_HALF_ELAPSED_CUTOFF_SECONDS = 70 * 60
 const SECOND_HALF_ELAPSED_CEILING_SECONDS = 115 * 60
 
@@ -52,12 +52,12 @@ type ClockLike = {
 } | null | undefined
 
 function toLivePhaseLabel(clock: ClockLike, secondHalfStarted: boolean): string {
-  // elapsedSeconds is null during intermission — trust the backend's
+  // elapsedSeconds is null during intermission. Trust the backend's
   // own "Half Time" label instead of guessing from minutes.
   if (clock?.state === "intermission") return clock.displayLong ?? clock.display ?? "Half Time"
 
   if (secondHalfStarted) {
-    // Confirmed via a real event — elapsed time only decides whether
+    // Confirmed via a real event: elapsed time only decides whether
     // we've since moved into extra time.
     if (clock?.elapsedSeconds != null && clock.elapsedSeconds > SECOND_HALF_ELAPSED_CEILING_SECONDS) {
       return SOCCER_PHASE_LABEL[clock?.phase ?? ""] ?? clock?.displayLong ?? clock?.display ?? "2nd Half"
@@ -79,7 +79,7 @@ function isLivePastFirstHalf(clock: ClockLike, secondHalfStarted: boolean): bool
   return clock?.elapsedSeconds != null && clock.elapsedSeconds > FIRST_HALF_ELAPSED_CUTOFF_SECONDS
 }
 
-// Per-event minute, parsed from captions[0] ("41", "45+3") — a fixed
+// Per-event minute, parsed from captions[0] ("41", "45+3"): a fixed
 // value recorded at the time, not subject to the clock staleness above.
 function parseEventMinute(caption: string | undefined): number | null {
   if (!caption) return null
@@ -93,7 +93,7 @@ function isEventPastFirstHalf(minute: number | null): boolean {
 
 /**
  * Maps a real `matches.get()`/`matches.subscribe()` response to Match
- * Timeline's props — filtered to goals, cards, penalties, and
+ * Timeline's props: filtered to goals, cards, penalties, and
  * half/full-time, most-recent-first. If the SDK's shape changes, this
  * fails to compile.
  */
@@ -170,8 +170,8 @@ export function matchToMatchTimelineProps(match: MatchDetail): MatchTimelineProp
 
   entries.reverse()
 
-  // During intermission, the HT divider above already says exactly this —
-  // a second "Half Time" banner here would just repeat it.
+  // During intermission, the HT divider above already says exactly this.
+  // A second "Half Time" banner here would just repeat it.
   if (match.status === "live" && match.stats?.clock?.state !== "intermission") {
     entries.unshift({
       id: "live",

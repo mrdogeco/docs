@@ -13,7 +13,7 @@ import {
 } from "@/components/docs/demos/use-shared-demo-matches"
 import { FINISHED_MATCH_ID } from "@/components/docs/sample-data"
 
-// Lazily fetches other matches today in the same competition — only once
+// Lazily fetches other matches today in the same competition, only once
 // the dropdown is actually opened, not eagerly on every render.
 function useCompetitionMatches(competitionId: number | undefined, date: string | undefined) {
   const [matches, setMatches] = useState<Match[] | null | undefined>(undefined)
@@ -39,7 +39,7 @@ function useCompetitionMatches(competitionId: number | undefined, date: string |
 }
 
 function FinishedHighlight() {
-  // A fixed, hand-picked match rather than a resolver — nothing about a
+  // A fixed, hand-picked match rather than a resolver: nothing about a
   // completed match changes, so there's no "current" one to resolve.
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const matchId = selectedId ?? FINISHED_MATCH_ID
@@ -73,7 +73,7 @@ function UpcomingHighlight() {
   const resolvedId = useSharedUpcomingMatchId()
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const matchId = selectedId ?? resolvedId
-  // One-shot, not live — nothing about an upcoming match changes before kickoff.
+  // One-shot, not live: nothing about an upcoming match changes before kickoff.
   const match = useMatch({ matchId: matchId ?? undefined })
   const { matches: competitionMatches, open } = useCompetitionMatches(
     match?.competition.id,

@@ -8,7 +8,7 @@ type Props = {
 }
 
 /**
- * Sunset-gradient CTA section — ported from mrdoge-ai's developer landing
+ * Sunset-gradient CTA section, ported from mrdoge-ai's developer landing
  * (same Grainient background, same card treatment).
  */
 export function BrandedCta({ title, description, children }: Props) {
@@ -20,7 +20,7 @@ export function BrandedCta({ title, description, children }: Props) {
         className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_60%_50%_at_50%_50%,rgba(236,72,153,0.2),transparent_70%)]"
       />
 
-      {/* Full-bleed, flat, no shadow below sm — only becomes a floating
+      {/* Full-bleed, flat, no shadow below sm. Only becomes a floating
           card with margins/rounded corners/shadow at sm and up. */}
       <div className="relative mx-auto w-full max-w-5xl px-0 py-0 sm:px-6">
         <div className="relative overflow-hidden rounded-none shadow-none sm:rounded-3xl sm:shadow-2xl sm:shadow-[#EC4899]/30">

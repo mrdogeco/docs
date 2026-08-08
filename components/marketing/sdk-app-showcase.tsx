@@ -6,9 +6,9 @@ import { Button } from "@/components/ui/button"
 import { PhoneMockup } from "./phone-mockup"
 
 // Same screenshot + phone-mockup treatment as mrdoge-ai's own landing page
-// (components/marketing/app-showcase.tsx) — proof that this is a real,
+// (components/marketing/app-showcase.tsx): proof that this is a real,
 // shipping app running on the SDK, not a mockup. Copy is reframed for a
-// developer audience (no App/Play Store buttons — those belong on
+// developer audience (no App/Play Store buttons, those belong on
 // mrdoge.ai, not here) and links out to the app itself instead.
 export function SdkAppShowcase() {
   return (
@@ -21,7 +21,7 @@ export function SdkAppShowcase() {
           The official Mr. Doge App
         </h2>
         <p className="mx-auto max-w-2xl text-muted-foreground">
-          Mr. Doge — live scores, odds, and AI picks for millions of matches —
+          Mr. Doge, with live scores, odds, and AI picks for millions of matches,
           runs on the exact same SDK you&apos;d install today.
         </p>
       </div>
@@ -38,7 +38,7 @@ export function SdkAppShowcase() {
           <PhoneMockup className="absolute inset-x-0 top-0 w-full">
             <Image
               src="/assets/mrdoge-app-screenshot.png"
-              alt="Mr. Doge app — live match discovery screen"
+              alt="Mr. Doge app: live match discovery screen"
               fill
               sizes="(max-width: 768px) 86vw, 460px"
               className="object-contain object-top"

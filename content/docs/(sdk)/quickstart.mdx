@@ -68,12 +68,12 @@ You should see live matches print to stdout.
 
 ## Subscribe to live updates
 
-The real magic — live deltas as scores and odds change.
+The real magic: live deltas as scores and odds change.
 
 ```ts title="bot.ts"
 const sub = await mrdoge.matches.subscribeLive({ sports: ["soccer"] });
 
-// initial state — already populated from the HTTP cold-start cache
+// initial state, already populated from the HTTP cold-start cache
 console.log("Snapshot:", sub.snapshot.length, "matches");
 
 // stream deltas as the server pushes them
@@ -97,7 +97,7 @@ await sub.cancel();
 ```
 
 Under the hood the SDK races HTTP cache (~100ms) against the WebSocket
-handshake (~1.5s) — whichever resolves first populates `sub.snapshot`. WS
+handshake (~1.5s); whichever resolves first populates `sub.snapshot`. WS
 continues for the live deltas. See [transports](/docs/concepts/transports)
 for the deep dive.
 

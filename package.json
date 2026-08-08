@@ -2,7 +2,7 @@
   "name": "mrdoge-docs",
   "version": "0.1.0",
   "private": true,
-  "description": "mrdoge.co — Mr. Doge SDK docs and marketing, mrdoge-ui component registry, docs, and showcase.",
+  "description": "mrdoge.co: Mr. Doge SDK docs and marketing, mrdoge-ui component registry, docs, and showcase.",
   "scripts": {
     "dev": "next dev -p 3001",
     "build": "next build",
@@ -15,6 +15,7 @@
     "@mrdoge/node": "^0.4.3",
     "@mrdoge/protocol": "^0.4.3",
     "@mrdoge/react": "^0.1.7",
+    "@vercel/analytics": "^1.5.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "fumadocs-core": "^16.8.11",

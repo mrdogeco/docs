@@ -1,6 +1,6 @@
 // Docs live OUTSIDE the `[locale]` tree, so `Link` from `@/i18n/navigation`
 // would throw "No intl context found" when rendered inside an MDX doc
-// page. Plain next/link is the right primitive here — docs are
+// page. Plain next/link is the right primitive here: docs are
 // English-only, no locale prefix to preserve.
 import Link from "next/link";
 import {

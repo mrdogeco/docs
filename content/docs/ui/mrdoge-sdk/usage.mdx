@@ -12,12 +12,12 @@ import { InstallTabs } from "@/components/docs/install-tabs"
 </div>
 
 Small, pure functions from a real `@mrdoge/protocol` response to a
-component's plain props — type-checked, so a schema change fails to
+component's plain props: type-checked, so a schema change fails to
 compile instead of silently going stale. They live in
 `lib/mrdoge-adapters/`, named for this specific integration, and are the
 ones used throughout every example on this site. Integrating a different
 data provider? Your own `lib/<provider>-adapters/` directory, following
-the same pattern, is the way — a new page here too, PRs welcome.
+the same pattern, is the way. A new page here too, PRs welcome.
 
 See [Installation](/docs/ui/mrdoge-sdk/installation) for setting up
 `@mrdoge/react`, the hooks package that feeds these adapters real data.
@@ -30,7 +30,7 @@ market from [`odds.list()`](/docs/reference/odds)) onto
 
 <InstallTabs name="mrdoge-match-card-adapter" />
 
-`movementById` is optional throughout — pass
+`movementById` is optional throughout: pass
 [useOddsMovement](/docs/ui/hooks/use-odds-movement)`(market)`'s result to
 color options as prices change (green/red), or omit it and options render
 without any color change.
@@ -39,16 +39,16 @@ without any color change.
 
 `matchToMatchHighlightProps` maps a real
 [`matches.get()`](/docs/reference/matches)/`matches.subscribe()` response
-onto [Match Highlight](/docs/ui/components/match-highlight)'s props —
+onto [Match Highlight](/docs/ui/components/match-highlight)'s props,
 including the `minute`/`stoppage`/`elapsedSeconds`/`referenceTime` fields
 that drive its live ticking clock. Cards and corners are soccer-specific;
 other sports get no stats row rather than misleading zeros.
 
-`matchesToCompetitionMatches` is separate — a pure mapping from a
+`matchesToCompetitionMatches` is separate: a pure mapping from a
 [`matches.list({ competitionIds, date })`](/docs/reference/matches)
 response onto `competitionMatches`, excluding the match you're already
 viewing and sorting by kickoff time. Running that query lazily (only once
-the dropdown first opens) is the caller's job, same as fetching itself —
+the dropdown first opens) is the caller's job, same as fetching itself;
 see [The competition dropdown](/docs/ui/components/match-highlight#the-competition-dropdown).
 
 <InstallTabs name="mrdoge-match-highlight-adapter" />
@@ -57,7 +57,7 @@ see [The competition dropdown](/docs/ui/components/match-highlight#the-competiti
 
 Maps a real [`matches.get()`](/docs/reference/matches)/`matches.subscribe()`
 response onto [Match Timeline](/docs/ui/components/match-timeline)'s
-`entries` prop — filtered to goals, cards, penalties, and half/full-time,
+`entries` prop, filtered to goals, cards, penalties, and half/full-time,
 most-recent-first. Full-time is synthesized from
 `match.status`/`stats` rather than a specific timeline event, since
 there's no single event that reliably marks a match as truly over once
@@ -70,13 +70,13 @@ extra time is possible.
 `statsToStatsListEntries` maps `match.stats` onto
 [Stats List](/docs/ui/components/stats-list)'s `entries` prop.
 `MatchStats` is a discriminated union per sport, so this switches on
-`stats.sport` — soccer has the richest set (possession, shots, corners,
+`stats.sport`: soccer has the richest set (possession, shots, corners,
 cards, tackles, throw-ins, goal kicks, woodwork hits, penalty kicks,
 ...); american football, baseball, ice hockey, and handball currently
 have no comparable home/away stats in the protocol beyond score and
 clock, so those return an empty array.
 
-`matchToPlayerStatsListEntries` is separate — the top player per side
+`matchToPlayerStatsListEntries` is separate: the top player per side
 (soccer only) for shots, shots on target, and woodwork hits, from
 `match.stats`'s per-player arrays. Returns empty unless `match.timeline`
 has at least one player-attributed event, a proxy for "this match has
@@ -87,18 +87,18 @@ player-level tracking at all."
 ## Odds Selector
 
 `SOCCER_UNDER_OVER` posts one market per threshold (0.5, 1.5, 2.5, ...)
-instead of one market total — `toOddsLines` pairs each into a row, sorted
+instead of one market total. `toOddsLines` pairs each into a row, sorted
 by threshold, for [Odds Selector](/docs/ui/components/odds-selector)'s
 `lines` prop. `pickMostBalancedMarket` picks the closest-to-even
 Over/Under pair as a single representative line, e.g. for the Odds Board
-example, instead of an arbitrary — often lopsided — first market.
+example, instead of an arbitrary, often lopsided, first market.
 
 <InstallTabs name="mrdoge-odds-selector-adapter" />
 
 ## Bet Slip
 
 Builds a `BetSlipPick` directly from a real match, one of its markets,
-and a selected line id — a pick is basically a selected odds line. For
+and a selected line id. A pick is basically a selected odds line. For
 [Bet Slip](/docs/ui/components/bet-slip)'s `picks`. Also populates
 `home`/`away` from the match's teams, so `BetSlipPickRow` can render team
 crests.
@@ -107,7 +107,7 @@ crests.
 
 ## Conflicts
 
-Some selections are mutually exclusive on the same match — any Match
+Some selections are mutually exclusive on the same match: any Match
 Result pick rules out the entire Double Chance market, Over 4.5 rules
 out Under 1.5 in Total Goals, and so on. `getConflictingIds` checks a set of
 selections against every available candidate and returns the ids
@@ -115,7 +115,7 @@ incompatible with at least one of them; `getConflictingPickIds` does the
 same directly against an existing `BetSlipPick[]`, for consumers without
 live `Market` data on hand (e.g. picks loaded from storage).
 
-What to do with a conflicting id is entirely up to you — feed it into
+What to do with a conflicting id is entirely up to you: feed it into
 [Odds Selector](/docs/ui/components/odds-selector)'s `disabledIds` to
 block the click before it happens, or into
 [Bet Slip](/docs/ui/components/bet-slip)'s `conflictingPickIds` to flag
@@ -126,17 +126,17 @@ never what to do about it.
 
 Three rule families, scoped to the same match:
 
-- **Match Result ↔ Double Chance** — Double Chance is just two of Match
+- **Match Result ↔ Double Chance**: Double Chance is just two of Match
   Result's three outcomes combined, so the two markets describe
   overlapping information about the same result rather than independent
   events. Any Match Result selection blocks the entire Double Chance
-  market, and vice versa — not just the specific pairs that are outright
+  market, and vice versa, not just the specific pairs that are outright
   impossible.
-- **Over/Under threshold overlap** — Over-at-`T1` and Under-at-`T2` in the
+- **Over/Under threshold overlap**: Over-at-`T1` and Under-at-`T2` in the
   same Totals market conflict once `T1 >= T2` (Under 1.5 + Over 4.5 can
   never both be true; Over 1.5 + Under 4.5 can). Same-side pairs at
-  different thresholds conflict too, e.g. Over 1.5 + Over 2.5 — the
+  different thresholds conflict too, e.g. Over 1.5 + Over 2.5: the
   higher threshold winning always means the lower one wins too, so it's
   never a genuinely new combination.
-- **Both Teams to Score ↔ low Totals** — BTTS "Yes" conflicts with Under
+- **Both Teams to Score ↔ low Totals**: BTTS "Yes" conflicts with Under
   1.5 goals or lower (scoring twice needs at least 2 goals).

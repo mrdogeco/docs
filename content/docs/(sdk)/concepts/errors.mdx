@@ -14,7 +14,7 @@ Re-exported from `@mrdoge/node` and `@mrdoge/client`:
 | Class | Wire code | When |
 |-------|-----------|------|
 | `ValidationError` | `invalid_params` | Schema rejected your params |
-| `AuthEndpointError` | — | `@mrdoge/client` only — your token-mint route is down or returned non-2xx |
+| `AuthEndpointError` | N/A | `@mrdoge/client` only, your token-mint route is down or returned non-2xx |
 | `UnauthorizedError` | `unauthorized` | Invalid/revoked key, expired JWT |
 | `ForbiddenError` | `forbidden` | Method not in your tier |
 | `NotFoundError` | `not_found` | Resource doesn't exist |
@@ -24,10 +24,10 @@ Re-exported from `@mrdoge/node` and `@mrdoge/client`:
 | `UnavailableError` | `unavailable` | Server temporarily down |
 | `InternalError` | `internal_error` | Server bug or transient failure |
 | `ProtocolError` | `invalid_request` / `method_not_found` | Frame-level violation |
-| `ConnectionError` | — | WebSocket couldn't connect |
-| `DisconnectedError` | — | Connection dropped mid-request |
-| `TimeoutError` | — | Request exceeded `requestTimeoutMs` (default 10s) |
-| `AbortError` | — | User aborted via `AbortSignal` |
+| `ConnectionError` | N/A | WebSocket couldn't connect |
+| `DisconnectedError` | N/A | Connection dropped mid-request |
+| `TimeoutError` | N/A | Request exceeded `requestTimeoutMs` (default 10s) |
+| `AbortError` | N/A | User aborted via `AbortSignal` |
 
 All classes extend `MrDogeError`, which extends `Error`.
 
@@ -46,7 +46,7 @@ try {
   if (err instanceof UnauthorizedError) {
     // refresh token / re-auth
   } else if (err instanceof ForbiddenError) {
-    // upgrade tier — err.data exposes method + tier context
+    // upgrade tier; err.data exposes method + tier context
   } else if (err instanceof RateLimitError) {
     // back off and retry
   } else {
@@ -93,7 +93,7 @@ try {
 }
 ```
 
-`AbortError` matches the fetch convention — `err.name === "AbortError"` is
+`AbortError` matches the fetch convention: `err.name === "AbortError"` is
 true.
 
 ## Validation errors
@@ -111,7 +111,7 @@ catch (err) {
 ```
 
 In dev this usually means a typo or a wrong type. In prod, treat it as a
-bug — TypeScript types prevent most of these.
+bug: TypeScript types prevent most of these.
 
 ## Subscription errors
 
@@ -128,8 +128,8 @@ sub.on("closed", ({ reason, message }) => {
 ```
 
 If the subscription **never opens** (you're rate-limited at subscribe
-time), `subscribeLive` throws `SubscriptionLimitError` or similar — handle
-in the `try/catch` around `await mrdoge.matches.subscribeLive(...)`.
+time), `subscribeLive` throws `SubscriptionLimitError` or similar. Handle
+it in the `try/catch` around `await mrdoge.matches.subscribeLive(...)`.
 
 ## Next
 

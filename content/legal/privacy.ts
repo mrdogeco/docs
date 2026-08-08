@@ -5,12 +5,12 @@ import type { LegalData } from "@/components/legal/legal-page"
 // really wired up), since the original draft named vendors that were
 // either aspirational or wrong:
 //  - Auth is homegrown (NextAuth + our own RS256 JWTs via mrdoge-api),
-//    not Clerk/Auth0 — those were never integrated.
+//    not Clerk/Auth0: those were never integrated.
 //  - Email is Resend (confirmed in mrdoge-api/services/EmailService.ts),
 //    not SendGrid/AWS SES.
 //  - AI inference runs on OpenAI (mrdoge-ai depends on @ai-sdk/openai);
 //    Anthropic was never wired in, dropped.
-//  - Cloud hosting: no specific provider named — the old draft's
+//  - Cloud hosting: no specific provider named. The old draft's
 //    "AWS, Google Cloud" wasn't verifiable against any actual infra
 //    config in the repos, so this stays generic rather than asserting
 //    something that might be wrong.
@@ -20,7 +20,7 @@ import type { LegalData } from "@/components/legal/legal-page"
 export const privacyData: LegalData = {
   title: "Privacy Policy",
   lastUpdated: "August 8, 2026",
-  noticeTitle: "🔒 Your Privacy Matters",
+  noticeTitle: "Your Privacy Matters",
   noticeText:
     "We are committed to protecting your personal information and being transparent about how we collect, use, and share your data. This policy explains your rights and our responsibilities regarding your privacy.",
   sections: [
@@ -42,7 +42,7 @@ export const privacyData: LegalData = {
             "Email address",
             "Name or display name, and profile picture if you sign in with Google",
             "Password (encrypted and hashed), if you register with email/password instead of Google",
-            "Payment information (processed securely through Stripe — we never see or store your card number)",
+            "Payment information (processed securely through Stripe; we never see or store your card number)",
             "Company name and business details (for enterprise accounts)",
             "Authentication tokens and session data",
           ],

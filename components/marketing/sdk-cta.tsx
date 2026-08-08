@@ -13,7 +13,7 @@ export function SdkCta() {
       <Button
         asChild
         size="lg"
-        className="rounded-full bg-black px-6 py-3 text-white shadow-lg shadow-black/30 hover:bg-black/90"
+        className="rounded-full bg-black px-6 py-3 text-white shadow-lg hover:bg-black/90"
       >
         <Link href="/docs">Read the docs</Link>
       </Button>

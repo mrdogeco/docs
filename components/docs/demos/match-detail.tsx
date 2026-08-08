@@ -28,7 +28,7 @@ export interface MatchDetailProps {
  * Match Highlight header plus a Timeline/Odds/Stats tab strip below it.
  * Owns its own data-fetching via the Mr. Doge SDK (`useLiveMatch`/
  * `useOdds`), unlike the rest of mrdoge-ui's plain-props components.
- * Soccer-specific for the Odds tab's three markets — other sports show an
+ * Soccer-specific for the Odds tab's three markets. Other sports show an
  * empty state there, same as Match Timeline elsewhere.
  */
 export function MatchDetail({ matchId, className }: MatchDetailProps) {

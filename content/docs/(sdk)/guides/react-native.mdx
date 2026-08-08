@@ -12,7 +12,7 @@ JWT-based auth pattern as the browser.
 npm i @mrdoge/react
 ```
 
-`@mrdoge/react` wraps `@mrdoge/client` with hooks and a shared cache —
+`@mrdoge/react` wraps `@mrdoge/client` with hooks and a shared cache,
 recommended even on RN, for the same reason as the browser: components
 watching the same match/list don't duplicate a subscription.
 
@@ -31,7 +31,7 @@ an example.
 
 ## Client setup
 
-Call `configureMrDoge()` once, before any hook runs — e.g. at your app's
+Call `configureMrDoge()` once, before any hook runs, e.g. at your app's
 entry point:
 
 ```ts title="lib/mrdoge.ts"
@@ -52,7 +52,7 @@ configureMrDoge({
 });
 ```
 
-The custom `fetchToken` lets you forward your app's session — gate the
+The custom `fetchToken` lets you forward your app's session and gate the
 Mr. Doge token mint by your own auth. Same options as `MrDogeOptions` in
 `@mrdoge/client`.
 
@@ -111,7 +111,7 @@ export function LiveScreen() {
 }
 ```
 
-Mobile apps churn screens hard — `useLiveMatches` cancels the underlying
+Mobile apps churn screens hard: `useLiveMatches` cancels the underlying
 subscription automatically once the last component using it unmounts, no
 manual cleanup to get wrong.
 
@@ -180,7 +180,7 @@ export function LiveScreen() {
 ## Background and reconnect
 
 When the app backgrounds, iOS / Android may close the WebSocket. The SDK
-auto-reconnects on its own — your `sub.on()` listeners keep firing once
+auto-reconnects on its own; your `sub.on()` listeners keep firing once
 the socket is back.
 
 For best foreground UX, wire `AppState` to `pingOrReconnect()`:
@@ -200,7 +200,7 @@ AppState.addEventListener("change", (state) => {
 - Fires a reconnect when the socket is dead but no reconnect is in flight
   (e.g. iOS killed the WS during background and the loop hadn't picked it
   up yet).
-- Wakes the SDK's backoff loop when one is currently sleeping — so the
+- Wakes the SDK's backoff loop when one is currently sleeping, so the
   first user interaction after foreground doesn't wait out a stale
   exponential delay (could be 30s+ on a long-failed reconnect series).
 
@@ -211,7 +211,7 @@ SDK refetches via your `fetchToken` callback transparently.
 
 ## TanStack Query interop
 
-`@mrdoge/react`'s own hooks already share a cache — reach for TanStack
+`@mrdoge/react`'s own hooks already share a cache. Reach for TanStack
 Query instead only if you want Mr. Doge data unified into a cache layer
 you're already using for everything else:
 
@@ -228,7 +228,7 @@ export function useMatches(sport: string) {
 }
 ```
 
-The SDK doesn't fight your cache layer — every method is a plain async
+The SDK doesn't fight your cache layer: every method is a plain async
 function.
 
 ## Next

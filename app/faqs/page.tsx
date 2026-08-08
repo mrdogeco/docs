@@ -1,8 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { Button } from "@/components/ui/button"
-import { BrandedCta } from "@/components/marketing/branded-cta"
 import { Footer } from "@/components/marketing/footer"
 import { HomeLayout } from "fumadocs-ui/layouts/home"
 import { baseOptions } from "@/lib/layout.shared"
@@ -15,7 +13,7 @@ export const metadata: Metadata = buildMetadata({
 })
 
 // Ported from old_mrdoge-co's (landing)/faqs/page.tsx, rewritten for the
-// current Stripe subscription model (was pay-as-you-go credits) — see
+// current Stripe subscription model (was pay-as-you-go credits). See
 // content/legal/terms.ts's header comment for the same context. Also
 // fixed a real factual error carried over from the old draft: AI
 // recommendations are Business-tier only, not "starting from Growth"
@@ -27,12 +25,12 @@ const faqs = [
       {
         question: "How do I get started with Mr. Doge API?",
         answer:
-          "Sign up for a free account, pick a plan, and start your 7-day free trial — a card is required, but you won't be charged until the trial ends. Create your first API key from the dashboard and start making requests using our documentation.",
+          "Sign up for a free account, pick a plan, and start your 7-day free trial. A card is required, but you won't be charged until the trial ends. Create your first API key from the dashboard and start making requests using our documentation.",
       },
       {
         question: "Do I need a credit card to sign up?",
         answer:
-          "Creating an account is free and doesn't require a card. Starting a subscription trial does — every plan includes a 7-day free trial, but a payment method is required upfront so the subscription can continue automatically once the trial ends.",
+          "Creating an account is free and doesn't require a card. Starting a subscription trial does: every plan includes a 7-day free trial, but a payment method is required upfront so the subscription can continue automatically once the trial ends.",
       },
       {
         question: "Can I switch plans later?",
@@ -76,7 +74,7 @@ const faqs = [
       },
       {
         question: "How often is odds data updated?",
-        answer: "Live odds are pushed over WebSocket as they change — no polling needed. HTTP endpoints reflect the latest snapshot at request time.",
+        answer: "Live odds are pushed over WebSocket as they change, no polling needed. HTTP endpoints reflect the latest snapshot at request time.",
       },
       {
         question: "What are the API rate limits?",
@@ -84,12 +82,12 @@ const faqs = [
       },
       {
         question: "Do you provide historical odds data?",
-        answer: "Not yet — this is on our roadmap. The current API surfaces live and upcoming match data only.",
+        answer: "Not yet. This is on our roadmap. The current API surfaces live and upcoming match data only.",
       },
       {
         question: "Can I use the API for commercial purposes?",
         answer:
-          "Yes. The SDK is licensed for direct integration into your own applications, commercial or personal. Reselling or redistributing the raw data stream to third parties requires a separate Enterprise license — see the Terms of Service for details.",
+          "Yes. The SDK is licensed for direct integration into your own applications, commercial or personal. Reselling or redistributing the raw data stream to third parties requires a separate Enterprise license. See the Terms of Service for details.",
       },
     ],
   },
@@ -104,12 +102,12 @@ const faqs = [
       {
         question: "How accurate are the AI predictions?",
         answer:
-          "Predictions are probabilistic, based on statistical models and historical data — not guarantees. Past performance doesn't guarantee future results. Use them as one input among many, not as a standalone signal.",
+          "Predictions are probabilistic, based on statistical models and historical data, not guarantees. Past performance doesn't guarantee future results. Use them as one input among many, not as a standalone signal.",
       },
       {
         question: "Are AI features included in all plans?",
         answer:
-          "No — AI recommendations are exclusive to the Business tier. Starter and Growth cover discovery, live scores, and match state, but not odds or AI picks.",
+          "No. AI recommendations are exclusive to the Business tier. Starter and Growth cover discovery, live scores, and match state, but not odds or AI picks.",
       },
     ],
   },
@@ -123,7 +121,7 @@ const faqs = [
       },
       {
         question: "Do you have API documentation?",
-        answer: "Yes — full documentation lives at mrdoge.co/docs, with quickstarts, guides per runtime, and a complete method reference, kept up to date as the SDK evolves.",
+        answer: "Yes, full documentation lives at mrdoge.co/docs, with quickstarts, guides per runtime, and a complete method reference, kept up to date as the SDK evolves.",
       },
       {
         question: "Where can I report bugs or request features?",
@@ -164,12 +162,6 @@ export default function FAQsPage() {
           ))}
         </div>
       </section>
-
-      <BrandedCta title="Still have questions?" description="Our support team typically responds within a few hours. Share your use case and we'll help you get unstuck.">
-        <Button asChild size="lg" className="rounded-full bg-black px-6 py-3 text-white shadow-lg shadow-black/30 hover:bg-black/90">
-          <Link href="mailto:support@mrdoge.co">Contact support</Link>
-        </Button>
-      </BrandedCta>
 
       <Footer />
     </HomeLayout>

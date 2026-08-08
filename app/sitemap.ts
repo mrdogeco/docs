@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next"
 import { source } from "@/lib/source"
 import { absoluteUrl } from "@/lib/seo"
 
-const staticRoutes = ["/", "/ui", "/about", "/faqs", "/terms", "/privacy"]
+const staticRoutes = ["/", "/ui", "/pricing", "/about", "/faqs", "/terms", "/privacy"]
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date()

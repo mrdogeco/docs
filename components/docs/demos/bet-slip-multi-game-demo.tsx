@@ -89,7 +89,7 @@ function MultiGameSelector({
 }
 
 export function BetSlipMultiGameDemo() {
-  // Bounded to today/tomorrow — "upcoming" alone can include matches
+  // Bounded to today/tomorrow: "upcoming" alone can include matches
   // stuck on that status well past their real kickoff.
   const today = new Date()
   const tomorrow = new Date(today)
@@ -146,7 +146,7 @@ export function BetSlipMultiGameDemo() {
         pickStakes={pickStakes}
         onPickStakeChange={(id, value) => setPickStakes((prev) => ({ ...prev, [id]: value }))}
         onSubmit={() => {
-          // Fake submit — no real endpoint here, just enough to show the states.
+          // Fake submit: no real endpoint here, just enough to show the states.
           setSubmitState("loading")
           setTimeout(() => {
             setSubmitState("success")

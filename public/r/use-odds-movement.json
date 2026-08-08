@@ -9,7 +9,7 @@
   "files": [
     {
       "path": "registry/mrdoge-ui/use-odds-movement/use-odds-movement.ts",
-      "content": "// Re-exported from @mrdoge/react — pure diffing, no cache/store involved.\nexport { useOddsMovement, type OddsMovement } from \"@mrdoge/react\"\n",
+      "content": "// Re-exported from @mrdoge/react. Pure diffing, no cache/store involved.\nexport { useOddsMovement, type OddsMovement } from \"@mrdoge/react\"\n",
       "type": "registry:hook"
     }
   ],

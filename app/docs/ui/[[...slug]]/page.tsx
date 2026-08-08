@@ -16,7 +16,7 @@ type PageProps = {
 }
 
 // This route only ever receives the slug *after* "ui" (Next.js strips the
-// static "ui" segment before handing off to this catch-all) — the page
+// static "ui" segment before handing off to this catch-all). The page
 // tree indexes pages by their full path, "ui" included, so prepend it back.
 function fullSlug(slug?: string[]) {
   return ["ui", ...(slug ?? [])]
@@ -31,7 +31,7 @@ export default async function Page(props: PageProps) {
 
   return (
     <DocsPage toc={page.data.toc} full={page.data.full}>
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col-reverse items-start gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
         <DocsTitle>{page.data.title}</DocsTitle>
         <PageActions slug={page.slugs} />
       </div>

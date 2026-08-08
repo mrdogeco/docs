@@ -1,47 +1,48 @@
 import Link from "next/link"
-import { SiGithub } from "react-icons/si"
 
 import { Button } from "@/components/ui/button"
 import { bungee } from "@/lib/fonts"
 import { cn } from "@/lib/utils"
-import { FluidMorphCard } from "./fluid-morph-card"
+import { GithubStarButton } from "./github-star-button"
+import { SunglassesScene } from "./sunglasses-scene"
 
-// Same font + gradient treatment as mrdoge.ai/developers' hero title —
-// Bungee display font, uppercase, tight leading. Only the second line
-// gets the warm gradient fill; the first stays plain white.
+// Same font treatment as mrdoge.ai/developers' hero title: Bungee
+// display font, uppercase, tight leading.
 const TITLE_CLASSNAME = cn(bungee.className, "uppercase leading-[0.88] tracking-tight")
 
+// Full-bleed hero: the fluid blob background fills the whole section
+// (not boxed into a card), with the sunglasses, title, and description
+// stacked on top — one big hero moment instead of a card floating in a
+// section.
 export function SdkHero() {
   return (
-    <FluidMorphCard
-      titleAs="h1"
-      title={
-        <>
-          The odds in
-          <br />
-          <span className="bg-gradient-to-br from-[#FADFAD] via-[#FAAF45] to-[#EC4899] bg-clip-text text-transparent">
-            your favor.
-          </span>
-        </>
-      }
-      titleClassName={TITLE_CLASSNAME}
-      description="Matches, live odds, stats, AI predictions and insights. Native WebSocket support. Typed end to end."
-    >
-      <Button asChild size="lg" className="rounded-full bg-white px-6 py-3 text-black shadow-lg shadow-black/30 hover:bg-white/90">
-        <Link href="/docs">Read the docs</Link>
-      </Button>
+    <section className="relative overflow-hidden pt-28 sm:pt-16">
+      <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col items-center px-3 pt-8 pb-20 text-center sm:px-6 sm:pt-12 sm:pb-16">
+        <div className="h-40 w-full max-w-2xs sm:h-72 sm:max-w-lg">
+          <SunglassesScene zoom={1.6} />
+        </div>
 
-      <Button
-        asChild
-        variant="outline"
-        size="lg"
-        className="rounded-full border-white/20 bg-white/10 px-5 py-3 text-white backdrop-blur hover:bg-white/20 hover:text-white"
-      >
-        <Link href="https://github.com/mrdogeco/sdk" target="_blank" rel="noopener noreferrer">
-          <SiGithub />
-          Star on GitHub
-        </Link>
-      </Button>
-    </FluidMorphCard>
+        <h1 className={cn("text-balance text-5xl font-bold tracking-tight text-black sm:text-8xl", TITLE_CLASSNAME)}>
+          The <span className="text-[#EC4899] drop-shadow-xs drop-shadow-black/50">odds</span> in
+          <br />
+          your favor
+        </h1>
+        <p className="mx-auto mt-5 max-w-xl text-balance text-lg leading-relaxed text-black/80">
+          Matches, live odds, stats, AI predictions and insights. Native WebSocket support. Typed end to end.
+        </p>
+
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+          <Button
+            asChild
+            size="lg"
+            className="rounded-full bg-black px-6 py-3 text-white shadow-lg hover:bg-black/90"
+          >
+            <Link href="/docs">Read the docs</Link>
+          </Button>
+
+          <GithubStarButton />
+        </div>
+      </div>
+    </section>
   )
 }

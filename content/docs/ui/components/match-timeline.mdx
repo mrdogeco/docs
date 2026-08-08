@@ -1,6 +1,6 @@
 ---
 title: Match Timeline
-description: Chronological feed of match events — goals, cards, penalties, and half/full-time, most-recent-first.
+description: Chronological feed of match events. Goals, cards, penalties, and half/full-time, most-recent-first.
 ---
 
 import { MatchTimelineDemo } from "@/components/docs/demos/match-timeline-demo"
@@ -29,11 +29,11 @@ import { MatchTimeline } from "@/components/match-timeline"
 />
 ```
 
-`type` is an open string — pass whatever event kinds your data has (e.g.
+`type` is an open string: pass whatever event kinds your data has (e.g.
 `"goal"`, `"yellow-card"`); unrecognized ones fall back to a generic
 marker instead of being rejected. `side: "match"` entries render as a
 divider (a horizontal line either side of centered text) instead of a
-row — pass `live` to color the current one red instead of muted.
+row; pass `live` to color the current one red instead of muted.
 
 ## Use with the Mr. Doge SDK
 
@@ -41,9 +41,9 @@ Match Timeline takes a plain `entries` array, so it works with any data
 source. See the
 [Match Timeline Adapter](/docs/ui/mrdoge-sdk/usage#match-timeline) for
 the real function mapping a match's timeline (from
-`matches.get()`/`matches.subscribe()`) onto this prop — the one behind
+`matches.get()`/`matches.subscribe()`) onto this prop. It's the one behind
 the example above. It filters down to goals, cards, penalties, and
-half/full-time — the rest of a real timeline (fouls, tackles, throw-ins,
+half/full-time; the rest of a real timeline (fouls, tackles, throw-ins,
 corners, goal kicks, offsides, shots) stays available on the match object
 itself if you want a denser view.
 
@@ -75,26 +75,26 @@ itself if you want a denser view.
       type: "string",
     },
     type: {
-      description: "Open event type, e.g. \"goal\", \"yellow-card\" — pass whatever your data has. Unrecognized types get a generic marker.",
+      description: "Open event type, e.g. \"goal\", \"yellow-card\". Pass whatever your data has; unrecognized types get a generic marker.",
       type: "string",
       required: true,
     },
     side: {
-      description: '"match" renders as a divider instead of a row — see live below.',
+      description: '"match" renders as a divider instead of a row; see live below.',
       type: '"home" | "away" | "match"',
       required: true,
     },
     description: {
-      description: "Always shown — the divider's full text for side \"match\" entries, or the player/team name otherwise. score (below) adds a pill alongside it, not instead of it.",
+      description: "Always shown: the divider's full text for side \"match\" entries, or the player/team name otherwise. score (below) adds a pill alongside it, not instead of it.",
       type: "string",
       required: true,
     },
     score: {
-      description: "Goal-type events only — renders a running score pill alongside description.",
+      description: "Goal-type events only; renders a running score pill alongside description.",
       type: "{ home: number; away: number }",
     },
     live: {
-      description: 'side "match" entries only — colors the divider red instead of muted, for the current live period.',
+      description: 'side "match" entries only; colors the divider red instead of muted, for the current live period.',
       type: "boolean",
     },
   }}
@@ -102,6 +102,6 @@ itself if you want a denser view.
 
 ### MatchTimelineSkeleton
 
-`import { MatchTimelineSkeleton } from "@/components/match-timeline"` —
+`import { MatchTimelineSkeleton } from "@/components/match-timeline"`
 for a loading state before the real entries have arrived. Takes
 `rowCount` (default 4) and `className`.

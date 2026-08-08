@@ -21,11 +21,11 @@ export interface OddsOption {
  * One market rendered as a two-column row, e.g. Over/Under at a single
  * goal threshold. Use `lines` (a market per row) instead of `options` (a
  * flat row of a single market) for bet types that post one market per
- * line — see the "Multiple Lines" example.
+ * line: see the "Multiple Lines" example.
  */
 export interface OddsLine {
   id: string
-  /** Short label for the line itself, e.g. "2.5" — shown above the slider in slider view. Omit if there's no natural short label. */
+  /** Short label for the line itself, e.g. "2.5". Shown above the slider in slider view. Omit if there's no natural short label. */
   label?: string
   over: OddsOption
   under: OddsOption
@@ -40,18 +40,18 @@ export interface OddsSelectorProps {
   selectedId?: string
   /** Called with the pressed option's id, or `undefined` when pressing the already-selected option deselects it. For `options` mode. */
   onSelect?: (id: string | undefined) => void
-  /** Several markets, one per row — e.g. every Over/Under goal threshold stacked in one card. Takes over `options` when set. */
+  /** Several markets, one per row, e.g. every Over/Under goal threshold stacked in one card. Takes over `options` when set. */
   lines?: OddsLine[]
-  /** Ids of every currently selected option across `lines` — unlike `options`, more than one row can be selected at once. */
+  /** Ids of every currently selected option across `lines`. Unlike `options`, more than one row can be selected at once. */
   selectedLineIds?: string[]
   /** Called with a pressed option's id and the resulting selected state (not a bare toggle), for `lines` mode. */
   onSelectLine?: (id: string, selected: boolean) => void
   /**
-   * Ids that render as unavailable — e.g. because they're logically
+   * Ids that render as unavailable, e.g. because they're logically
    * incompatible with the current selection. Applies to both `options`
    * and `lines`. Computed externally (e.g. via a conflict adapter) and
    * passed in; OddsSelector never decides this itself. Unlike
-   * `suspended`, a disabled option still shows its real price — it's
+   * `suspended`, a disabled option still shows its real price: it's
    * fully priced and available, just not currently combinable.
    */
   disabledIds?: string[]
@@ -61,7 +61,7 @@ export interface OddsSelectorProps {
   collapsible?: boolean
   /**
    * "card" (default) renders its own border/background, for standalone
-   * use. "bare" drops that chrome — for embedding inside another card
+   * use. "bare" drops that chrome, for embedding inside another card
    * (e.g. Match Card's odds row) without a card-in-a-card look.
    */
   variant?: "card" | "bare"
@@ -69,7 +69,7 @@ export interface OddsSelectorProps {
 }
 
 // A price shortening (going down) means the market now thinks the outcome
-// is more likely — the conventional "hot" direction in real odds boards,
+// is more likely: the conventional "hot" direction in real odds boards,
 // shown green. Drifting (going up) means the opposite, shown red. Same
 // mechanical rule regardless of market type.
 const movementColor: Record<OddsMovement, string> = {
@@ -87,7 +87,7 @@ function OddsOptionButton({
 }: {
   option: OddsOption
   selected: boolean
-  /** Conflict-disabled, distinct from `option.suspended` — still shows the real price. */
+  /** Conflict-disabled, distinct from `option.suspended`: still shows the real price. */
   disabled?: boolean
   onClick: () => void
   layout: "column" | "row"
@@ -189,7 +189,7 @@ function OddsLinesSlider({
   onSelectLine?: (id: string, selected: boolean) => void
 }) {
   const [index, setIndex] = useState(() => mostBalancedIndex(lines))
-  // Lines can arrive/change size as live data updates — clamp rather than
+  // Lines can arrive/change size as live data updates; clamp rather than
   // point past the end.
   const currentIndex = Math.min(index, lines.length - 1)
   const line = lines[currentIndex]

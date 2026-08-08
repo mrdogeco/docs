@@ -51,7 +51,7 @@ export interface MatchCardDataProps {
    */
   redCardPosition?: "left" | "right"
   /**
-   * Renders a labeled odds card when provided. Any market works — Match
+   * Renders a labeled odds card when provided. Any market works: Match
    * Card doesn't care which one, it just needs a name and options.
    */
   odds?: MatchCardOdds
@@ -71,7 +71,7 @@ export interface MatchCardDataProps {
 }
 
 interface MatchCardLoadingProps {
-  /** Renders a skeleton with the same dimensions instead — no other prop is needed. */
+  /** Renders a skeleton with the same dimensions instead; no other prop is needed. */
   loading: true
   /** Reserves space for an odds row/column in the skeleton too. */
   oddsLoading?: boolean
@@ -181,7 +181,7 @@ function TeamRow({
   showScore: boolean
   showRedCards: boolean
   redCardPosition: "left" | "right"
-  /** True while the match is in progress (live/paused/intermission/interrupted) — the score reads in the live color. */
+  /** True while the match is in progress (live/paused/intermission/interrupted); the score reads in the live color. */
   live: boolean
   /** True for the losing side once the match is finished. */
   dimmed: boolean

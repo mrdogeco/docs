@@ -18,7 +18,7 @@ const sizeClass: Record<NonNullable<EntityImageProps["size"]>, string> = {
 }
 
 /**
- * Just the image — no background, border, or corner radius, so team crests
+ * Just the image: no background, border, or corner radius, so team crests
  * and region flags render at their native shape. Pass a `className` (e.g.
  * `size-6`) to override the size; it takes precedence over `size`.
  */

@@ -1,6 +1,6 @@
 ---
 title: Teams
-description: List, search, and look up teams — with form data.
+description: List, search, and look up teams, with form data.
 ---
 
 The `teams` resource exposes the team catalog plus team-form aggregates.
@@ -42,7 +42,7 @@ type Team = {
 
 ## `teams.get`
 
-Single team by ID — same fields as `Team` plus the embedded sport reference.
+Single team by ID: same fields as `Team` plus the embedded sport reference.
 
 ```ts
 const team = await mrdoge.teams.get({ id: 158346 }); // Liverpool
@@ -60,7 +60,7 @@ type TeamDetail = {
 
 ## `teams.form`
 
-Aggregated form for a team — wins/draws/losses across recent matches plus
+Aggregated form for a team: wins/draws/losses across recent matches plus
 the underlying match details.
 
 ```ts

@@ -1,13 +1,13 @@
 ---
 title: Transports
-description: HTTP for one-shot reads, WebSocket for live subscriptions — and how the client picks for you.
+description: HTTP for one-shot reads, WebSocket for live subscriptions, and how the client picks for you.
 ---
 
 The Mr. Doge SDK exposes one method surface over two transports.
 
 <Cards>
-  <Card title="HTTP" description="POST /sdk/v1/rpc — JSON-RPC 2.0 envelope. Stateless, edge-friendly, single-request reads." />
-  <Card title="WebSocket" description="wss://api.mrdoge.co/sdk/v1 — long-lived connection. Required for subscriptions, faster for repeated reads." />
+  <Card title="HTTP" description="POST /sdk/v1/rpc. JSON-RPC 2.0 envelope. Stateless, edge-friendly, single-request reads." />
+  <Card title="WebSocket" description="wss://api.mrdoge.co/sdk/v1. Long-lived connection. Required for subscriptions, faster for repeated reads." />
 </Cards>
 
 ## Routing rule
@@ -19,7 +19,7 @@ The dual-transport clients (`@mrdoge/client`, `@mrdoge/node`) follow one rule:
 
 This means:
 
-- Your first call (or any call before the WS connects) goes over HTTP — no
+- Your first call (or any call before the WS connects) goes over HTTP, no
   handshake delay.
 - Once the WS connects, subsequent reads ride the open connection.
 - Subscriptions always require WS (no polling).
@@ -27,16 +27,16 @@ This means:
 ```ts
 const mrdoge = new MrDoge({ apiKey: process.env.MRDOGE_API_KEY! });
 
-// HTTP — WS hasn't connected yet, returns in ~200ms
+// HTTP: WS hasn't connected yet, returns in ~200ms
 const regions = await mrdoge.regions.list();
 
-// HTTP — still no WS, also ~200ms
+// HTTP: still no WS, also ~200ms
 const matches = await mrdoge.matches.list({ sports: ["soccer"] });
 
-// WS — subscription forces a connection
+// WS: subscription forces a connection
 const sub = await mrdoge.matches.subscribeLive({ sports: ["soccer"] });
 
-// WS — connection is now open, subsequent reads ride it
+// WS: connection is now open, subsequent reads ride it
 const teams = await mrdoge.teams.list({ sports: ["soccer"] });
 ```
 
@@ -50,7 +50,7 @@ Client ─── matches.getLive (HTTP, ~100ms cache hit) ───────�
 Client ─── ws.connect + auth + subscribe (~1.5s)           │
                                                             │
        ◄──────────── snapshot (HTTP wins)  ────────────────┘
-       ◄──────────── snapshot (WS, discarded — already have it)
+       ◄──────────── snapshot (WS, discarded, already have it)
        ◄──────────── match.upd
        ◄──────────── match.upd
        ◄──────────── ...
@@ -62,7 +62,7 @@ The result:
 - **`sub.id`** is `"__pending_ws__"` until WS lands, then updates to the
   real subId
 - **Live deltas** (`match.upd` / `match.del`) start flowing as soon as the
-  WS subscription is registered — no delay, no missed updates
+  WS subscription is registered: no delay, no missed updates
 
 ```ts
 const sub = await mrdoge.matches.subscribeLive({ sports: ["soccer"] });
@@ -76,7 +76,7 @@ sub.on("match.del", ({ id }) => removeFromUI(id));
 If the WS fails after HTTP won, the subscription closes with
 `internal_error` and the `closed` event fires.
 
-## HTTP — the JSON-RPC envelope
+## HTTP: the JSON-RPC envelope
 
 Every HTTP call posts to `POST /sdk/v1/rpc`:
 
@@ -104,10 +104,10 @@ Response:
 }
 ```
 
-You can also send a **batch** by posting an array of requests — useful for
+You can also send a **batch** by posting an array of requests, useful for
 edge runtimes that want to coalesce reads.
 
-## WebSocket — frames
+## WebSocket: frames
 
 The WebSocket uses the same JSON-RPC envelope, plus push frames from the
 server:
@@ -123,10 +123,10 @@ server:
 { "jsonrpc": "2.0", "method": "subscription.event", "params": { "sub": "...", "event": "match.upd", "data": {...} } }
 ```
 
-The SDK handles framing, auth, and reconnection automatically — you'll only
+The SDK handles framing, auth, and reconnection automatically. You'll only
 see push events via `sub.on("match.upd", …)`.
 
-## `@mrdoge/http` — HTTP only
+## `@mrdoge/http`: HTTP only
 
 When you don't need subscriptions (edge functions, cron jobs, Lambda), use
 the HTTP-only client. Zero runtime dependencies beyond `@mrdoge/protocol`:
@@ -143,7 +143,7 @@ const { data } = await mrdoge.call("matches.list", {
 ```
 
 Subscription methods (`matches.subscribeLive`, `matches.subscribe`,
-`auth`, `subscription.cancel`) throw `method_not_found` over HTTP — use
+`auth`, `subscription.cancel`) throw `method_not_found` over HTTP. Use
 `matches.getLive` for a one-shot snapshot instead.
 
 ## Next

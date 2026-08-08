@@ -45,7 +45,7 @@ export function InstallTabs({ name }: { name: string }) {
           </Tabs>
           {envVarNames.length > 0 ? (
             <p className="text-sm text-fd-muted-foreground">
-              Also requires {envVarNames.map((v) => <code key={v}>{v}</code>)} — set it in your
+              Also requires {envVarNames.map((v) => <code key={v}>{v}</code>)}. Set it in your
               own environment after installing.
             </p>
           ) : null}

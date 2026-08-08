@@ -5,7 +5,7 @@ description: Edge-and-confidence-scored bet recommendations with reasoning attac
 
 The `ai.recommendations` resource exposes Mr. Doge's tool-calling pipeline:
 single-outcome picks with quantified edge, Kelly sizing, supporting
-rationale, and risk factors — all localized server-side.
+rationale, and risk factors, all localized server-side.
 
 <Callout type="info">
   Requires the **Business tier**. [Upgrade →](https://dashboard.mrdoge.co/billing)
@@ -13,7 +13,7 @@ rationale, and risk factors — all localized server-side.
 
 ## `ai.recommendations.list`
 
-Paginated list of recommendations. Filters compose — pass any combination
+Paginated list of recommendations. Filters compose: pass any combination
 of `matchId`, `confidence`, `minEdge`, `minOdds`, `maxOdds`.
 
 ```ts
@@ -48,7 +48,7 @@ See [pagination](/docs/concepts/pagination) for the cursor walk.
 
 Auto-paginated version of `ai.recommendations.list`. Walks every page and
 returns the combined array. Supports `onPage` for progressive rendering
-and an `AbortSignal` for cancellation — same shape as `matches.listAll`.
+and an `AbortSignal` for cancellation, same shape as `matches.listAll`.
 
 ```ts
 const all = await mrdoge.ai.recommendations.listAll(
@@ -82,7 +82,7 @@ type Recommendation = {
   match?: Match;                    // optionally embedded summary
   marketId: string;
   betItemId?: string | null;
-  outcome: string;                  // localized — see Localization below
+  outcome: string;                  // localized, see Localization below
   odds: number;                     // decimal odds at pick time
   point?: number | null;            // handicap line, e.g. 2.5
   confidence: "High" | "Medium" | "Low";

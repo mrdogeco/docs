@@ -46,12 +46,12 @@ export function OddsSelectorBoardDemo() {
     return <p className="text-sm text-fd-muted-foreground">No trending match to show right now.</p>
   }
 
-  // Odds close once the match ends — same as matchToMatchCardProps, drop
+  // Odds close once the match ends, same as matchToMatchCardProps: drop
   // them rather than freeze on the last live value.
   const showOdds = match?.status !== "completed"
 
   // Match Result and Double Chance describe overlapping information
-  // about the same result — any selection in one blocks the entire
+  // about the same result, so any selection in one blocks the entire
   // other market rather than just a specific contradicting option.
   const mrDcCandidates =
     matchId && matchResultMarkets && doubleChanceMarkets

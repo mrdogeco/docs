@@ -11,8 +11,8 @@ function percent(value: number) {
   return `${Math.round(value * 100)}%`
 }
 
-// Booleans (who's serving, who's in the bonus) still render as a bar —
-// a full bar on whichever side is true, empty on the other — rather than
+// Booleans (who's serving, who's in the bonus) still render as a bar (a
+// full bar on whichever side is true, empty on the other) rather than
 // being dropped, since every row here is a comparison bar.
 function booleanPair(label: string, home: boolean | undefined, away: boolean | undefined): StatsListEntry | null {
   if (home == null && away == null) return null
@@ -27,16 +27,16 @@ function booleanPair(label: string, home: boolean | undefined, away: boolean | u
 
 /**
  * Maps a real `match.stats` (from `matches.get()`/`matches.subscribe()`)
- * to Stats List's entries — a plain array, one row per available stat. If
+ * to Stats List's entries: a plain array, one row per available stat. If
  * the SDK's shape changes, this fails to compile.
  *
  * MatchStats is a discriminated union per sport, so this switches on
- * `stats.sport` — every branch is covered, but four sports
+ * `stats.sport`. Every branch is covered, but four sports
  * (american football, baseball, ice hockey, handball) currently have no
  * comparable home/away stats in the protocol beyond score and clock
  * (already shown elsewhere, e.g. Match Highlight), so those return an
  * empty array rather than padding the list with fields that don't exist.
- * Tennis's current-game points ("15"/"40"/"AD") aren't included — text,
+ * Tennis's current-game points ("15"/"40"/"AD") aren't included: text,
  * not a number, so there's no meaningful bar for it.
  */
 export function statsToStatsListEntries(stats: MatchStats | null | undefined): StatsListEntry[] {
@@ -80,7 +80,7 @@ export function statsToStatsListEntries(stats: MatchStats | null | undefined): S
       )
 
     // Baseball's stats (outs, balls, strikes, bases) describe the current
-    // at-bat, not a per-team count — they don't fit a home/away comparison
+    // at-bat, not a per-team count. They don't fit a home/away comparison
     // row. American football, ice hockey, and handball have no
     // sport-specific fields in the protocol at all yet.
     case "american_football":
@@ -117,11 +117,11 @@ function playerPair(
 }
 
 /**
- * Maps a real match's per-player stat breakdowns (soccer only — the only
+ * Maps a real match's per-player stat breakdowns (soccer only, the only
  * sport with per-player arrays in the protocol today) to Stats List's
  * entries: the top player per side for shots, shots on target, and
  * woodwork hits. Returns an empty array when `match.timeline` has no
- * player-attributed events (captions with a player name) — a proxy for
+ * player-attributed events (captions with a player name), a proxy for
  * "this match doesn't have player-level tracking," since the same
  * data-provider gap that skips player names in the timeline also tends
  * to leave the per-player stat arrays empty.

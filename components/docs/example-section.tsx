@@ -16,7 +16,7 @@ export function ExampleSection({
 }) {
   return (
     <div className="not-prose overflow-hidden rounded-xl border">
-      <div className="flex items-center justify-center bg-background p-8">{children}</div>
+      <div className="flex items-center justify-center bg-background p-3 pb-8 sm:p-8">{children}</div>
       <ExpandableCode code={readSource(file)} />
     </div>
   )

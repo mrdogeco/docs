@@ -1,10 +1,10 @@
 ---
 title: Odds
-description: Live order books for a single match — one-shot snapshots or streaming deltas.
+description: Live order books for a single match, one-shot snapshots or streaming deltas.
 ---
 
 The `odds` resource is dedicated to live betting markets, kept separate
-from `Match` — customers who only render scores and stats pay zero
+from `Match`: customers who only render scores and stats pay zero
 bandwidth for an order book they don't use.
 
 <Callout type="info">
@@ -14,7 +14,7 @@ bandwidth for an order book they don't use.
 ## `odds.list`
 
 One-shot snapshot of every live market for a single match. Backed by the
-same in-memory cache as `odds.subscribe`'s initial snapshot — typical
+same in-memory cache as `odds.subscribe`'s initial snapshot: typical
 latency well under 100ms.
 
 ```ts
@@ -24,7 +24,7 @@ const markets = await mrdoge.odds.list({
 });
 
 for (const market of markets) {
-  console.log(market.betType, "—", market.lines.length, "lines");
+  console.log(market.betType, "-", market.lines.length, "lines");
   for (const line of market.lines) {
     console.log(`  ${line.code} (${line.caption}) @ ${line.price}`);
   }
@@ -37,15 +37,15 @@ for (const market of markets) {
 |-------|------|-------|
 | `matchId` | `string` | Required |
 | `betTypes` | `string[]` | Restrict to one or more market sysnames (e.g. `["SOCCER_MATCH_RESULT", "SOCCER_UNDER_OVER"]`) |
-| `select` | `MarketSelect` | Field selector — see [selectors](/docs/reference/matches#selectors) |
+| `select` | `MarketSelect` | Field selector, see [selectors](/docs/reference/matches#selectors) |
 | `locale` | `string` | Localizes each line's `caption` |
 
-**Returns:** `Market[]` — every available live market for the match.
+**Returns:** `Market[]`, every available live market for the match.
 
 ## `odds.subscribe`
 
 WebSocket subscription pushing the full latest markets array on every
-change. State-snapshot semantics — clients replace, never merge.
+change. State-snapshot semantics: clients replace, never merge.
 
 ```ts
 const sub = await mrdoge.odds.subscribe({
@@ -56,7 +56,7 @@ const sub = await mrdoge.odds.subscribe({
 // Initial snapshot (already populated from the cache cold-start)
 console.log("Snapshot:", sub.snapshot.length, "markets");
 
-// Live updates — the full markets array on every change
+// Live updates, the full markets array on every change
 sub.on("odds.upd", (markets) => repriceLines(markets));
 
 // Clean shutdown when the match completes
@@ -78,10 +78,10 @@ await sub.cancel();
 | `select` | `MarketSelect` | Field selector applies to snapshot AND every push |
 | `locale` | `string` | Localizes each push's line captions |
 
-**Returns:** `Subscription<"odds.subscribe">` — see
+**Returns:** `Subscription<"odds.subscribe">`, see
 [subscriptions](/docs/reference/subscriptions).
 
-**Push events:** `odds.upd` — the full `Market[]` for the match.
+**Push events:** `odds.upd`, the full `Market[]` for the match.
 
 ## The `Market` shape
 
@@ -124,7 +124,7 @@ await mrdoge.odds.list({
 });
 ```
 
-For `odds.subscribe`, the filter applies to **every push** — you don't
+For `odds.subscribe`, the filter applies to **every push**: you don't
 re-broadcast filtered-out market updates to the customer over the wire.
 A subscription scoped to two market types receives only those markets'
 deltas; the others are dropped server-side.
@@ -133,7 +133,7 @@ deltas; the others are dropped server-side.
   Some markets use a different `betType` sysname before kickoff than they
   do once live. The standard 1X2 line, for example, is
   `SOCCER_MATCH_RESULT_PRELIVE` up until the match goes live, then
-  `SOCCER_MATCH_RESULT` — a match only ever has one of the two at a time.
+  `SOCCER_MATCH_RESULT`. A match only ever has one of the two at a time.
   Filtering on `SOCCER_MATCH_RESULT` alone returns nothing for a match
   that hasn't started yet. If you want the market regardless of match
   state, filter on both:
@@ -169,7 +169,7 @@ sub.on("closed", ({ reason, message }) => {
 });
 ```
 
-No final push fires — the order book is gone. Stats subscribers
+No final push fires: the order book is gone. Stats subscribers
 (`matches.subscribe`) receive a `status.upd` event instead; odds is
 terminal because there's nothing live left to stream.
 
@@ -180,7 +180,7 @@ const sub = await mrdoge.odds.subscribe({
   matchId,
   betTypes: [
     "SOCCER_MATCH_RESULT",
-    "SOCCER_MATCH_RESULT_PRELIVE", // headline market pre-kickoff — see the betTypes note above
+    "SOCCER_MATCH_RESULT_PRELIVE", // headline market pre-kickoff, see the betTypes note above
     "SOCCER_UNDER_OVER",
     "SOCCER_BOTH_TEAMS_TO_SCORE",
   ],

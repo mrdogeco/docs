@@ -17,15 +17,15 @@ export interface MatchesFeedProps {
   className?: string
 }
 
-// Simulated Reality League — a 24/7 virtual competition, not a real match.
+// Simulated Reality League: a 24/7 virtual competition, not a real match.
 const EXCLUDED_REGION_IDS = new Set([733])
 
-// Public, unauthenticated, cached CDN — not part of the Region shape itself.
+// Public, unauthenticated, cached CDN. Not part of the Region shape itself.
 function regionLogoUrl(regionId: number) {
   return `https://api.mrdoge.co/images/regions/${regionId}.png`
 }
 
-// Only fetches once its region is actually open — regions.list() already
+// Only fetches once its region is actually open. regions.list() already
 // gave the count for the closed state, so there's nothing to fetch until
 // then.
 function RegionMatches({
@@ -50,7 +50,7 @@ function RegionMatches({
     limit: 100,
   })
 
-  // useMatches never carries live stats (score/clock) — patch those in
+  // useMatches never carries live stats (score/clock); patch those in
   // for whichever of the above are currently live.
   const liveMatches = useLiveMatches({ sports, regionIds: [regionId] })
 
@@ -61,7 +61,7 @@ function RegionMatches({
       if (m.status !== "live") return m
       const live = liveById.get(m.id)
       if (live) return live
-      // match.del only carries the id, not a final state — a live match
+      // match.del only carries the id, not a final state: a live match
       // that's no longer in the live snapshot has finished.
       return { ...m, status: "completed" as const }
     })
@@ -106,7 +106,7 @@ function RegionMatches({
 }
 
 /**
- * Today's matches (the viewer's own timezone), grouped by region — an
+ * Today's matches (the viewer's own timezone), grouped by region: an
  * accordion per region, competition sub-groups inside once opened. Owns
  * its own data-fetching via the Mr. Doge SDK (`useRegions`/`useMatches`),
  * unlike the rest of mrdoge-ui's plain-props components.
@@ -148,7 +148,7 @@ export function MatchesFeed({ sports, className }: MatchesFeedProps) {
               <span className="shrink-0 text-xs text-muted-foreground">{region.eventCount}</span>
             </div>
           </AccordionTrigger>
-          {/* h-auto — default height is locked at open-animation time, before the async match list grows past the skeleton. */}
+          {/* h-auto: default height is locked at open-animation time, before the async match list grows past the skeleton. */}
           <AccordionContent className="h-auto">
             {openRegions.includes(String(region.id)) ? (
               <RegionMatches regionId={region.id} sports={sports} date={today} timezone={timezone} />

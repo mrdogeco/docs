@@ -1,6 +1,6 @@
 ---
 title: Odds Selector
-description: Labeled odds card for a market — selectable options with price movement and suspended states.
+description: Labeled odds card for a market, selectable options with price movement and suspended states.
 ---
 
 import { OddsSelectorDemo } from "@/components/docs/demos/odds-selector-demo"
@@ -14,7 +14,7 @@ import { InstallTabs } from "@/components/docs/install-tabs"
 
 ## Odds Board
 
-Rendering several markets at once is just several Odds Selectors —
+Rendering several markets at once is just several Odds Selectors:
 there's no separate component for it. This example shows a match's Match
 Result, Double Chance, and Total Goals lines stacked together, each with
 its own selection state and live price movement. Match Result and Double
@@ -29,12 +29,12 @@ Multiple Lines below:
 
 ## Multiple Lines
 
-Some bet types post one market per line instead of one market total —
+Some bet types post one market per line instead of one market total:
 `SOCCER_UNDER_OVER` posts a separate market for each Over/Under threshold
 (0.5, 1.5, 2.5, ...). Pass all of them to the `lines` prop instead of
-`options`, and Odds Selector renders one row per market — Over on the
+`options`, and Odds Selector renders one row per market, Over on the
 left, Under on the right. Unlike `options`, more than one line can be
-selected at once — compatible cross-threshold picks like Over 1.5 +
+selected at once: compatible cross-threshold picks like Over 1.5 +
 Under 4.5 are both allowed, while genuinely incompatible ones like
 Under 1.5 + Over 4.5 are blocked via `disabledIds`, computed here from the
 [Conflict Adapter](/docs/ui/mrdoge-sdk/usage#conflicts). `enableSliderView`
@@ -69,7 +69,7 @@ functions behind the examples above.
       type: "OddsOption[]",
     },
     lines: {
-      description: <>Several markets, one per row — e.g. every Over/Under goal threshold stacked in one card. See <a href="#oddsline">OddsLine</a> below. Takes over options when set; uses selectedLineIds/onSelectLine instead of selectedId/onSelect.</>,
+      description: <>Several markets, one per row, e.g. every Over/Under goal threshold stacked in one card. See <a href="#oddsline">OddsLine</a> below. Takes over options when set; uses selectedLineIds/onSelectLine instead of selectedId/onSelect.</>,
       type: "OddsLine[]",
     },
     selectedId: {
@@ -81,7 +81,7 @@ functions behind the examples above.
       type: "(id: string | undefined) => void",
     },
     selectedLineIds: {
-      description: "Ids of every currently selected option across lines — unlike options, more than one row can be selected at once.",
+      description: "Ids of every currently selected option across lines. Unlike options, more than one row can be selected at once.",
       type: "string[]",
     },
     onSelectLine: {
@@ -89,7 +89,7 @@ functions behind the examples above.
       type: "(id: string, selected: boolean) => void",
     },
     disabledIds: {
-      description: <>Ids that render as unavailable — e.g. because they're logically incompatible with the current selection. Applies to both options and lines. Computed externally (e.g. via the <a href="/docs/ui/mrdoge-sdk/usage#conflicts">Conflict Adapter</a>) and passed in; Odds Selector never decides this itself. Unlike suspended, a disabled option still shows its real price — it's fully priced and available, just not currently combinable.</>,
+      description: <>Ids that render as unavailable, e.g. because they're logically incompatible with the current selection. Applies to both options and lines. Computed externally (e.g. via the <a href="/docs/ui/mrdoge-sdk/usage#conflicts">Conflict Adapter</a>) and passed in; Odds Selector never decides this itself. Unlike suspended, a disabled option still shows its real price: it's fully priced and available, just not currently combinable.</>,
       type: "string[]",
     },
     enableSliderView: {
@@ -101,7 +101,7 @@ functions behind the examples above.
       type: "boolean",
     },
     variant: {
-      description: <>"card" (default) renders its own border/background, for standalone use. "bare" drops that chrome — for embedding inside another card (e.g. <a href="/docs/ui/components/match-card#with-odds">Match Card's odds row</a>) without a card-in-a-card look.</>,
+      description: <>"card" (default) renders its own border/background, for standalone use. "bare" drops that chrome, for embedding inside another card (e.g. <a href="/docs/ui/components/match-card#with-odds">Match Card's odds row</a>) without a card-in-a-card look.</>,
       type: '"card" | "bare"',
     },
     className: {
@@ -129,7 +129,7 @@ functions behind the examples above.
       required: true,
     },
     movement: {
-      description: <>Colors the price — "down" (shortening, more likely) green, "up" (drifting, less likely) red, "flat" or omitted stays the default color. Static here — for live data, see <a href="/docs/ui/hooks/use-odds-movement">useOddsMovement</a>.</>,
+      description: <>Colors the price: "down" (shortening, more likely) green, "up" (drifting, less likely) red, "flat" or omitted stays the default color. Static here; for live data, see <a href="/docs/ui/hooks/use-odds-movement">useOddsMovement</a>.</>,
       type: '"up" | "down" | "flat"',
     },
     suspended: {
@@ -149,7 +149,7 @@ functions behind the examples above.
       required: true,
     },
     label: {
-      description: 'Short label for the line itself, e.g. "2.5" — shown above the slider in slider view. Omit if there\'s no natural short label.',
+      description: 'Short label for the line itself, e.g. "2.5", shown above the slider in slider view. Omit if there\'s no natural short label.',
       type: "string",
     },
     over: {

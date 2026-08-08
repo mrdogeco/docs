@@ -26,7 +26,7 @@ export interface LegalData {
   sections: LegalSection[]
 }
 
-// Shared by /terms and /privacy — same table-of-contents + numbered-section
+// Shared by /terms and /privacy: same table-of-contents + numbered-section
 // shape, ported from old_mrdoge-co's terms/privacy pages (which had this
 // duplicated inline in each page.tsx).
 export function LegalPage({ data }: { data: LegalData }) {

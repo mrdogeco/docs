@@ -2,14 +2,14 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "mrdoge-client",
   "title": "Mr. Doge Client",
-  "description": "Browser SDK client singleton, authenticated via short-lived tokens minted by your own backend — never a raw API key.",
+  "description": "Browser SDK client singleton, authenticated via short-lived tokens minted by your own backend, never a raw API key.",
   "dependencies": [
     "@mrdoge/react"
   ],
   "files": [
     {
       "path": "registry/mrdoge-ui/mrdoge-client/mrdoge-client.ts",
-      "content": "// Re-exported from @mrdoge/react — the same singleton every hook uses\n// internally. Import this directly for one-off SDK calls with no matching\n// hook (e.g. matches.search()).\nexport { getMrDogeClient, configureMrDoge } from \"@mrdoge/react\"\n",
+      "content": "// Re-exported from @mrdoge/react. Same singleton every hook uses\n// internally; import this directly for one-off SDK calls with no matching\n// hook (e.g. matches.search()).\nexport { getMrDogeClient, configureMrDoge } from \"@mrdoge/react\"\n",
       "type": "registry:lib"
     }
   ],

@@ -21,7 +21,7 @@ function MatchCardOddsSlot({
 }) {
   const match = useLiveMatch({ matchId: matchId ?? undefined })
   const markets = useOdds({ matchId: match?.id, betTypes: MATCH_RESULT_BET_TYPES })
-  // markets is null when no market matched (not loading) — preserve that
+  // markets is null when no market matched (not loading); preserve that
   // distinction rather than letting `null?.[0]` collapse it into undefined
   // (which would mean "still loading" and get stuck showing a skeleton).
   const market = markets === null ? null : markets?.[0]
@@ -51,9 +51,9 @@ export function MatchCardLiveWithOddsDemo() {
 
   return (
     <div className="flex w-full max-w-xl flex-col gap-4">
-      {/* Stacked variant only needs the same width as the Basic example — the
-          row variant below is the one that actually needs max-w-xl, for its
-          w-64 side-by-side odds column. */}
+      {/* Stacked variant only needs the same width as the Basic example.
+          The row variant below is the one that actually needs max-w-xl, for
+          its w-64 side-by-side odds column. */}
       <div className="mx-auto w-full max-w-sm">
         <MatchCardOddsSlot matchId={upcomingMatchId} />
       </div>

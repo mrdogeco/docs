@@ -7,7 +7,7 @@ import { InstallTabs } from "@/components/docs/install-tabs"
 
 Wraps `regions.list()`. `eventCount`/`competitionCount` are only populated
 on each region when at least one filter (`date`, `sports`, `status`) is
-passed — with no filters you get every region with no counts.
+passed; with no filters you get every region with no counts.
 
 ## Installation
 
@@ -17,7 +17,7 @@ Installing this pulls in two files: the hook itself (a thin re-export
 from [`@mrdoge/react`](/docs/ui/mrdoge-sdk/installation), which does the
 real work) and a Next.js route at `app/api/mrdoge/token/route.ts` that
 mints short-lived tokens using `@mrdoge/node` and your own
-`MRDOGE_ODDS_API_KEY` — the browser client never sees the raw key.
+`MRDOGE_ODDS_API_KEY`. The browser client never sees the raw key.
 
 ## Usage
 
@@ -28,8 +28,8 @@ const regions = useRegions({ sports: ["soccer"], date: "2026-08-06" })
 ```
 
 Takes a single options object, like every real SDK method it wraps
-(`regions.list(params)`) — not positional arguments. Only resolves *which*
-regions have matches — pair it with
+(`regions.list(params)`), not positional arguments. Only resolves *which*
+regions have matches; pair it with
 [useMatches](/docs/ui/mrdoge-sdk/hooks/use-matches)'s `regionIds` to
 actually fetch them.
 
@@ -70,6 +70,6 @@ actually fetch them.
 
 ## Returns
 
-`Region[] | null | undefined` — `undefined` while the request is in flight,
+`Region[] | null | undefined`: `undefined` while the request is in flight,
 `null` if it failed (no fallback data), otherwise the list. One-shot: this
-doesn't push live updates — call it again (or remount) to refresh.
+doesn't push live updates; call it again (or remount) to refresh.

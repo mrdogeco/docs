@@ -1,12 +1,12 @@
 ---
 title: Installation
-description: Set up @mrdoge/react — the shared-cache hooks package every live example on this site is built on.
+description: Set up @mrdoge/react, the shared-cache hooks package every live example on this site is built on.
 ---
 
 import { InstallTabs } from "@/components/docs/install-tabs"
 
 `@mrdoge/react` is a real npm package, not a copy-paste registry item like
-the components — React hooks for `@mrdoge/client`, backed by a shared
+the components: React hooks for `@mrdoge/client`, backed by a shared
 cache so any number of components watching the same match/odds share one
 subscription and one copy of the data instead of each duplicating it.
 
@@ -36,7 +36,7 @@ subscription and one copy of the data instead of each duplicating it.
 ## Token route
 
 The client authenticates via short-lived tokens minted by your own
-backend — never a raw API key. Add this route:
+backend, never a raw API key. Add this route:
 
 <InstallTabs name="mrdoge-token-route" />
 
@@ -45,7 +45,7 @@ env var, never exposed to the browser.
 
 ## Usage
 
-No Provider required — the client and its cache are both module-level,
+No Provider required: the client and its cache are both module-level,
 the same zero-setup shape as calling `@mrdoge/client` directly.
 
 ```tsx
@@ -58,7 +58,7 @@ function Match({ matchId }: { matchId: string }) {
 ```
 
 Mount `useLiveMatch({ matchId: "123" })` in ten different components and
-they share one `matches.subscribe()` call and one copy of the data — the
+they share one `matches.subscribe()` call and one copy of the data: the
 first mount starts it, the last unmount cancels it. See
 [Hooks](/docs/ui/mrdoge-sdk/hooks/use-live-match) for the full list.
 
@@ -77,7 +77,7 @@ and it defaults to `authEndpoint: "/api/mrdoge/token"`.
 ## Imperative access
 
 `getMrDogeClient()` returns the same configured singleton every hook uses
-internally — for one-off SDK calls with no matching hook (e.g.
+internally, for one-off SDK calls with no matching hook (e.g.
 `matches.search()`):
 
 ```ts

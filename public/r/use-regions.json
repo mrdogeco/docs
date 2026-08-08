@@ -11,7 +11,7 @@
   "files": [
     {
       "path": "registry/mrdoge-ui/use-regions/use-regions.ts",
-      "content": "// Re-exported from @mrdoge/react — fetched once per unique params, shared\n// by every component asking for the same ones; a later mount reads the\n// cache instead of refetching.\nexport { useRegions, type UseRegionsOptions } from \"@mrdoge/react\"\n",
+      "content": "// Re-exported from @mrdoge/react. Fetched once per unique params, shared\n// by every component asking for the same ones; a later mount reads the\n// cache instead of refetching.\nexport { useRegions, type UseRegionsOptions } from \"@mrdoge/react\"\n",
       "type": "registry:hook"
     },
     {

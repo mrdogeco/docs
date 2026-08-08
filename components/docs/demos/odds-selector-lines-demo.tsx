@@ -22,7 +22,7 @@ export function OddsSelectorLinesDemo() {
   }
 
   const lines = markets ? toOddsLines(markets) : undefined
-  // Odds close once the match ends — same as matchToMatchCardProps, drop
+  // Odds close once the match ends, same as matchToMatchCardProps: drop
   // them rather than freeze on the last live value.
   const showOdds = match?.status !== "completed"
 

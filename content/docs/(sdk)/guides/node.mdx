@@ -1,9 +1,9 @@
 ---
 title: Node.js
-description: Plain Node — scripts, cron jobs, bots, and anything that just needs the SDK.
+description: Plain Node, for scripts, cron jobs, bots, and anything that just needs the SDK.
 ---
 
-The simplest case. No framework, no SSR — just import and go.
+The simplest case. No framework, no SSR, just import and go.
 
 ## Install
 
@@ -76,7 +76,7 @@ process.on("SIGINT", async () => {
 
 ## Cron / scheduled job
 
-For periodic data pulls (every 30 seconds, hourly, whatever), use HTTP — no
+For periodic data pulls (every 30 seconds, hourly, whatever), use HTTP: no
 need to hold a WebSocket open:
 
 ```ts title="cron.ts"
@@ -110,7 +110,7 @@ const all = await mrdoge.matches.listAll(
   },
 );
 
-console.log(`Done — ${all.length} matches`);
+console.log(`Done, ${all.length} matches`);
 ```
 
 ## Process-level abort

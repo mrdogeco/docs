@@ -63,7 +63,7 @@ export function BetSlipDemo() {
   // Adding a 2nd pick defaults to parlay; dropping below 2 forces back to
   // single. Freely switchable in between. BetSlip holds no state of its
   // own, so this lives here. useLayoutEffect (not useEffect) so this
-  // resolves before the browser paints — otherwise the new pick would
+  // resolves before the browser paints, otherwise the new pick would
   // briefly render in single mode for one frame before flipping to
   // parlay.
   const [mode, setMode] = useState<"single" | "parlay">("single")
@@ -159,7 +159,7 @@ export function BetSlipDemo() {
         pickStakes={pickStakes}
         onPickStakeChange={(id, value) => setPickStakes((prev) => ({ ...prev, [id]: value }))}
         onSubmit={() => {
-          // Fake submit — no real endpoint here, just enough to show the states.
+          // Fake submit: no real endpoint here, just enough to show the states.
           setSubmitState("loading")
           setTimeout(() => {
             setSubmitState("success")

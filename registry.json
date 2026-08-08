@@ -43,7 +43,7 @@
       "name": "match-card-compact",
       "type": "registry:component",
       "title": "Match Card Compact",
-      "description": "Minimal match row — overlapping crests plus a label, no score/status/odds.",
+      "description": "Minimal match row: overlapping crests plus a label, no score/status/odds.",
       "registryDependencies": ["entity-image"],
       "files": [
         {
@@ -56,7 +56,7 @@
       "name": "match-highlight",
       "type": "registry:component",
       "title": "Match Highlight",
-      "description": "Detailed match header for a match page — teams, score, live clock, cards, and corners.",
+      "description": "Detailed match header for a match page: teams, score, live clock, cards, and corners.",
       "registryDependencies": ["popover", "match-card-compact"],
       "files": [
         {
@@ -120,7 +120,7 @@
       "name": "bet-slip",
       "type": "registry:component",
       "title": "Bet Slip",
-      "description": "Panel for selected picks — single/parlay mode, optional stake input and computed potential payout.",
+      "description": "Panel for selected picks, with single/parlay mode, optional stake input, and computed potential payout.",
       "registryDependencies": ["button", "input", "match-card-compact"],
       "files": [
         {
@@ -176,7 +176,7 @@
       "name": "stats-list",
       "type": "registry:component",
       "title": "Stats List",
-      "description": "Generic home/away match stats comparison — one row per stat, sport-agnostic.",
+      "description": "Generic home/away match stats comparison, one row per stat, sport-agnostic.",
       "registryDependencies": [],
       "files": [
         {
@@ -219,7 +219,7 @@
       "name": "entity-image",
       "type": "registry:component",
       "title": "Entity Image",
-      "description": "Team or region logo, unstyled — falls back to initials when the image is missing.",
+      "description": "Team or region logo, unstyled; falls back to initials when the image is missing.",
       "registryDependencies": [],
       "files": [
         {
@@ -232,7 +232,7 @@
       "name": "mrdoge-client",
       "type": "registry:lib",
       "title": "Mr. Doge Client",
-      "description": "Browser SDK client singleton, authenticated via short-lived tokens minted by your own backend — never a raw API key.",
+      "description": "Browser SDK client singleton, authenticated via short-lived tokens minted by your own backend, never a raw API key.",
       "dependencies": ["@mrdoge/react"],
       "files": [
         {
@@ -262,7 +262,7 @@
       "name": "use-live-match",
       "type": "registry:hook",
       "title": "useLiveMatch",
-      "description": "Subscribes to a single match over WebSocket — score, status, and clock update in real time as the match progresses.",
+      "description": "Subscribes to a single match over WebSocket: score, status, and clock update in real time as the match progresses.",
       "dependencies": ["@mrdoge/react", "@mrdoge/node", "server-only"],
       "envVars": {
         "MRDOGE_ODDS_API_KEY": ""
@@ -283,7 +283,7 @@
       "name": "use-match",
       "type": "registry:hook",
       "title": "useMatch",
-      "description": "One-shot fetch of a single match — no live updates, unlike useLiveMatch. Call again / remount to refresh.",
+      "description": "One-shot fetch of a single match: no live updates, unlike useLiveMatch. Call again / remount to refresh.",
       "dependencies": ["@mrdoge/react", "@mrdoge/node", "server-only"],
       "envVars": {
         "MRDOGE_ODDS_API_KEY": ""
@@ -304,7 +304,7 @@
       "name": "use-odds",
       "type": "registry:hook",
       "title": "useOdds",
-      "description": "Subscribes to a single match's odds over WebSocket (Business tier) — pre-live or in-play, every matching market updates in place as odds change.",
+      "description": "Subscribes to a single match's odds over WebSocket (Business tier): pre-live or in-play, every matching market updates in place as odds change.",
       "dependencies": ["@mrdoge/react", "@mrdoge/node", "server-only"],
       "envVars": {
         "MRDOGE_ODDS_API_KEY": ""
@@ -401,7 +401,7 @@
       "name": "use-live-matches",
       "type": "registry:hook",
       "title": "useLiveMatches",
-      "description": "Subscribes to matches over WebSocket, filtered by sports/regions/competitions — updates in place as matches start, finish, or change.",
+      "description": "Subscribes to matches over WebSocket, filtered by sports/regions/competitions; updates in place as matches start, finish, or change.",
       "dependencies": ["@mrdoge/react", "@mrdoge/node", "server-only"],
       "envVars": {
         "MRDOGE_ODDS_API_KEY": ""
