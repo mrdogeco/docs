@@ -22,6 +22,8 @@ interface Tier {
   inheritsFrom?: string
   features: string[]
   popular?: boolean
+  /** Stripe Price UUIDs (DB) — checked out at dashboard.mrdoge.co/checkout/[priceId]. Keep in sync with mrdoge-dashboard's lib/sdk-prices.ts. */
+  priceId: { monthly: string; annual: string }
 }
 
 const TIERS: Tier[] = [
@@ -33,6 +35,7 @@ const TIERS: Tier[] = [
     price: "$29.90",
     annualPrice: "$24.99",
     annualTotal: "$299.90",
+    priceId: { monthly: "abb7b0b7-1026-47a9-b475-4474e6bddc40", annual: "c7f1093e-5924-40ba-8896-aa1040305139" },
     features: [
       "Browse matches, teams, competitions",
       "Details & search",
@@ -48,6 +51,7 @@ const TIERS: Tier[] = [
     price: "$59.90",
     annualPrice: "$44.99",
     annualTotal: "$539.90",
+    priceId: { monthly: "3ad1e3df-5af4-40d5-ac5a-2d765f41845d", annual: "0c00a6bc-7473-4edd-8abc-3cc72cbee0b5" },
     inheritsFrom: "Starter",
     popular: true,
     features: [
@@ -67,6 +71,7 @@ const TIERS: Tier[] = [
     discountBadge: "Limited-time price",
     annualPrice: "$133.33",
     annualTotal: "$1,599.90",
+    priceId: { monthly: "cf4011fc-4b87-4989-bad9-fa7ba9071983", annual: "3e851e6f-3688-4e48-97d0-7005bcec724f" },
     inheritsFrom: "Growth",
     features: [
       "Live odds feed (WebSocket)",
@@ -77,10 +82,7 @@ const TIERS: Tier[] = [
   },
 ]
 
-// The real pricing CTAs go through /login -> Stripe checkout in mrdoge-ai.
-// That auth/billing flow doesn't exist in this repo yet (dashboard
-// migration is a separate task), so every tier links to /docs for now.
-const PLACEHOLDER_CTA_HREF = "/docs"
+const DASHBOARD_URL = "https://dashboard.mrdoge.co"
 
 export function SdkPricing() {
   const [frequency, setFrequency] = useState<Frequency>("monthly")
@@ -93,7 +95,7 @@ export function SdkPricing() {
           Pricing
         </span>
         <h2 className="text-3xl font-semibold tracking-tight">
-          Try free for 7 days. Pay when you scale.
+          Try free for 7 days. Then pick the plan that fits.
         </h2>
         <p className="mx-auto max-w-2xl text-muted-foreground">
           Every plan ships the same SDK. Tiers unlock request volume, live
@@ -230,7 +232,7 @@ function TierCard({ tier, isMonthly }: { tier: Tier; isMonthly: boolean }) {
         size="lg"
         className="mt-6 w-full"
       >
-        <Link href={PLACEHOLDER_CTA_HREF}>
+        <Link href={`${DASHBOARD_URL}/checkout/${isMonthly ? tier.priceId.monthly : tier.priceId.annual}`}>
           Start 7-day trial
           <ArrowRight />
         </Link>

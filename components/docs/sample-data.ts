@@ -13,6 +13,12 @@ export const DEMO_MATCH_ID = "45293428"
 // Highlight's "completed" example.
 export const FINISHED_MATCH_ID = "47170270"
 
+// Curated set of real, completed matches for build-time SSG showcases
+// (mrdoge.co's homepage components teaser) — fetched via
+// lib/mrdoge-server.ts's fetchShowcaseMatches. FINISHED_MATCH_ID leads the
+// list since it doubles as the single-match demo used elsewhere.
+export const SHOWCASE_MATCH_IDS = [FINISHED_MATCH_ID, "47170287", "46934657"]
+
 // Typed against the real SDK response shape (satisfies Market[]/TimelineEvent[]/etc),
 // so a schema change in @mrdoge/protocol shows up here as a build failure
 // instead of a silent inaccuracy. Content is still hand-picked for a good

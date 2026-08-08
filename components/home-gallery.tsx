@@ -6,14 +6,13 @@ import { Check, Copy } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { BetSlip } from "@/registry/mrdoge-ui/bet-slip/bet-slip"
-import { MatchCard } from "@/registry/mrdoge-ui/match-card/match-card"
-import { MatchTimeline } from "@/registry/mrdoge-ui/match-timeline/match-timeline"
-import { OddsSelector } from "@/registry/mrdoge-ui/odds-selector/odds-selector"
-import {
-  sampleOdds,
-  sampleTimeline,
-  samplePicks,
-} from "@/components/docs/sample-data"
+import { MatchCard, type MatchCardDataProps } from "@/registry/mrdoge-ui/match-card/match-card"
+import { MatchTimeline, type MatchTimelineEntry } from "@/registry/mrdoge-ui/match-timeline/match-timeline"
+import { OddsSelector, type OddsOption } from "@/registry/mrdoge-ui/odds-selector/odds-selector"
+import { sampleOdds, sampleTimeline, samplePicks } from "@/components/docs/sample-data"
+import { matchToMatchCardPropsWithOdds, toOddsOptions } from "@/lib/mrdoge-adapters/match-card"
+import { matchToMatchTimelineProps } from "@/lib/mrdoge-adapters/match-timeline"
+import type { ShowcaseMatch } from "@/lib/mrdoge-server"
 
 const REGISTRY_URL = "https://mrdoge.co"
 
@@ -70,10 +69,39 @@ function ShowcaseItem({
   )
 }
 
-export function HomeGallery() {
+export function HomeGallery({ showcase }: { showcase: ShowcaseMatch | null }) {
   const [selectedOddsId, setSelectedOddsId] = useState<string | undefined>("home")
   const [picks, setPicks] = useState(samplePicks)
   const [stake, setStake] = useState("")
+
+  // Real match — the 2026 World Cup Final — fetched server-side at build
+  // time (lib/mrdoge-server.ts). Falls back to hand-picked sample data
+  // below if that fetch failed (missing key, build-time network hiccup).
+  const market = showcase?.markets.find((m) => m.betType === "SOCCER_MATCH_RESULT") ?? showcase?.markets[0]
+
+  const matchCardProps: MatchCardDataProps = showcase
+    ? {
+        ...matchToMatchCardPropsWithOdds(showcase.match, market),
+        selectedOddsId,
+        onSelectOdds: setSelectedOddsId,
+      }
+    : {
+        status: "live",
+        elapsed: "63'",
+        home: { name: "Palmeiras" },
+        away: { name: "Flamengo" },
+        homeScore: 2,
+        awayScore: 1,
+        odds: { market: "Match Result", options: sampleOdds },
+        selectedOddsId,
+        onSelectOdds: setSelectedOddsId,
+      }
+
+  const timelineEntries: MatchTimelineEntry[] = showcase
+    ? matchToMatchTimelineProps(showcase.match).entries
+    : sampleTimeline
+
+  const oddsSelectorOptions: OddsOption[] = market ? toOddsOptions(market, { labelFrom: "caption" }) : sampleOdds
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-12 px-6 py-16">
@@ -103,17 +131,7 @@ export function HomeGallery() {
           title="Match Card"
           description="Compact match row with teams, live status, and an optional odds row."
         >
-          <MatchCard
-            status="live"
-            elapsed="63'"
-            home={{ name: "Palmeiras" }}
-            away={{ name: "Flamengo" }}
-            homeScore={2}
-            awayScore={1}
-            odds={{ market: "Match Result", options: sampleOdds }}
-            selectedOddsId={selectedOddsId}
-            onSelectOdds={setSelectedOddsId}
-          />
+          <MatchCard {...matchCardProps} />
         </ShowcaseItem>
 
         <ShowcaseItem
@@ -135,7 +153,7 @@ export function HomeGallery() {
           description="Selectable price buttons with movement and suspended states."
         >
           <OddsSelector
-            options={sampleOdds}
+            options={oddsSelectorOptions}
             selectedId={selectedOddsId}
             onSelect={setSelectedOddsId}
             className="w-full max-w-xs"
@@ -147,7 +165,7 @@ export function HomeGallery() {
           title="Match Timeline"
           description="Chronological feed of match events."
         >
-          <MatchTimeline entries={sampleTimeline} className="w-full max-w-sm" />
+          <MatchTimeline entries={timelineEntries} className="w-full max-w-sm" />
         </ShowcaseItem>
       </div>
     </div>

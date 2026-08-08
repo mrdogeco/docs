@@ -90,7 +90,7 @@ export function InstallTabs({ name }: { name: string }) {
                   lang="tsx"
                   code={readSource(file.path)}
                   codeblock={{
-                    title: "target" in file && file.target ? file.target : file.path.split("/").pop(),
+                    title: (file as { target?: string }).target ?? file.path.split("/").pop(),
                   }}
                 />
               ))}

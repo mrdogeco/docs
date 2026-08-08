@@ -3,6 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { ArrowRight, Check, Copy } from "lucide-react"
+import { DynamicCodeBlock } from "fumadocs-ui/components/dynamic-codeblock"
 
 const INSTALL_COMMAND = "npm i @mrdoge/node"
 
@@ -72,9 +73,9 @@ export function SdkQuickstart() {
         <InstallCommand />
       </div>
 
-      <pre className="mx-auto mt-8 max-w-3xl overflow-x-auto rounded-2xl border bg-muted p-5 text-xs leading-relaxed">
-        <code>{CODE_SAMPLE}</code>
-      </pre>
+      <div className="mx-auto mt-8 max-w-3xl">
+        <DynamicCodeBlock lang="ts" code={CODE_SAMPLE} codeblock={{ title: "index.ts" }} />
+      </div>
 
       <div className="mt-8 flex justify-center">
         <Link

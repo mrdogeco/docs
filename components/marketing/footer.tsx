@@ -13,10 +13,17 @@ const LINK_GROUPS = [
     ],
   },
   {
+    group: "Company",
+    items: [
+      { title: "About", href: "/about" },
+      { title: "FAQs", href: "/faqs" },
+    ],
+  },
+  {
     group: "Legal",
     items: [
-      { title: "Terms", href: "https://mrdoge.co/terms" },
-      { title: "Privacy", href: "https://mrdoge.co/privacy" },
+      { title: "Terms", href: "/terms" },
+      { title: "Privacy", href: "/privacy" },
     ],
   },
 ]
@@ -31,7 +38,7 @@ const SOCIAL_LINKS = [
 
 export function Footer() {
   return (
-    <footer className="mt-24 border-t">
+    <footer className="sm:mt-24 border-t">
       <div className="mx-auto max-w-(--fd-layout-width) px-4 pt-16">
         <div className="grid gap-12 md:grid-cols-5">
           <div className="md:col-span-2">
@@ -56,7 +63,7 @@ export function Footer() {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-6 md:col-span-3">
+          <div className="grid grid-cols-3 gap-6 md:col-span-3">
             {LINK_GROUPS.map((group) => (
               <div key={group.group} className="space-y-4 text-sm">
                 <span className="block font-medium">{group.group}</span>

@@ -120,3 +120,22 @@ export function matchToMatchCardProps(
     odds: match.status === "completed" ? undefined : toMatchCardOdds(market, movementById),
   }
 }
+
+/**
+ * Same as matchToMatchCardProps, but keeps odds even once the match is
+ * completed. matchToMatchCardProps drops them there deliberately — correct
+ * for the live app, where a frozen line would be misleading once betting's
+ * closed. Showcase/marketing usage (mrdoge.co's homepage and /ui gallery)
+ * wants the opposite: proving the SDK still has the data regardless of
+ * match status, suspended lines and all.
+ */
+export function matchToMatchCardPropsWithOdds(
+  match: MatchDetail,
+  market?: Market,
+  movementById?: Record<string, OddsMovement>,
+): MatchCardDataProps {
+  return {
+    ...matchToMatchCardProps(match, market, movementById),
+    odds: toMatchCardOdds(market, movementById),
+  }
+}
