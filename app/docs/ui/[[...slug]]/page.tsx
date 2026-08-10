@@ -10,6 +10,9 @@ import { getMDXComponents } from "@/components/mdx"
 import { PageActions } from "@/components/docs/page-actions"
 import type { Metadata } from "next"
 import { createRelativeLink } from "fumadocs-ui/mdx"
+import { buildMetadata } from "@/lib/seo"
+import { breadcrumbJsonLd, docsBreadcrumbItems } from "@/lib/json-ld"
+import { JsonLd } from "@/components/json-ld"
 
 type PageProps = {
   params: Promise<{ slug?: string[] }>
@@ -31,6 +34,7 @@ export default async function Page(props: PageProps) {
 
   return (
     <DocsPage toc={page.data.toc} full={page.data.full}>
+      <JsonLd data={breadcrumbJsonLd(docsBreadcrumbItems(page.url, page.data.title))} />
       <div className="flex flex-col-reverse items-start gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
         <DocsTitle>{page.data.title}</DocsTitle>
         <PageActions slug={page.slugs} />
@@ -59,8 +63,9 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
   const page = source.getPage(fullSlug(params.slug))
   if (!page) notFound()
 
-  return {
+  return buildMetadata({
     title: page.data.title,
-    description: page.data.description,
-  }
+    description: page.data.description ?? "",
+    path: page.url,
+  })
 }

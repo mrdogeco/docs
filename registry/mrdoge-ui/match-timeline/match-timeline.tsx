@@ -7,7 +7,7 @@ function GoalPostIcon({ className }: { className?: string }) {
   return (
     <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
       width="457.338px" height="457.338px" viewBox="0 0 457.338 457.338"
-      className={className}>
+      className={cn(className, "scale-125")}>
       <g>
         <g>
           <path d="M13.738,345.63c7.59,0,13.739-6.155,13.739-13.737V140.401c7.348,1.741,17.236,5.759,27.429,14.942

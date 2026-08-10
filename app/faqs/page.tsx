@@ -5,6 +5,8 @@ import { Footer } from "@/components/marketing/footer"
 import { HomeLayout } from "fumadocs-ui/layouts/home"
 import { baseOptions } from "@/lib/layout.shared"
 import { buildMetadata } from "@/lib/seo"
+import { faqPageJsonLd } from "@/lib/json-ld"
+import { JsonLd } from "@/components/json-ld"
 
 export const metadata: Metadata = buildMetadata({
   title: "FAQs | Mr. Doge API",
@@ -134,6 +136,7 @@ const faqs = [
 export default function FAQsPage() {
   return (
     <HomeLayout {...baseOptions()}>
+      <JsonLd data={faqPageJsonLd(faqs)} />
       <section className="mx-auto w-full max-w-4xl px-6 py-16">
         <div className="text-center">
           <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">Frequently asked questions</h1>

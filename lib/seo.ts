@@ -13,17 +13,23 @@ export const siteMetadata = {
 
 export const absoluteUrl = (path = "/") => new URL(path, siteMetadata.url).toString()
 
+/** Path to this page's generated OG image — see app/og/route.tsx. */
+export function ogImagePath({ title, description }: { title: string; description: string }): string {
+  const params = new URLSearchParams({ title, description })
+  return `/og?${params.toString()}`
+}
+
 interface BuildMetadataInput {
   title: string
   description: string
   path?: string
-  /** Relative path under /public, e.g. "/og.png". Omit until a real one exists: no OG image beats a broken one. */
+  /** Relative path (or full URL) to a hand-made image, overriding the auto-generated OG image. */
   image?: string
 }
 
 export function buildMetadata({ title, description, path = "/", image }: BuildMetadataInput): Metadata {
   const pageUrl = absoluteUrl(path)
-  const imageUrl = image ? absoluteUrl(image) : undefined
+  const imageUrl = absoluteUrl(image ?? ogImagePath({ title, description }))
 
   return {
     title,
@@ -37,15 +43,15 @@ export function buildMetadata({ title, description, path = "/", image }: BuildMe
       siteName: siteMetadata.name,
       title,
       description,
-      ...(imageUrl && { images: [{ url: imageUrl, width: 1200, height: 630, alt: `${siteMetadata.name} preview` }] }),
+      images: [{ url: imageUrl, width: 1200, height: 630, alt: `${siteMetadata.name} preview` }],
     },
     twitter: {
-      card: imageUrl ? "summary_large_image" : "summary",
+      card: "summary_large_image",
       site: siteMetadata.twitter,
       creator: siteMetadata.twitter,
       title,
       description,
-      ...(imageUrl && { images: [imageUrl] }),
+      images: [imageUrl],
     },
   }
 }
