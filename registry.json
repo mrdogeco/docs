@@ -242,11 +242,25 @@
       ]
     },
     {
+      "name": "rate-limit",
+      "type": "registry:lib",
+      "title": "Rate Limit",
+      "description": "In-memory, per-instance rate limiter for gating routes that have no user session to check instead.",
+      "files": [
+        {
+          "path": "lib/rate-limit.ts",
+          "type": "registry:lib",
+          "target": "lib/rate-limit.ts"
+        }
+      ]
+    },
+    {
       "name": "mrdoge-token-route",
       "type": "registry:item",
       "title": "Mr. Doge Token Route",
       "description": "Server route that mints short-lived SDK tokens for the browser client, using @mrdoge/node and your MRDOGE_ODDS_API_KEY.",
       "dependencies": ["@mrdoge/node", "server-only"],
+      "registryDependencies": ["rate-limit"],
       "envVars": {
         "MRDOGE_ODDS_API_KEY": ""
       },

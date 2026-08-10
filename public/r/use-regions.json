@@ -16,7 +16,7 @@
     },
     {
       "path": "registry/mrdoge-ui/mrdoge-token-route/route.ts",
-      "content": "import \"server-only\"\nimport { NextResponse } from \"next/server\"\nimport { MrDoge } from \"@mrdoge/node\"\n\nlet client: MrDoge | null = null\n\nfunction getClient() {\n  if (!client) {\n    client = new MrDoge({ apiKey: process.env.MRDOGE_ODDS_API_KEY! })\n  }\n  return client\n}\n\nexport async function POST() {\n  const { token, expiresAt } = await getClient().tokens.create()\n  return NextResponse.json({ token, expiresAt })\n}\n",
+      "content": "import \"server-only\"\nimport { NextResponse } from \"next/server\"\nimport { MrDoge } from \"@mrdoge/node\"\nimport { isRateLimited } from \"@/lib/rate-limit\"\n\nlet client: MrDoge | null = null\n\nfunction getClient() {\n  if (!client) {\n    client = new MrDoge({ apiKey: process.env.MRDOGE_ODDS_API_KEY! })\n  }\n  return client\n}\n\n// This site has no user sessions to gate on (public docs/demo widgets),\n// so this follows the SDK's own documented \"anonymous public widget\"\n// pattern (see content/docs/(sdk)/authentication.mdx): rate-limit instead\n// of a session check, and keep the minted token's blast radius short.\nexport async function POST(request: Request) {\n  const ip = request.headers.get(\"x-forwarded-for\")?.split(\",\")[0]?.trim() ?? \"unknown\"\n  if (isRateLimited(ip)) {\n    return NextResponse.json({ error: \"Too many requests\" }, { status: 429 })\n  }\n\n  const { token, expiresAt } = await getClient().tokens.create({ ttl: 300 })\n  return NextResponse.json({ token, expiresAt })\n}\n",
       "type": "registry:page",
       "target": "app/api/mrdoge/token/route.ts"
     }

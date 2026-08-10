@@ -1,0 +1,15 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "rate-limit",
+  "title": "Rate Limit",
+  "description": "In-memory, per-instance rate limiter for gating routes that have no user session to check instead.",
+  "files": [
+    {
+      "path": "lib/rate-limit.ts",
+      "content": "import \"server-only\"\n\n// In-memory, per-instance limiter — imperfect across multiple serverless\n// replicas (each has its own memory), but a real floor against naive\n// scraping/abuse with zero new infra. For a stronger guarantee, put the\n// route behind Vercel Firewall or Cloudflare Rate Limiting too — this is\n// meant as defense in depth, not a replacement for that.\nconst hits = new Map<string, { count: number; resetAt: number }>()\n\n// Sweep expired entries occasionally so `hits` doesn't grow unbounded\n// across the life of a warm instance.\nlet lastSweep = Date.now()\nfunction sweep(now: number) {\n  if (now - lastSweep < 60_000) return\n  lastSweep = now\n  for (const [key, entry] of hits) {\n    if (now > entry.resetAt) hits.delete(key)\n  }\n}\n\nexport function isRateLimited(key: string, { windowMs = 60_000, max = 20 } = {}): boolean {\n  const now = Date.now()\n  sweep(now)\n\n  const entry = hits.get(key)\n  if (!entry || now > entry.resetAt) {\n    hits.set(key, { count: 1, resetAt: now + windowMs })\n    return false\n  }\n\n  entry.count++\n  return entry.count > max\n}\n",
+      "type": "registry:lib",
+      "target": "lib/rate-limit.ts"
+    }
+  ],
+  "type": "registry:lib"
+}
