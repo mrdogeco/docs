@@ -44,9 +44,7 @@ const values = [
 export default function AboutPage() {
   return (
     <HomeLayout {...baseOptions()}>
-      <section className="mx-auto w-full max-w-4xl px-6 pt-20 pb-16 text-center">
-        <Image src="/assets/mrdoge-logo-light.svg" alt="Mr. Doge" width={160} height={36} className="mx-auto dark:hidden" />
-        <Image src="/assets/mrdoge-logo-dark.svg" alt="Mr. Doge" width={160} height={36} className="mx-auto hidden dark:block" />
+      <section className="mx-auto w-full max-w-4xl px-6 pt-32 pb-16 text-center">
         <h1 className="mt-8 text-4xl font-semibold tracking-tight sm:text-6xl">
           Built by developers who got tired of building this themselves.
         </h1>

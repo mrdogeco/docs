@@ -137,7 +137,7 @@ export default function FAQsPage() {
   return (
     <HomeLayout {...baseOptions()}>
       <JsonLd data={faqPageJsonLd(faqs)} />
-      <section className="mx-auto w-full max-w-4xl px-6 py-16">
+      <section className="mx-auto w-full max-w-4xl px-6 pt-32 pb-16">
         <div className="text-center">
           <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">Frequently asked questions</h1>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">

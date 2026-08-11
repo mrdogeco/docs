@@ -24,7 +24,7 @@ export async function GithubStarButton({ repo = "mrdogeco/sdk", count, className
       asChild
       variant="outline"
       size="lg"
-      className={cn("rounded-full border-black/20 bg-white/30 py-3 pr-3 pl-5 text-black backdrop-blur hover:bg-white/50 hover:text-black", className)}
+      className={cn("rounded-full border-black/20 dark:border-black bg-white/30 py-3 pr-3 pl-5 text-black backdrop-blur hover:bg-white/50 hover:text-black", className)}
     >
       <Link href={`https://github.com/${repo}`} target="_blank" rel="noopener noreferrer">
         <SiGithub />

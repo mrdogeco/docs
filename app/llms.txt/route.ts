@@ -25,6 +25,11 @@ ${sdkPages.map(toLink).join("\n")}
 
 ## UI Components (mrdoge-ui)
 
+> Not an npm package. mrdoge-ui is a shadcn/ui-compatible registry:
+> components are copy-paste source code, installed one at a time with
+> \`npx shadcn@latest add https://mrdoge.co/r/<component>.json\`. Browse
+> the full list, live previews, and props at ${absoluteUrl("/ui")}.
+
 ${uiPages.map(toLink).join("\n")}
 `
 

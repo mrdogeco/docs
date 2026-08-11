@@ -33,7 +33,7 @@ export default async function Home() {
         githubButton={
           <GithubStarButton
             repo="mrdogeco/docs"
-            className="rounded-lg border-border bg-background text-foreground backdrop-blur-none hover:bg-muted hover:text-foreground"
+            className="rounded-lg bg-background text-foreground backdrop-blur-none hover:bg-muted hover:text-foreground"
           />
         }
       />

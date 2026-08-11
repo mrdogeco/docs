@@ -1,8 +1,8 @@
 import Link from "next/link"
-import { SiGithub } from "react-icons/si"
 
 import { Button } from "@/components/ui/button"
 import { BrandedCta } from "./branded-cta"
+import { GithubStarButton } from "./github-star-button"
 
 export function SdkCta() {
   return (
@@ -18,21 +18,8 @@ export function SdkCta() {
         <Link href="/docs">Read the docs</Link>
       </Button>
 
-      <Button
-        asChild
-        variant="outline"
-        size="lg"
-        className="rounded-full border-black/20 bg-white/30 px-5 py-3 text-black backdrop-blur hover:bg-white/50 hover:text-black"
-      >
-        <Link
-          href="https://github.com/mrdogeco/sdk"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <SiGithub />
-          Star on GitHub
-        </Link>
-      </Button>
+
+      <GithubStarButton />
     </BrandedCta>
   )
 }

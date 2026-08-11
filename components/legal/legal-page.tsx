@@ -33,7 +33,7 @@ export function LegalPage({ data }: { data: LegalData }) {
   const { title, lastUpdated, noticeTitle, noticeText, sections } = data
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-6 py-16">
+    <div className="mx-auto w-full max-w-3xl px-6 pt-32 pb-16">
       <h1 className="text-center text-4xl font-semibold tracking-tight sm:text-5xl">{title}</h1>
       <p className="mt-4 text-center text-sm text-muted-foreground">Last updated: {lastUpdated}</p>
 

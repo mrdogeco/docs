@@ -89,7 +89,7 @@ export function SdkPricing({ compareHref }: { compareHref?: string } = {}) {
   const isMonthly = frequency === "monthly"
 
   return (
-    <section id="pricing" className="relative mx-auto w-full max-w-5xl px-6 py-16">
+    <section id="pricing" className="relative mx-auto w-full max-w-5xl px-6 pt-32 pb-16">
       {/* Same sunset radial backdrop as mrdoge.ai's pricing section — low
           enough opacity to read on both light and dark theme. */}
       <div
