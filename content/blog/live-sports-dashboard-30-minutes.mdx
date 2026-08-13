@@ -1,0 +1,199 @@
+---
+title: Build a Live Sports Dashboard in 30 Minutes with Mr. Doge
+description: A hands-on walkthrough — live matches, real-time score updates, and a working React dashboard using the Mr. Doge SDK and mrdoge-ui.
+date: "2026-08-14"
+tags: ["tutorial", "react"]
+author: Mr. Doge Team
+image: /assets/mrdoge-blog-1.jpg
+---
+
+Most "live sports dashboard" tutorials fake it: a `setInterval` polling
+loop hitting a REST endpoint every few seconds. It works, technically, but
+it's not actually live, and it doesn't scale past a handful of users
+without hammering someone's rate limit.
+
+This one's real: matches update in place over WebSocket, no polling, and
+by the end you'll have a working dashboard listing today's live soccer
+matches with scores updating as they happen. You'll need a Next.js app
+(App Router) and about 30 minutes.
+
+<Steps>
+
+<Step>
+
+## Get an API key
+
+Mint one in the [dashboard](https://dashboard.mrdoge.co/keys) — every
+plan includes a 7-day trial, no card required to start. You'll get a key
+prefixed `sk_live_…`.
+
+<Callout type="error">
+  Keep this key server-side only. The next step is exactly why: browsers
+  never see it, they get a short-lived token instead.
+</Callout>
+
+</Step>
+
+<Step>
+
+## Mint short-lived tokens for the browser
+
+Install the server-side package:
+
+```bash
+npm i @mrdoge/node
+```
+
+Then expose a route that mints a token on demand. This is a public,
+anonymous dashboard (no user accounts), so we rate-limit the route
+instead of gating it behind a session:
+
+```ts title="app/api/mrdoge/token/route.ts"
+import { MrDoge } from "@mrdoge/node";
+
+const mrdoge = new MrDoge({ apiKey: process.env.MRDOGE_API_KEY! });
+
+export async function POST(req: Request) {
+  // swap in real rate limiting (Vercel Firewall, Cloudflare, etc.)
+  // before this goes anywhere near production traffic
+  const { token, expiresAt } = await mrdoge.tokens.create({ ttl: 300 });
+  return Response.json({ token, expiresAt });
+}
+```
+
+</Step>
+
+<Step>
+
+## Configure the client
+
+Install the browser packages:
+
+```bash
+npm i @mrdoge/client @mrdoge/react
+```
+
+Point the client at the token route once, near your app's entry point:
+
+```ts title="app/mrdoge-config.ts"
+import { configureMrDoge } from "@mrdoge/react";
+
+configureMrDoge({
+  authEndpoint: "/api/mrdoge/token",
+});
+```
+
+```tsx title="app/layout.tsx"
+import "./mrdoge-config";
+// ...rest of your root layout
+```
+
+The SDK calls `authEndpoint` automatically whenever it needs a fresh
+token — first connect, after expiry, after a reconnect. You never touch
+tokens directly again.
+
+</Step>
+
+<Step>
+
+## Render live matches
+
+This is the actual dashboard — one hook, no polling:
+
+```tsx title="components/live-dashboard.tsx"
+"use client";
+
+import { useLiveMatches } from "@mrdoge/react";
+
+export function LiveDashboard() {
+  const matches = useLiveMatches({ sports: ["soccer"] });
+
+  if (matches === undefined) return <p>Loading live matches…</p>;
+  if (matches === null) return <p>Couldn't load live matches right now.</p>;
+  if (matches.length === 0) return <p>Nothing live right now — check back soon.</p>;
+
+  return (
+    <div className="grid gap-3">
+      {matches.map((match) => (
+        <div key={match.id} className="flex items-center justify-between rounded-lg border p-4">
+          <span>
+            {match.homeTeam.name} vs {match.awayTeam.name}
+          </span>
+          <span className="font-semibold tabular-nums">
+            {match.stats?.homeScore ?? 0} – {match.stats?.awayScore ?? 0}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+```
+
+`useLiveMatches` subscribes once and updates in place as scores change —
+every component using the same filters shares one underlying
+subscription, so rendering this in multiple places doesn't multiply your
+connections.
+
+</Step>
+
+<Step>
+
+## Polish it with mrdoge-ui (optional, but free)
+
+The plain `<div>` rows above work, but you don't have to build the card
+UI yourself. [mrdoge-ui](/ui) ships a real `MatchCard` component,
+copy-paste, MIT licensed:
+
+```bash
+npx shadcn@latest add https://mrdoge.co/r/match-card.json
+```
+
+Swap it in and you get team logos, status pills, and score formatting
+for free:
+
+```tsx title="components/live-dashboard.tsx"
+"use client";
+
+import { useLiveMatches } from "@mrdoge/react";
+import { MatchCard } from "@/components/match-card";
+
+export function LiveDashboard() {
+  const matches = useLiveMatches({ sports: ["soccer"] });
+
+  if (!matches) return null;
+
+  return (
+    <div className="grid gap-3 sm:grid-cols-2">
+      {matches.map((match) => (
+        <MatchCard
+          key={match.id}
+          status={match.status}
+          home={{ name: match.homeTeam.name }}
+          away={{ name: match.awayTeam.name }}
+          homeScore={match.stats?.homeScore}
+          awayScore={match.stats?.awayScore}
+        />
+      ))}
+    </div>
+  );
+}
+```
+
+</Step>
+
+</Steps>
+
+## What you built
+
+A dashboard that updates in place as goals happen, with zero polling
+code and zero manual reconnect logic — the SDK handles both. Everything
+here runs on the same free trial tier; nothing in this tutorial requires
+a paid plan.
+
+## Next steps
+
+<Cards>
+  <Card href="/docs/quickstart" title="Quickstart →" description="The same flow from the server side, plus AI recommendations." />
+  <Card href="/ui" title="Browse mrdoge-ui →" description="Every component, live previews, copy-paste install." />
+  <Card href="/docs/concepts/transports" title="How transports work →" description="HTTP, WebSocket, and the cold-start race under the hood." />
+</Cards>

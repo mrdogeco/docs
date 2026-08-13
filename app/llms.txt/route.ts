@@ -1,4 +1,5 @@
 import { source } from "@/lib/source"
+import { blogSource } from "@/lib/blog-source"
 import { absoluteUrl, siteMetadata } from "@/lib/seo"
 
 // The llms.txt convention (llmstxt.org): a curated index linking out to
@@ -31,6 +32,10 @@ ${sdkPages.map(toLink).join("\n")}
 > the full list, live previews, and props at ${absoluteUrl("/ui")}.
 
 ${uiPages.map(toLink).join("\n")}
+
+## Blog
+
+${blogSource.getPages().map(toLink).join("\n")}
 `
 
   return new Response(body, {

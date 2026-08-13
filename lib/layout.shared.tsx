@@ -92,6 +92,7 @@ export function baseOptions(variant: "sdk" | "ui" = "sdk"): BaseLayoutProps {
     links: [
       { text: "Documentation", url: "/docs" },
       { text: "Components", url: "/ui" },
+      { text: "Blog", url: "/blog" },
       { text: "Pricing", url: "/pricing" },
       ...(variant === "ui" ? [] : [DASHBOARD_LINK]),
       githubLink(variant === "ui" ? UI_GITHUB : SDK_GITHUB),
@@ -109,6 +110,7 @@ export function docsOptions(isUiRoot: boolean): BaseLayoutProps {
   return {
     nav: NAV_TITLE,
     links: [
+      { text: "Blog", url: "/blog" },
       ...(isUiRoot
         ? []
         : [

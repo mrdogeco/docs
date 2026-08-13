@@ -11,6 +11,7 @@ const LINK_GROUPS = [
     items: [
       { title: "Documentation", href: "/docs" },
       { title: "Components", href: "/ui" },
+      { title: "Blog", href: "/blog" },
       { title: "Pricing", href: "/pricing" },
     ],
   },

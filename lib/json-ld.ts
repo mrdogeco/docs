@@ -67,6 +67,38 @@ export function docsBreadcrumbItems(pageUrl: string, title: string): { name: str
   })
 }
 
+export function blogPostingJsonLd({
+  title,
+  description,
+  path,
+  date,
+  author,
+  image,
+}: {
+  title: string
+  description: string
+  path: string
+  date: string
+  author?: string
+  image: string
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: title,
+    description,
+    url: absoluteUrl(path),
+    datePublished: date,
+    image: absoluteUrl(image),
+    author: { "@type": "Organization", name: author ?? siteMetadata.name },
+    publisher: {
+      "@type": "Organization",
+      name: siteMetadata.name,
+      logo: { "@type": "ImageObject", url: absoluteUrl("/assets/mrdoge-logo-dark.svg") },
+    },
+  }
+}
+
 interface FaqCategory {
   category: string
   questions: { question: string; answer: string }[]

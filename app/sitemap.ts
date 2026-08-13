@@ -1,8 +1,9 @@
 import type { MetadataRoute } from "next"
 import { source } from "@/lib/source"
+import { blogSource } from "@/lib/blog-source"
 import { absoluteUrl } from "@/lib/seo"
 
-const staticRoutes = ["/", "/ui", "/pricing", "/about", "/faqs", "/terms", "/privacy"]
+const staticRoutes = ["/", "/ui", "/blog", "/pricing", "/about", "/faqs", "/terms", "/privacy"]
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date()
@@ -21,5 +22,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.8,
   }))
 
-  return [...staticEntries, ...docEntries]
+  const blogEntries: MetadataRoute.Sitemap = blogSource.getPages().map((page) => ({
+    url: absoluteUrl(page.url),
+    lastModified: new Date(page.data.date),
+    changeFrequency: "monthly",
+    priority: 0.7,
+  }))
+
+  return [...staticEntries, ...docEntries, ...blogEntries]
 }

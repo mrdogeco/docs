@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button"
 import { bungee } from "@/lib/fonts"
 import { cn } from "@/lib/utils"
 import { GithubStarButton } from "./github-star-button"
-import { ProductHuntBanner } from "./product-hunt-banner"
 import { SunglassesScene } from "./sunglasses-scene"
 import Grainient from "./grainient"
 
@@ -46,15 +45,13 @@ export function SdkHero() {
           className="hidden dark:block"
         />
 
-        <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col items-center px-3 pt-8 pb-20 text-center sm:px-6 sm:pt-12 sm:pb-16">
-          <ProductHuntBanner />
-
+        <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col items-center px-3 pt-16 pb-20 text-center sm:px-6 sm:pt-12 sm:pb-16">
           <div className="h-40 w-full max-w-2xs sm:h-72 sm:max-w-lg">
             <SunglassesScene zoom={1.6} />
           </div>
 
           <h1 className={cn("text-balance text-5xl font-bold tracking-tight text-black sm:text-8xl", TITLE_CLASSNAME)}>
-            The <span className="text-[#EC4899] dark:text-[#FADFAD] drop-shadow-xs drop-shadow-black/50">odds</span> in
+            The <span className="text-[#EC4899] dark:text-[#FFFFFF] drop-shadow-xs drop-shadow-black/50">odds</span> in
             <br />
             your favor
           </h1>

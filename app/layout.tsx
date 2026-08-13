@@ -5,6 +5,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { siteMetadata } from "@/lib/seo";
 import { organizationJsonLd, softwareApplicationJsonLd } from "@/lib/json-ld";
 import { JsonLd } from "@/components/json-ld";
+import { RedditPixel } from "@/components/reddit-pixel";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -39,6 +40,7 @@ export default function RootLayout({
         <JsonLd data={[organizationJsonLd(), softwareApplicationJsonLd()]} />
         <RootProvider>{children}</RootProvider>
         <Analytics />
+        <RedditPixel />
       </body>
     </html>
   );
